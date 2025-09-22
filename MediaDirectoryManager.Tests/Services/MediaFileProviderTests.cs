@@ -1,6 +1,7 @@
 using MediaOrganizer.Services;
 using MediaOrganizer.Configuration;
 using System.IO.Abstractions.TestingHelpers;
+using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Tests.Services;
 
@@ -20,7 +21,7 @@ public class MediaFileProviderTests
     {
         // Arrange
         const string nonExistentPath = @"C:\NonExistent";
-        var sut = new MediaFileProvider(_mockFileSystem, _settings);
+        var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
 
         // Act & Assert
         Assert.Throws<DirectoryNotFoundException>(() => sut.GetMediaFiles(nonExistentPath).ToList());
@@ -42,7 +43,7 @@ public class MediaFileProviderTests
         _mockFileSystem.AddFile(documentFile, new MockFileData(""));
         _mockFileSystem.AddFile(movieFile, new MockFileData(""));
         _mockFileSystem.AddFile(musicFile, new MockFileData(""));
-        var sut = new MediaFileProvider(_mockFileSystem, _settings);
+        var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
 
         // Act
         var result = sut.GetMediaFiles(mediaPath);
@@ -66,8 +67,9 @@ public class MediaFileProviderTests
 
         _mockFileSystem.AddFile(videoFile, new MockFileData(""));
         _mockFileSystem.AddFile(subfolderMovieFile, new MockFileData(""));
-        var settings = new MediaOrganizerSettings { IncludeSubdirectories = true };
-        var sut = new MediaFileProvider(_mockFileSystem, settings);
+        _settings.IncludeSubdirectories = true;
+
+        var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
 
         // Act
         var result = sut.GetMediaFiles(mediaPath);
@@ -88,8 +90,9 @@ public class MediaFileProviderTests
 
         _mockFileSystem.AddFile(videoFile, new MockFileData(""));
         _mockFileSystem.AddFile(subfolderMovieFile, new MockFileData(""));
-        var settings = new MediaOrganizerSettings { IncludeSubdirectories = false };
-        var sut = new MediaFileProvider(_mockFileSystem, settings);
+        _settings.IncludeSubdirectories = false;
+        
+        var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
 
         // Act
         var result = sut.GetMediaFiles(mediaPath);
@@ -109,7 +112,7 @@ public class MediaFileProviderTests
 
         _mockFileSystem.AddFile(videoFileUpper, new MockFileData(""));
         _mockFileSystem.AddFile(movieFileMixed, new MockFileData(""));
-        var sut = new MediaFileProvider(_mockFileSystem, _settings);
+        var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
 
         // Act
         var result = sut.GetMediaFiles(mediaPath);

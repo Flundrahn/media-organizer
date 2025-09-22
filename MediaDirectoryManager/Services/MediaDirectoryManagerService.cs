@@ -1,5 +1,6 @@
 using MediaOrganizer.Configuration;
 using MediaOrganizer.Output;
+using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Services;
 
@@ -9,10 +10,10 @@ public class MediaOrganizerService
     private readonly MediaOrganizerSettings _settings;
     private readonly IMediaFileProvider _mediaFileProvider;
 
-    public MediaOrganizerService(IOutputWriter output, MediaOrganizerSettings settings, IMediaFileProvider mediaFileProvider)
+    public MediaOrganizerService(IOutputWriter output, IOptions<MediaOrganizerSettings> settings, IMediaFileProvider mediaFileProvider)
     {
         _output = output;
-        _settings = settings;
+        _settings = settings.Value;
         _mediaFileProvider = mediaFileProvider;
     }
 

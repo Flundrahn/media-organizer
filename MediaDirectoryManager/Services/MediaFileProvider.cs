@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using MediaOrganizer.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Services;
 
@@ -17,10 +18,10 @@ public class MediaFileProvider : IMediaFileProvider
         ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".3gp"
     };
 
-    public MediaFileProvider(IFileSystem fileSystem, MediaOrganizerSettings settings)
+    public MediaFileProvider(IFileSystem fileSystem, IOptions<MediaOrganizerSettings> settings)
     {
         _fileSystem = fileSystem;
-        _includeSubdirectories = settings.IncludeSubdirectories;
+        _includeSubdirectories = settings.Value.IncludeSubdirectories;
     }
 
     public IEnumerable<string> GetMediaFiles(string directoryPath)

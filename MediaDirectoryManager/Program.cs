@@ -4,6 +4,7 @@ using MediaOrganizer.Services;
 using MediaOrganizer.Validations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System.IO.Abstractions;
 
 var configuration = new ConfigurationBuilder()
@@ -12,7 +13,20 @@ var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
     .Build();
 
-var settings = configuration.GetSection(MediaOrganizerSettings.SectionName).Get<MediaOrganizerSettings>();
+var services = new ServiceCollection();
+var serviceProvider = services
+    .AddSingleton<IConfiguration>(configuration)
+    .Configure<MediaOrganizerSettings>(configuration.GetSection(MediaOrganizerSettings.SectionName))
+    .AddSingleton<IOutputWriter, ConsoleOutputWriter>()
+    .AddTransient<IFileSystem, FileSystem>()
+    .AddTransient<FileSystemValidator>()
+    .AddTransient<IMediaFileProvider, MediaFileProvider>()
+    .AddTransient<MediaOrganizerService>()
+    .BuildServiceProvider();
+
+// Validate settings early
+var settingsOptions = serviceProvider.GetRequiredService<IOptions<MediaOrganizerSettings>>();
+var settings = settingsOptions.Value;
 
 if (settings is null)
 {
@@ -20,23 +34,10 @@ if (settings is null)
     return 1;
 }
 
-var services = new ServiceCollection();
-var serviceProvider = services
-    .AddSingleton<IOutputWriter, ConsoleOutputWriter>()
-    .AddTransient<IFileSystem, FileSystem>()
-    .AddTransient<FileSystemValidator>()
-    .AddSingleton(settings) // Register the settings instance
-    .AddTransient<IMediaFileProvider, MediaFileProvider>()
-    .AddTransient<MediaOrganizerService>()
-    .BuildServiceProvider();
-
-var output = serviceProvider.GetRequiredService<IOutputWriter>();
+// Set the validator on the settings
 var validator = serviceProvider.GetRequiredService<FileSystemValidator>();
-
-// Set the validator on the settings, cannot inject because needs parameterless ctor, could put in factory but keep simple for now
 settings.SetValidator(validator);
 
-var mediaFileProvider = serviceProvider.GetRequiredService<IMediaFileProvider>();
-var mediaService = new MediaOrganizerService(output, settings, mediaFileProvider);
+var mediaService = serviceProvider.GetRequiredService<MediaOrganizerService>();
 
 return mediaService.Run();

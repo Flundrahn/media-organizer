@@ -6,7 +6,7 @@ namespace MediaOrganizer.Services;
 
 public interface IMediaFileProvider
 {
-    IEnumerable<string> GetMediaFiles(string directoryPath);
+    IEnumerable<IFileInfo> GetMediaFiles(string directoryPath);
 }
 
 public class MediaFileProvider : IMediaFileProvider
@@ -24,7 +24,7 @@ public class MediaFileProvider : IMediaFileProvider
         _includeSubdirectories = settings.Value.IncludeSubdirectories;
     }
 
-    public IEnumerable<string> GetMediaFiles(string directoryPath)
+    public IEnumerable<IFileInfo> GetMediaFiles(string directoryPath)
     {
         if (!_fileSystem.Directory.Exists(directoryPath))
             throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");
@@ -37,10 +37,10 @@ public class MediaFileProvider : IMediaFileProvider
 
         foreach (var file in files)
         {
-            var extension = _fileSystem.Path.GetExtension(file);
-            if (_videoExtensions.Contains(extension))
+            var fileInfo = _fileSystem.FileInfo.New(file);
+            if (_videoExtensions.Contains(fileInfo.Extension))
             {
-                yield return file;
+                yield return fileInfo;
             }
         }
     }

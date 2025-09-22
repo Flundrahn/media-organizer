@@ -87,18 +87,18 @@ public class MediaOrganizerService
         try
         {
             var files = _mediaFileProvider.GetMediaFiles(_settings.SourceDirectory);
-            
-            if (files.Any())
-            {
-                _output.WriteSuccess($"Found {files.Count()} video file(s):");
-                foreach (var file in files)
-                {
-                    _output.WriteLine($"   • {file}");
-                }
-            }
-            else
+
+            if (!files.Any())
             {
                 _output.WriteLine("No video files found.");
+                return;
+            }
+
+            _output.WriteSuccess($"Found {files.Count()} video file(s):");
+            foreach (var file in files)
+            {
+                var fileSize = FormatFileSize(file.Length);
+                _output.WriteLine($"   • {file.Name} ({fileSize}) - {file.FullName}");
             }
         }
         catch (Exception ex)
@@ -118,5 +118,18 @@ public class MediaOrganizerService
         {
             return 0;
         }
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
+        int counter = 0;
+        decimal number = bytes;
+        while (Math.Round(number / 1024) >= 1)
+        {
+            number /= 1024;
+            counter++;
+        }
+        return $"{number:n1}{suffixes[counter]}";
     }
 }

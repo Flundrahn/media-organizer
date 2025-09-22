@@ -46,15 +46,15 @@ public class MediaFileProviderTests
         var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
 
         // Act
-        var result = sut.GetMediaFiles(mediaPath);
+        var result = sut.GetMediaFiles(mediaPath).ToList();
 
         // Assert
-        Assert.Equal(2, result.Count());
-        Assert.Contains(videoFile, result);
-        Assert.Contains(movieFile, result);
-        Assert.DoesNotContain(photoFile, result);
-        Assert.DoesNotContain(documentFile, result);
-        Assert.DoesNotContain(musicFile, result);
+        Assert.Equal(2, result.Count);
+        Assert.Contains(result, f => f.FullName == videoFile);
+        Assert.Contains(result, f => f.FullName == movieFile);
+        Assert.DoesNotContain(result, f => f.FullName == photoFile);
+        Assert.DoesNotContain(result, f => f.FullName == documentFile);
+        Assert.DoesNotContain(result, f => f.FullName == musicFile);
     }
 
     [Fact]
@@ -72,12 +72,12 @@ public class MediaFileProviderTests
         var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
 
         // Act
-        var result = sut.GetMediaFiles(mediaPath);
+        var result = sut.GetMediaFiles(mediaPath).ToList();
 
         // Assert
-        Assert.Equal(2, result.Count());
-        Assert.Contains(videoFile, result);
-        Assert.Contains(subfolderMovieFile, result);
+        Assert.Equal(2, result.Count);
+        Assert.Contains(result, f => f.FullName == videoFile);
+        Assert.Contains(result, f => f.FullName == subfolderMovieFile);
     }
 
     [Fact]
@@ -95,11 +95,11 @@ public class MediaFileProviderTests
         var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
 
         // Act
-        var result = sut.GetMediaFiles(mediaPath);
+        var result = sut.GetMediaFiles(mediaPath).ToList();
 
         // Assert
         Assert.Single(result);
-        Assert.Contains(videoFile, result);
+        Assert.Contains(result, f => f.FullName == videoFile);
     }
 
     [Fact]
@@ -115,9 +115,9 @@ public class MediaFileProviderTests
         var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
 
         // Act
-        var result = sut.GetMediaFiles(mediaPath);
+        var result = sut.GetMediaFiles(mediaPath).ToList();
 
         // Assert
-        Assert.Equal(2, result.Count());
+        Assert.Equal(2, result.Count);
     }
 }

@@ -2,11 +2,11 @@ using System.IO.Abstractions;
 
 namespace MediaDirectoryManager.Validations;
 
-public class FileSystemValidations
+public class FileSystemValidator
 {
     private readonly IFileSystem _fileSystem;
 
-    public FileSystemValidations(IFileSystem fileSystem)
+    public FileSystemValidator(IFileSystem fileSystem)
     {
         _fileSystem = fileSystem;
     }

@@ -3,15 +3,15 @@ using System.IO.Abstractions.TestingHelpers;
 
 namespace MediaDirectoryManager.Tests.Validations;
 
-public class FileSystemValidationsTests
+public class FileSystemValidatorTests
 {
     private MockFileSystem _mockFileSystem;
-    private FileSystemValidations _sut;
+    private FileSystemValidator _sut;
 
-    public FileSystemValidationsTests()
+    public FileSystemValidatorTests()
     {
         _mockFileSystem = new MockFileSystem();
-        _sut = new FileSystemValidations(_mockFileSystem);
+        _sut = new FileSystemValidator(_mockFileSystem);
     }
 
     [Fact]

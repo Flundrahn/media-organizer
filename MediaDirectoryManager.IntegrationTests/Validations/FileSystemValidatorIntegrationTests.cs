@@ -7,15 +7,15 @@ namespace MediaDirectoryManager.IntegrationTests.Validations;
 /// Integration tests for FileSystemValidations using real file system I/O
 /// Focus: Critical real-world scenarios that mocks cannot adequately test
 /// </summary>
-public class FileSystemValidationsIntegrationTests : IDisposable
+public class FileSystemValidatorIntegrationTests : IDisposable
 {
-    private readonly FileSystemValidations _sut;
+    private readonly FileSystemValidator _sut;
     private readonly string _testDirectory;
 
-    public FileSystemValidationsIntegrationTests()
+    public FileSystemValidatorIntegrationTests()
     {
         var fileSystem = new FileSystem();
-        _sut = new FileSystemValidations(fileSystem);
+        _sut = new FileSystemValidator(fileSystem);
         
         _testDirectory = Directory.CreateTempSubdirectory("MediaDirectoryManagerTests_").FullName;
         Directory.CreateDirectory(_testDirectory);

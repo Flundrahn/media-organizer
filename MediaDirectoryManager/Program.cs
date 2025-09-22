@@ -17,13 +17,13 @@ var serviceProvider = services
     .Configure<MediaOrganizerSettings>(configuration.GetSection(MediaOrganizerSettings.SectionName))
     .AddSingleton<IOutputWriter, ConsoleOutputWriter>()
     .AddTransient<IFileSystem, FileSystem>()
-    .AddTransient<FileSystemValidations>()
+    .AddTransient<FileSystemValidator>()
     .AddTransient<MediaDirectoryManagerService>()
     .BuildServiceProvider();
 
 var settings = configuration.GetSection(MediaOrganizerSettings.SectionName).Get<MediaOrganizerSettings>();
 var output = serviceProvider.GetRequiredService<IOutputWriter>();
-var validator = serviceProvider.GetRequiredService<FileSystemValidations>();
+var validator = serviceProvider.GetRequiredService<FileSystemValidator>();
 
 if (settings is null)
 {

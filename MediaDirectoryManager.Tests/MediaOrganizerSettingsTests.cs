@@ -7,13 +7,13 @@ namespace MediaDirectoryManager.Tests;
 public class MediaOrganizerSettingsTests
 {
     private readonly MockFileSystem _mockFileSystem;
-    private readonly FileSystemValidations _validator;
+    private readonly FileSystemValidator _validator;
     private readonly MediaOrganizerSettings _sut;
 
     public MediaOrganizerSettingsTests()
     {
         _mockFileSystem = new MockFileSystem();
-        _validator = new FileSystemValidations(_mockFileSystem);
+        _validator = new FileSystemValidator(_mockFileSystem);
         _sut = new MediaOrganizerSettings();
         _sut.SetValidator(_validator);
     }

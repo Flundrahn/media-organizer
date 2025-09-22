@@ -8,7 +8,7 @@ namespace MediaDirectoryManager.Configuration;
 public class MediaOrganizerSettings
 {
     private List<string> _validationErrors = [];
-    private FileSystemValidations? _validator;
+    private FileSystemValidator? _validator;
 
     public const string SectionName = "MediaOrganizer";
 
@@ -29,7 +29,7 @@ public class MediaOrganizerSettings
 
     public ICollection<string> GetValidationErrors() => _validationErrors;
 
-    public void SetValidator(FileSystemValidations validator)
+    public void SetValidator(FileSystemValidator validator)
     {
         _validator = validator;
     }

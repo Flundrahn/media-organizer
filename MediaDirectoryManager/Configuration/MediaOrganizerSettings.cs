@@ -1,3 +1,5 @@
+using MediaDirectoryManager.Validations;
+
 namespace MediaDirectoryManager.Configuration;
 
 /// <summary>
@@ -5,6 +7,9 @@ namespace MediaDirectoryManager.Configuration;
 /// </summary>
 public class MediaOrganizerSettings
 {
+    private List<string> _validationErrors = [];
+    private FileSystemValidations? _validator;
+
     public const string SectionName = "MediaOrganizer";
 
     /// <summary>
@@ -22,30 +27,49 @@ public class MediaOrganizerSettings
     /// </summary>
     public bool DryRun { get; set; } = true;
 
+    public ICollection<string> GetValidationErrors() => _validationErrors;
+
+    public void SetValidator(FileSystemValidations validator)
+    {
+        _validator = validator;
+    }
+
     /// <summary>
     /// Validates the configuration settings
     /// </summary>
     /// <returns>True if configuration is valid</returns>
     public bool IsValid()
     {
-        return !string.IsNullOrWhiteSpace(SourceDirectory) && 
-               !string.IsNullOrWhiteSpace(DestinationDirectory);
-    }
+        if (_validator is null)
+        {
+            throw new InvalidOperationException("Validator must be set.");
+        }
 
-    /// <summary>
-    /// Gets validation error messages
-    /// </summary>
-    /// <returns>List of validation errors</returns>
-    public List<string> GetValidationErrors()
-    {
-        var errors = new List<string>();
+        _validationErrors.Clear();
+        var isValid = true;
 
         if (string.IsNullOrWhiteSpace(SourceDirectory))
-            errors.Add("SourceDirectory is required");
+        {
+            _validationErrors.Add("SourceDirectory is required");
+            isValid = false;
+        }
+        else if (!_validator.DirectoryExists(SourceDirectory))
+        {
+            _validationErrors.Add("SourceDirectory does not exist");
+            isValid = false;
+        }
 
         if (string.IsNullOrWhiteSpace(DestinationDirectory))
-            errors.Add("DestinationDirectory is required");
+        {
+            _validationErrors.Add("DestinationDirectory is required");
+            isValid = false;
+        }
+        else if (!_validator.DirectoryIsWriteable(DestinationDirectory))
+        {
+            _validationErrors.Add("DestinationDirectory is not writable or cannot be created");
+            isValid = false;
+        }
 
-        return errors;
+        return isValid;
     }
 }

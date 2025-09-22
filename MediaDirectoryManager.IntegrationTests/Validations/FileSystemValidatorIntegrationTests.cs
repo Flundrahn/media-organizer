@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
-using MediaDirectoryManager.Validations;
+using MediaOrganizer.Validations;
 
-namespace MediaDirectoryManager.IntegrationTests.Validations;
+namespace MediaOrganizer.IntegrationTests.Validations;
 
 /// <summary>
 /// Integration tests for FileSystemValidations using real file system I/O

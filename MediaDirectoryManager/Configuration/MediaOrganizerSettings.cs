@@ -1,6 +1,6 @@
-using MediaDirectoryManager.Validations;
+using MediaOrganizer.Validations;
 
-namespace MediaDirectoryManager.Configuration;
+namespace MediaOrganizer.Configuration;
 
 /// <summary>
 /// Configuration settings for the Media Organizer application

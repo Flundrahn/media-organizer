@@ -1,7 +1,7 @@
-using MediaDirectoryManager.Validations;
+using MediaOrganizer.Validations;
 using System.IO.Abstractions.TestingHelpers;
 
-namespace MediaDirectoryManager.Tests.Validations;
+namespace MediaOrganizer.Tests.Validations;
 
 public class FileSystemValidatorTests
 {

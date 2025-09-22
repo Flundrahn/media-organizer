@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
-using MediaDirectoryManager.Configuration;
+using MediaOrganizer.Configuration;
 
-namespace MediaDirectoryManager.Services;
+namespace MediaOrganizer.Services;
 
 public interface IMediaFileProvider
 {

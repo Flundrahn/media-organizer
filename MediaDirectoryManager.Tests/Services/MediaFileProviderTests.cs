@@ -1,8 +1,8 @@
-using MediaDirectoryManager.Services;
-using MediaDirectoryManager.Configuration;
+using MediaOrganizer.Services;
+using MediaOrganizer.Configuration;
 using System.IO.Abstractions.TestingHelpers;
 
-namespace MediaDirectoryManager.Tests.Services;
+namespace MediaOrganizer.Tests.Services;
 
 public class MediaFileProviderTests
 {

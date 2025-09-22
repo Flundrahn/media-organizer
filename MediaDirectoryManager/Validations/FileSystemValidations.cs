@@ -1,6 +1,6 @@
 using System.IO.Abstractions;
 
-namespace MediaDirectoryManager.Validations;
+namespace MediaOrganizer.Validations;
 
 public class FileSystemValidator
 {

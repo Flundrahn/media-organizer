@@ -1,14 +1,14 @@
-using MediaDirectoryManager.Configuration;
-using MediaDirectoryManager.Output;
+using MediaOrganizer.Configuration;
+using MediaOrganizer.Output;
 
-namespace MediaDirectoryManager.Services;
+namespace MediaOrganizer.Services;
 
-public class MediaDirectoryManagerService
+public class MediaOrganizerService
 {
     private readonly IOutputWriter _output;
     private readonly MediaOrganizerSettings _settings;
 
-    public MediaDirectoryManagerService(IOutputWriter output, MediaOrganizerSettings settings)
+    public MediaOrganizerService(IOutputWriter output, MediaOrganizerSettings settings)
     {
         _output = output;
         _settings = settings;
@@ -16,7 +16,7 @@ public class MediaDirectoryManagerService
 
     public int Run()
     {
-        _output.WriteLine("Media Directory Manager");
+        _output.WriteLine("Media Organizer");
         _output.WriteLine("======================");
 
         if (!_settings.IsValid())

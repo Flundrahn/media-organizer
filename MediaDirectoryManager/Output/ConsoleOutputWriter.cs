@@ -1,4 +1,4 @@
-namespace MediaDirectoryManager.Output;
+namespace MediaOrganizer.Output;
 
 public class ConsoleOutputWriter : IOutputWriter
 {

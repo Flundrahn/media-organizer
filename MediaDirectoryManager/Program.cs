@@ -1,7 +1,7 @@
-﻿using MediaDirectoryManager.Configuration;
-using MediaDirectoryManager.Output;
-using MediaDirectoryManager.Services;
-using MediaDirectoryManager.Validations;
+﻿using MediaOrganizer.Configuration;
+using MediaOrganizer.Output;
+using MediaOrganizer.Services;
+using MediaOrganizer.Validations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO.Abstractions;
@@ -19,7 +19,7 @@ var serviceProvider = services
     .AddTransient<IFileSystem, FileSystem>()
     .AddTransient<FileSystemValidator>()
     .AddTransient<IMediaFileProvider, MediaFileProvider>()
-    .AddTransient<MediaDirectoryManagerService>()
+    .AddTransient<MediaOrganizerService>()
     .BuildServiceProvider();
 
 var settings = configuration.GetSection(MediaOrganizerSettings.SectionName).Get<MediaOrganizerSettings>();
@@ -35,6 +35,6 @@ if (settings is null)
 // Set the validator on the settings, cannot inject because needs parameterless ctor, could put in factory but keep simple for now
 settings.SetValidator(validator);
 
-var mediaService = new MediaDirectoryManagerService(output, settings);
+var mediaService = new MediaOrganizerService(output, settings);
 
 return mediaService.Run();

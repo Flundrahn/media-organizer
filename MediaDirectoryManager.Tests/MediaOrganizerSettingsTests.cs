@@ -1,8 +1,8 @@
-using MediaDirectoryManager.Configuration;
-using MediaDirectoryManager.Validations;
+using MediaOrganizer.Configuration;
+using MediaOrganizer.Validations;
 using System.IO.Abstractions.TestingHelpers;
 
-namespace MediaDirectoryManager.Tests;
+namespace MediaOrganizer.Tests;
 
 public class MediaOrganizerSettingsTests
 {

@@ -27,6 +27,11 @@ public class MediaOrganizerSettings
     /// </summary>
     public bool DryRun { get; set; } = true;
 
+    /// <summary>
+    /// When true, includes all subdirectories when searching for media files
+    /// </summary>
+    public bool IncludeSubdirectories { get; set; } = true;
+
     public ICollection<string> GetValidationErrors() => _validationErrors;
 
     public void SetValidator(FileSystemValidator validator)

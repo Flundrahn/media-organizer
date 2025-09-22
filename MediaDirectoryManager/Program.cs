@@ -18,6 +18,7 @@ var serviceProvider = services
     .AddSingleton<IOutputWriter, ConsoleOutputWriter>()
     .AddTransient<IFileSystem, FileSystem>()
     .AddTransient<FileSystemValidator>()
+    .AddTransient<IMediaFileProvider, MediaFileProvider>()
     .AddTransient<MediaDirectoryManagerService>()
     .BuildServiceProvider();
 

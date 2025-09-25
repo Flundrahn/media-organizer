@@ -101,8 +101,7 @@ public class MediaOrganizerService
             _output.WriteSuccess($"Found {files.Count()} video file(s):");
             foreach (var file in files)
             {
-                var fileSize = FormatFileSize(file.Length);
-                _output.WriteLine($"   • {file.Name} ({fileSize}) - {file.FullName}");
+                _output.WriteLine($"   {file.FullName}");
             }
         }
         catch (Exception ex)

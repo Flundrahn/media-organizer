@@ -18,6 +18,6 @@ public interface ITvShowEpisodeParser
     /// Parses TV show episode information from a filename
     /// </summary>
     /// <param name="filename">The filename to parse</param>
-    /// <returns>Episode information, or invalid EpisodeInfo if parsing fails</returns>
-    EpisodeInfo Parse(string filename);
+    /// <returns>Episode information, or invalid TvShowEpisode if parsing fails</returns>
+    TvShowEpisode Parse(string filename);
 }

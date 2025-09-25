@@ -3,7 +3,7 @@ namespace MediaOrganizer.Models;
 /// <summary>
 /// Contains information about a TV show episode parsed from a filename
 /// </summary>
-public class EpisodeInfo
+public class TvShowEpisode
 {
     /// <summary>
     /// The name of the TV show
@@ -23,7 +23,7 @@ public class EpisodeInfo
     /// <summary>
     /// The title of the episode, if available in the filename
     /// </summary>
-    public string EpisodeTitle { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
     /// The year of the show, useful for disambiguation
@@ -38,9 +38,9 @@ public class EpisodeInfo
     public override string ToString()
     {
         var result = $"{ShowName} S{Season:D2}E{Episode:D2}";
-        if (!string.IsNullOrWhiteSpace(EpisodeTitle))
+        if (!string.IsNullOrWhiteSpace(Title))
         {
-            result += $" - {EpisodeTitle}";
+            result += $" - {Title}";
         }
         if (Year.HasValue)
         {

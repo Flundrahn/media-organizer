@@ -34,9 +34,6 @@ if (settings is null)
     return 1;
 }
 
-// Set the validator on the settings
-var validator = serviceProvider.GetRequiredService<FileSystemValidator>();
-settings.SetValidator(validator);
 
 var mediaService = serviceProvider.GetRequiredService<MediaOrganizerService>();
 

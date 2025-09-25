@@ -1,19 +1,23 @@
 using MediaOrganizer.Configuration;
 using MediaOrganizer.Output;
+using MediaOrganizer.Validations;
 using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Services;
-
 public class MediaOrganizerService
 {
     private readonly IOutputWriter _output;
     private readonly MediaOrganizerSettings _settings;
     private readonly IMediaFileProvider _mediaFileProvider;
 
-    public MediaOrganizerService(IOutputWriter output, IOptions<MediaOrganizerSettings> settings, IMediaFileProvider mediaFileProvider)
+    public MediaOrganizerService(IOutputWriter output,
+                                 IOptions<MediaOrganizerSettings> settings,
+                                 IMediaFileProvider mediaFileProvider,
+                                 FileSystemValidator fileSystemValidator)
     {
         _output = output;
         _settings = settings.Value;
+        _settings.SetValidator(fileSystemValidator);
         _mediaFileProvider = mediaFileProvider;
     }
 

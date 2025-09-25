@@ -34,6 +34,7 @@ public class MediaOrganizerSettings
 
     public ICollection<string> GetValidationErrors() => _validationErrors;
 
+    // Set manually since options need empty ctor
     public void SetValidator(FileSystemValidator validator)
     {
         _validator = validator;

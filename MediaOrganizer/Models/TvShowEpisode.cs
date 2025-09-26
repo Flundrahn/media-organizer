@@ -8,6 +8,14 @@ namespace MediaOrganizer.Models;
 /// </summary>
 public class TvShowEpisode
 {
+    /// <summary>
+    /// Valid placeholders that can be used in path templates
+    /// </summary>
+    public static readonly HashSet<string> ValidPlaceholders = new()
+    {
+        "TvShowName", "Season", "Episode", "Title", "Year"
+    };
+
     public string TvShowName { get; internal set; } = string.Empty;
 
     /// <summary>
@@ -50,21 +58,22 @@ public class TvShowEpisode
     public bool IsValid => !string.IsNullOrWhiteSpace(TvShowName) && Season > 0 && Episode > 0;
 
     /// <summary>
-    /// Generates a relative file path based on the provided pattern string.
+    /// Generates a relative file path based on the provided template string.
     /// Supports placeholders: {TvShowName}, {Season}, {Episode}, {Title}, {Year}
+    /// The original file extension is automatically preserved and appended to the result.
     /// </summary>
-    /// <param name="pattern">The pattern string with placeholders to replace</param>
-    /// <returns>The formatted relative path</returns>
-    /// <exception cref="ArgumentNullException">Thrown when pattern is null</exception>
-    /// <exception cref="ArgumentException">Thrown when pattern is empty or whitespace</exception>
+    /// <param name="template">The template string with placeholders to replace</param>
+    /// <returns>The formatted relative path with the original file extension</returns>
+    /// <exception cref="ArgumentNullException">Thrown when template is null</exception>
+    /// <exception cref="ArgumentException">Thrown when template is empty or whitespace</exception>
     /// <exception cref="InvalidOperationException">Thrown when the episode is not in a valid state</exception>
-    internal string GenerateRelativePath(string pattern)
+    internal string GenerateRelativePath(string template)
     {
-        if (pattern is null)
-            throw new ArgumentNullException(nameof(pattern));
+        if (template is null)
+            throw new ArgumentNullException(nameof(template));
             
-        if (string.IsNullOrWhiteSpace(pattern))
-            throw new ArgumentException("Pattern cannot be empty or whitespace.", nameof(pattern));
+        if (string.IsNullOrWhiteSpace(template))
+            throw new ArgumentException("Template cannot be empty or whitespace.", nameof(template));
             
         if (!IsValid)
             throw new InvalidOperationException("Cannot generate path for an invalid TV show episode.");
@@ -80,7 +89,7 @@ public class TvShowEpisode
             { "{Year}", Year?.ToString() ?? string.Empty }
         };
 
-        var result = pattern;
+        var result = template;
         foreach (var replacement in replacements)
         {
             result = result.Replace(replacement.Key, replacement.Value);
@@ -94,6 +103,13 @@ public class TvShowEpisode
         
         // Clean up extra spaces
         result = Regex.Replace(result, @"\s+", " ").Trim();
+
+        // Always append the original file extension
+        var originalExtension = Path.GetExtension(OriginalFile.Name);
+        if (!string.IsNullOrEmpty(originalExtension) && !result.EndsWith(originalExtension, StringComparison.OrdinalIgnoreCase))
+        {
+            result += originalExtension;
+        }
 
         return result;
     }

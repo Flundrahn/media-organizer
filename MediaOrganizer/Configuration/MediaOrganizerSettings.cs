@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+using MediaOrganizer.Models;
 using MediaOrganizer.Validations;
 
 namespace MediaOrganizer.Configuration;
@@ -31,6 +33,13 @@ public class MediaOrganizerSettings
     /// When true, includes all subdirectories when searching for media files
     /// </summary>
     public bool IncludeSubdirectories { get; set; } = true;
+
+    /// <summary>
+    /// The template used to generate relative paths for TV show episodes.
+    /// Supports placeholders: {TvShowName}, {Season}, {Episode}, {Title}, {Year}
+    /// The file extension from the original file is automatically appended.
+    /// </summary>
+    public string TvShowPathTemplate { get; set; } = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}";
 
     public ICollection<string> GetValidationErrors() => _validationErrors;
 
@@ -74,6 +83,40 @@ public class MediaOrganizerSettings
         {
             _validationErrors.Add("DestinationDirectory is not writable or cannot be created");
             isValid = false;
+        }
+
+        if (string.IsNullOrWhiteSpace(TvShowPathTemplate))
+        {
+            _validationErrors.Add("TvShowPathTemplate is required");
+            isValid = false;
+        }
+        else
+        {
+            // Validate placeholders in the template using the valid placeholders from TvShowEpisode
+            var placeholderMatches = Regex.Matches(TvShowPathTemplate, @"\{([^}:]*)[^}]*\}");
+            
+            foreach (Match match in placeholderMatches)
+            {
+                var placeholderName = match.Groups[1].Value;
+                if (!TvShowEpisode.ValidPlaceholders.Contains(placeholderName))
+                {
+                    _validationErrors.Add($"TvShowPathTemplate contains invalid placeholder: {{{placeholderName}}}");
+                    isValid = false;
+                }
+            }
+
+            // Validate path characters by removing placeholders and checking segments
+            var templateWithoutPlaceholders = System.Text.RegularExpressions.Regex.Replace(
+                TvShowPathTemplate, 
+                @"\{[^}]*\}", 
+                "X"); // Replace placeholders with a safe character
+
+            var pathParts = templateWithoutPlaceholders.Split('/', '\\');
+            if (_validator != null && !_validator.AreValidPathSegments(pathParts))
+            {
+                _validationErrors.Add("TvShowPathTemplate contains invalid path characters");
+                isValid = false;
+            }
         }
 
         return isValid;

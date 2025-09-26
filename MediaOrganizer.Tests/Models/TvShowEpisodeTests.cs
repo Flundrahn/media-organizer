@@ -85,13 +85,13 @@ public class TvShowEpisodeTests
     }
 
     [Theory]
-    [InlineData("{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2} - {Title}.mkv", 
+    [InlineData("{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2} - {Title}", 
                 "The Office/Season 1/The Office - S01E01 - Pilot.mkv")]
-    [InlineData("{TvShowName}/S{Season:D2}/{TvShowName} S{Season:D2}E{Episode:D2}.mkv", 
+    [InlineData("{TvShowName}/S{Season:D2}/{TvShowName} S{Season:D2}E{Episode:D2}", 
                 "The Office/S01/The Office S01E01.mkv")]
-    [InlineData("TV Shows/{TvShowName} ({Year})/Season {Season}/{Episode:D2} - {Title}.mkv", 
+    [InlineData("TV Shows/{TvShowName} ({Year})/Season {Season}/{Episode:D2} - {Title}", 
                 "TV Shows/The Office (2005)/Season 1/01 - Pilot.mkv")]
-    [InlineData("{TvShowName}/{TvShowName} - {Season}x{Episode:D2}.mkv", 
+    [InlineData("{TvShowName}/{TvShowName} - {Season}x{Episode:D2}", 
                 "The Office/The Office - 1x01.mkv")]
     public void GenerateRelativePath_WithValidPattern_ReturnsFormattedPath(string pattern, string expectedPath)
     {
@@ -113,9 +113,9 @@ public class TvShowEpisodeTests
     }
 
     [Theory]
-    [InlineData("{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}.mkv", 
+    [InlineData("{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}", 
                 "Breaking Bad/Season 2/Breaking Bad - S02E13.mkv")]
-    [InlineData("Series/{TvShowName}/S{Season:D2}E{Episode:D2} - {TvShowName}.mkv", 
+    [InlineData("Series/{TvShowName}/S{Season:D2}E{Episode:D2} - {TvShowName}", 
                 "Series/Breaking Bad/S02E13 - Breaking Bad.mkv")]
     public void GenerateRelativePath_WithoutTitle_HandlesEmptyTitle(string pattern, string expectedPath)
     {
@@ -136,9 +136,9 @@ public class TvShowEpisodeTests
     }
 
     [Theory]
-    [InlineData("{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}.avi", 
+    [InlineData("{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}", 
                 "Game Of Thrones/Season 1/Game Of Thrones - S01E01.avi")]
-    [InlineData("{TvShowName} ({Year})/S{Season:D2}/{Episode:D2}.avi", 
+    [InlineData("{TvShowName} ({Year})/S{Season:D2}/{Episode:D2}", 
                 "Game Of Thrones/S01/01.avi")]
     public void GenerateRelativePath_WithoutYear_HandlesNullYear(string pattern, string expectedPath)
     {
@@ -170,7 +170,7 @@ public class TvShowEpisodeTests
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => 
-            episode.GenerateRelativePath("{TvShowName}/Season {Season}/{Episode:D2}.mkv"));
+            episode.GenerateRelativePath("{TvShowName}/Season {Season}/{Episode:D2}"));
     }
 
     [Theory]
@@ -206,9 +206,9 @@ public class TvShowEpisodeTests
     }
 
     [Theory]
-    [InlineData("{TvShowName}/Season {Season}/{TvShowName}.mkv", "The Office/Season 1/The Office.mkv")]
-    [InlineData("{TvShowName}", "The Office")]
-    [InlineData("Static/Path/File.mkv", "Static/Path/File.mkv")]
+    [InlineData("{TvShowName}/Season {Season}/{TvShowName}", "The Office/Season 1/The Office.mkv")]
+    [InlineData("{TvShowName}", "The Office.mkv")]
+    [InlineData("Static/Path/File", "Static/Path/File.mkv")]
     public void GenerateRelativePath_WithPartialPatterns_ReturnsCorrectPath(string pattern, string expectedPath)
     {
         // Arrange

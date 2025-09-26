@@ -5,6 +5,8 @@ namespace MediaOrganizer.Validations;
 public class FileSystemValidator
 {
     private readonly IFileSystem _fileSystem;
+    private static readonly char[] InvalidPathChars = Path.GetInvalidPathChars();
+    private static readonly char[] InvalidFileNameChars = Path.GetInvalidFileNameChars();
 
     public FileSystemValidator(IFileSystem fileSystem)
     {
@@ -23,7 +25,40 @@ public class FileSystemValidator
 
     public bool HasValidPath(string path)
     {
-        return path.IndexOfAny(_fileSystem.Path.GetInvalidPathChars()) < 0;
+        return path.IndexOfAny(InvalidPathChars) < 0;
+    }
+
+    /// <summary>
+    /// Validates that a path segment (directory or filename) contains only valid characters
+    /// </summary>
+    /// <param name="pathSegment">The path segment to validate</param>
+    /// <returns>True if the path segment is valid</returns>
+    public bool IsValidPathSegment(string pathSegment)
+    {
+        if (string.IsNullOrEmpty(pathSegment))
+            return false;
+
+        // Check for invalid path characters
+        if (pathSegment.IndexOfAny(InvalidPathChars) >= 0)
+            return false;
+
+        // ALL segments (both directory names and filenames) must follow filename character restrictions
+        // because directory names also cannot contain filename invalid characters in Windows
+        if (pathSegment.IndexOfAny(InvalidFileNameChars) >= 0)
+            return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Validates multiple path segments at once
+    /// </summary>
+    /// <param name="pathSegments">The path segments to validate</param>
+    /// <returns>True if all path segments are valid</returns>
+    public bool AreValidPathSegments(IEnumerable<string> pathSegments)
+    {
+        return pathSegments.All(segment => 
+            string.IsNullOrEmpty(segment) || IsValidPathSegment(segment));
     }
 
     public bool DirectoryIsWriteable(string path)

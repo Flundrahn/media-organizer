@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaDirectoryManager", "MediaDirectoryManager\MediaDirectoryManager.csproj", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaOrganizer", "MediaOrganizer\MediaOrganizer.csproj", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaDirectoryManager.Tests", "MediaDirectoryManager.Tests\MediaDirectoryManager.Tests.csproj", "{8BC9CEB9-8B4A-11D0-8D11-00A0C91BC942}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaOrganizer.Tests", "MediaOrganizer.Tests\MediaOrganizer.Tests.csproj", "{8BC9CEB9-8B4A-11D0-8D11-00A0C91BC942}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaDirectoryManager.IntegrationTests", "MediaDirectoryManager.IntegrationTests\MediaDirectoryManager.IntegrationTests.csproj", "{A3C238EA-AC7F-4225-BDD8-DA7D4AEC83E0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaOrganizer.IntegrationTests", "MediaOrganizer.IntegrationTests\MediaOrganizer.IntegrationTests.csproj", "{A3C238EA-AC7F-4225-BDD8-DA7D4AEC83E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

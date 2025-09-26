@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using MediaOrganizer.Configuration;
 using MediaOrganizer.Output;
 using MediaOrganizer.Validations;
@@ -49,11 +50,11 @@ public class MediaOrganizerService
     {
         while (true)
         {
-            var fileCount = GetFileCount();
+            var mediaFiles = _mediaFileProvider.GetMediaFiles(_settings.SourceDirectory);
             
             _output.WriteLine("Main Menu");
             _output.WriteLine("---------");
-            _output.WriteLine($"1. List video files ({fileCount} found)");
+            _output.WriteLine($"1. List video files ({mediaFiles.Count()} found)");
             _output.WriteLine("2. Exit");
             _output.WriteLine("");
             _output.WriteLine("Choose an option (1-2):");
@@ -63,7 +64,7 @@ public class MediaOrganizerService
             switch (input)
             {
                 case "1":
-                    ListFiles();
+                    ListMediaFiles(mediaFiles);
                     break;
                 case "2":
                     _output.WriteLine("Goodbye!");
@@ -83,23 +84,20 @@ public class MediaOrganizerService
         }
     }
 
-    private void ListFiles()
+    private void ListMediaFiles(IEnumerable<IFileInfo> mediaFiles)
     {
         _output.WriteLine("");
         _output.WriteLine($"📂 Source Directory: {_settings.SourceDirectory}");
 
         try
         {
-            var files = _mediaFileProvider.GetMediaFiles(_settings.SourceDirectory);
-
-            if (!files.Any())
+            if (!mediaFiles.Any())
             {
                 _output.WriteLine("No video files found.");
                 return;
             }
 
-            _output.WriteSuccess($"Found {files.Count()} video file(s):");
-            foreach (var file in files)
+            foreach (var file in mediaFiles)
             {
                 _output.WriteLine($"   {file.FullName}");
             }
@@ -107,19 +105,6 @@ public class MediaOrganizerService
         catch (Exception ex)
         {
             _output.WriteError($"Error listing files: {ex.Message}");
-        }
-    }
-
-    private int GetFileCount()
-    {
-        try
-        {
-            var files = _mediaFileProvider.GetMediaFiles(_settings.SourceDirectory);
-            return files.Count();
-        }
-        catch
-        {
-            return 0;
         }
     }
 

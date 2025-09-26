@@ -17,7 +17,7 @@ public class FileSystemValidatorIntegrationTests : IDisposable
         var fileSystem = new FileSystem();
         _sut = new FileSystemValidator(fileSystem);
         
-        _testDirectory = Directory.CreateTempSubdirectory("MediaDirectoryManagerTests_").FullName;
+        _testDirectory = Directory.CreateTempSubdirectory("MediaOrganizerTests_").FullName;
         Directory.CreateDirectory(_testDirectory);
     }
 

@@ -1,6 +1,6 @@
 using MediaOrganizer.Services;
 
-namespace MediaDirectoryManager.Tests.Services;
+namespace MediaOrganizer.Tests.Services;
 
 public class TvShowEpisodeParserTests
 {

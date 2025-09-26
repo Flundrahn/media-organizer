@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MediaDirectoryManager\MediaDirectoryManager.csproj" />
+    <ProjectReference Include="..\MediaOrganizer\MediaOrganizer.csproj" />
   </ItemGroup>
 
 </Project>

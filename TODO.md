@@ -13,6 +13,7 @@
 - [x] File size formatting (B, KB, MB, GB, TB)
 - [x] Clean architecture with proper service separation
 - [x] Console output abstraction for testability
+- [x] Tv show file parser.
 
 ## TODO - Core Features
 - [ ] File organization/moving functionality

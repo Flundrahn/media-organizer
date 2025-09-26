@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using System.Text.RegularExpressions;
 
 namespace MediaOrganizer.Models;
 
@@ -47,6 +48,55 @@ public class TvShowEpisode
     /// Whether the parsing was successful
     /// </summary>
     public bool IsValid => !string.IsNullOrWhiteSpace(TvShowName) && Season > 0 && Episode > 0;
+
+    /// <summary>
+    /// Generates a relative file path based on the provided pattern string.
+    /// Supports placeholders: {TvShowName}, {Season}, {Episode}, {Title}, {Year}
+    /// </summary>
+    /// <param name="pattern">The pattern string with placeholders to replace</param>
+    /// <returns>The formatted relative path</returns>
+    /// <exception cref="ArgumentNullException">Thrown when pattern is null</exception>
+    /// <exception cref="ArgumentException">Thrown when pattern is empty or whitespace</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the episode is not in a valid state</exception>
+    internal string GenerateRelativePath(string pattern)
+    {
+        if (pattern is null)
+            throw new ArgumentNullException(nameof(pattern));
+            
+        if (string.IsNullOrWhiteSpace(pattern))
+            throw new ArgumentException("Pattern cannot be empty or whitespace.", nameof(pattern));
+            
+        if (!IsValid)
+            throw new InvalidOperationException("Cannot generate path for an invalid TV show episode.");
+
+        var replacements = new Dictionary<string, string>
+        {
+            { "{TvShowName}", TvShowName },
+            { "{Season}", Season.ToString() },
+            { "{Season:D2}", Season.ToString("D2") },
+            { "{Episode}", Episode.ToString() },
+            { "{Episode:D2}", Episode.ToString("D2") },
+            { "{Title}", Title ?? string.Empty },
+            { "{Year}", Year?.ToString() ?? string.Empty }
+        };
+
+        var result = pattern;
+        foreach (var replacement in replacements)
+        {
+            result = result.Replace(replacement.Key, replacement.Value);
+        }
+
+        // Clean up any double slashes that might have been created
+        result = result.Replace("//", "/");
+        
+        // Clean up patterns where Year was empty - remove empty parentheses
+        result = Regex.Replace(result, @"\s*\(\s*\)", "");
+        
+        // Clean up extra spaces
+        result = Regex.Replace(result, @"\s+", " ").Trim();
+
+        return result;
+    }
 
     public override string ToString()
     {

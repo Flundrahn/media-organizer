@@ -1,4 +1,5 @@
 using MediaOrganizer.Services;
+using System.IO.Abstractions.TestingHelpers;
 
 namespace MediaOrganizer.Tests.Services;
 
@@ -13,13 +14,15 @@ public class TvShowEpisodeParserTests
     {
         // Arrange
         var parser = new TvShowEpisodeParser();
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}");
 
         // Act
-        var result = parser.Parse(filename);
+        var result = parser.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
-        Assert.Equal(expectedShow, result.ShowName);
+        Assert.Equal(expectedShow, result.TvShowName);
         Assert.Equal(expectedSeason, result.Season);
         Assert.Equal(expectedEpisode, result.Episode);
         Assert.Equal(expectedTitle, result.Title);
@@ -35,11 +38,11 @@ public class TvShowEpisodeParserTests
         var parser = new TvShowEpisodeParser();
 
         // Act
-        var result = parser.Parse(filename);
+        var mockFileSystem = new MockFileSystem(); var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); var result = parser.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
-        Assert.Equal(expectedShow, result.ShowName);
+        Assert.Equal(expectedShow, result.TvShowName);
         Assert.Equal(expectedSeason, result.Season);
         Assert.Equal(expectedEpisode, result.Episode);
         Assert.Equal(expectedTitle, result.Title);
@@ -56,11 +59,11 @@ public class TvShowEpisodeParserTests
         var parser = new TvShowEpisodeParser();
 
         // Act
-        var result = parser.Parse(filename);
+        var mockFileSystem = new MockFileSystem(); var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); var result = parser.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
-        Assert.Equal(expectedShow, result.ShowName);
+        Assert.Equal(expectedShow, result.TvShowName);
         Assert.Equal(expectedSeason, result.Season);
         Assert.Equal(expectedEpisode, result.Episode);
         Assert.Equal("", result.Title);
@@ -75,11 +78,11 @@ public class TvShowEpisodeParserTests
         var parser = new TvShowEpisodeParser();
 
         // Act
-        var result = parser.Parse(filename);
+        var mockFileSystem = new MockFileSystem(); var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); var result = parser.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
-        Assert.Equal(expectedShow, result.ShowName);
+        Assert.Equal(expectedShow, result.TvShowName);
         Assert.Equal(expectedSeason, result.Season);
         Assert.Equal(expectedEpisode, result.Episode);
         Assert.Equal(expectedYear, result.Year);
@@ -96,7 +99,7 @@ public class TvShowEpisodeParserTests
         var parser = new TvShowEpisodeParser();
 
         // Act
-        var result = parser.Parse(filename);
+        var mockFileSystem = new MockFileSystem(); var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); var result = parser.Parse(fileInfo);
 
         // Assert
         Assert.False(result.IsValid);

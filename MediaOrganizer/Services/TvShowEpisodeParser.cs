@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.IO.Abstractions;
 using MediaOrganizer.Models;
 
 namespace MediaOrganizer.Services;
@@ -36,10 +37,14 @@ public class TvShowEpisodeParser : ITvShowEpisodeParser
         return AllPatterns.Any(pattern => pattern.IsMatch(filename));
     }
 
-    public TvShowEpisode Parse(string filename)
+    public TvShowEpisode Parse(IFileInfo fileInfo)
     {
+        string filename = fileInfo.Name;
+        
         if (!CanParse(filename))
-            return new TvShowEpisode();
+        {
+            return new TvShowEpisode(fileInfo);
+        }
 
         foreach (var pattern in AllPatterns)
         {
@@ -54,18 +59,18 @@ public class TvShowEpisodeParser : ITvShowEpisodeParser
                     ? int.Parse(match.Groups["year"].Value) 
                     : null;
 
-                return new TvShowEpisode
-                {
-                    ShowName = showName,
-                    Season = season,
-                    Episode = episode,
-                    Title = episodeTitle,
-                    Year = year
-                };
+                var tvShowEpisode = new TvShowEpisode(fileInfo);
+                tvShowEpisode.TvShowName = showName;
+                tvShowEpisode.Season = season;
+                tvShowEpisode.Episode = episode;
+                tvShowEpisode.Title = episodeTitle;
+                tvShowEpisode.Year = year;
+
+                return tvShowEpisode;
             }
         }
 
-        return new TvShowEpisode();
+        return new TvShowEpisode(fileInfo);
     }
 
     private static string CleanShowName(string showName)

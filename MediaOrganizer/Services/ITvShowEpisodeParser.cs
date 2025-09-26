@@ -1,4 +1,5 @@
 using MediaOrganizer.Models;
+using System.IO.Abstractions;
 
 namespace MediaOrganizer.Services;
 
@@ -15,9 +16,9 @@ public interface ITvShowEpisodeParser
     bool CanParse(string filename);
 
     /// <summary>
-    /// Parses TV show episode information from a filename
+    /// Parses TV show episode information from a file
     /// </summary>
-    /// <param name="filename">The filename to parse</param>
+    /// <param name="fileInfo">The file to parse</param>
     /// <returns>Episode information, or invalid TvShowEpisode if parsing fails</returns>
-    TvShowEpisode Parse(string filename);
+    TvShowEpisode Parse(IFileInfo fileInfo);
 }

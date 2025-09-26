@@ -1,3 +1,5 @@
+using System.IO.Abstractions;
+
 namespace MediaOrganizer.Models;
 
 /// <summary>
@@ -5,39 +7,50 @@ namespace MediaOrganizer.Models;
 /// </summary>
 public class TvShowEpisode
 {
-    /// <summary>
-    /// The name of the TV show
-    /// </summary>
-    public string ShowName { get; set; } = string.Empty;
+    public string TvShowName { get; internal set; } = string.Empty;
 
     /// <summary>
     /// The season number (1-based)
     /// </summary>
-    public int Season { get; set; }
+    public int Season { get; internal set; }
 
     /// <summary>
     /// The episode number within the season (1-based)
     /// </summary>
-    public int Episode { get; set; }
+    public int Episode { get; internal set; }
+
+    public string Title { get; internal set; } = string.Empty;
+
+    public int? Year { get; internal set; }
 
     /// <summary>
-    /// The title of the episode, if available in the filename
+    /// The original file info when the episode was first parsed
     /// </summary>
-    public string Title { get; set; } = string.Empty;
+    public IFileInfo OriginalFile { get; init; }
 
     /// <summary>
-    /// The year of the show, useful for disambiguation
+    /// The current file info, which may be different from original if the file has been moved
     /// </summary>
-    public int? Year { get; set; }
+    public IFileInfo CurrentFile { get; internal set; }
+
+    /// <summary>
+    /// Initializes a new instance of TvShowEpisode with file information
+    /// </summary>
+    /// <param name="fileInfo">The file information to set as both original and current file</param>
+    public TvShowEpisode(IFileInfo fileInfo)
+    {
+        OriginalFile = fileInfo;
+        CurrentFile = fileInfo;
+    }
 
     /// <summary>
     /// Whether the parsing was successful
     /// </summary>
-    public bool IsValid => !string.IsNullOrWhiteSpace(ShowName) && Season > 0 && Episode > 0;
+    public bool IsValid => !string.IsNullOrWhiteSpace(TvShowName) && Season > 0 && Episode > 0;
 
     public override string ToString()
     {
-        var result = $"{ShowName} S{Season:D2}E{Episode:D2}";
+        var result = $"{TvShowName} S{Season:D2}E{Episode:D2}";
         if (!string.IsNullOrWhiteSpace(Title))
         {
             result += $" - {Title}";

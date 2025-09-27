@@ -121,8 +121,9 @@ public class TvShowEpisode
             result = result.Replace(replacement.Key, replacement.Value);
         }
 
-        // Clean up any double slashes that might have been created
-        result = result.Replace("//", "/");
+        // Clean up any double path separators that might have been created
+        var doublePathSep = $"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}";
+        result = result.Replace(doublePathSep, Path.DirectorySeparatorChar.ToString());
         
         // Clean up patterns where Year was empty - remove empty parentheses
         result = Regex.Replace(result, @"\s*\(\s*\)", "");

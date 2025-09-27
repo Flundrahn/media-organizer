@@ -29,7 +29,7 @@ public class MediaOrganizerSettingsTests
         Assert.Equal(string.Empty, settings.DestinationDirectory);
         Assert.True(settings.DryRun);
         Assert.True(settings.IncludeSubdirectories);
-        Assert.Equal("{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}", settings.TvShowPathTemplate);
+        Assert.Equal(string.Empty, settings.TvShowPathTemplate);
     }
 
     [Fact]

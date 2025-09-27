@@ -21,12 +21,17 @@ public class TvShowEpisodeParser : ITvShowEpisodeParser
     private static readonly Regex SeasonXEpisodePattern = new(
         @"^(?<showName>.+?)\s+(?<season>\d{1,2})x(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\.|$)", 
         RegexOptions.IgnoreCase);
+    
+    private static readonly Regex SpacedSxxExxWithTitlePattern = new(
+        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])\s+(?:\d{4}p|1080p|720p|480p|REPACK|WEB|BluRay|ATVP|WEB-DL|DD|H\.?264|x264|h264|AMZN|DDP\d|FLUX|\[.*?\]|Atmos)", 
+        RegexOptions.IgnoreCase);
 
     private static readonly Regex[] AllPatterns = [
         StandardSxxExxPattern,
         YearBeforeSxxExxPattern,
         YearInParenthesesPattern,
-        SeasonXEpisodePattern
+        SeasonXEpisodePattern,
+        SpacedSxxExxWithTitlePattern
     ];
 
     public bool CanParse(string filename)

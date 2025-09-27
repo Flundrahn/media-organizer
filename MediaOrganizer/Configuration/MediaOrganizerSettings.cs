@@ -51,7 +51,7 @@ public class MediaOrganizerSettings
     /// Supports placeholders: {TvShowName}, {Season}, {Episode}, {Title}, {Year}
     /// The file extension from the original file is automatically appended.
     /// </summary>
-    public string TvShowPathTemplate { get; set; } = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}";
+    public string TvShowPathTemplate { get; set; } = string.Empty;
 
     public ICollection<string> GetValidationErrors() => _validationErrors;
 

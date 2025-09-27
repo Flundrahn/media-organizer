@@ -17,6 +17,8 @@
 - [x] File organization/moving functionality
 - [x] Basic logging system
 - [x] Different file renaming patterns
+- [x] Fix bug with unparse-able file spaced with spaces instead of dots
+- [x] Use env dependent path separation character
 
 ## Doing
 - [ ] Fix bugs with certain unparse-able files
@@ -30,6 +32,7 @@
 ## Nice to Have 🌟
 
 ### Core Features
+- [ ] Generate regex in compile time for performance
 - [ ] Batch operations with progress tracking
 - [ ] Better error handling and user feedback
 - [ ] Undo operations for file moves

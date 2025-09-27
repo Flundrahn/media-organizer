@@ -73,9 +73,10 @@ public class TvShowEpisode
 
         try
         {
-            var expectedRelativePath = GenerateRelativePath(settings.TvShowPathTemplate);
-            var expectedFullPath = Path.Combine(settings.DestinationDirectory, expectedRelativePath);
-            return CurrentFile.FullName.Equals(expectedFullPath, StringComparison.OrdinalIgnoreCase);
+            var organizedFullPath = Path.GetFullPath(Path.Combine(settings.DestinationDirectory, GenerateRelativePath(settings.TvShowPathTemplate)));
+            var currentFullPath = Path.GetFullPath(CurrentFile.FullName); // Helps normalize for path comparison
+
+            return string.Equals(currentFullPath, organizedFullPath, StringComparison.OrdinalIgnoreCase);
         }
         catch
         {

@@ -106,7 +106,7 @@ public class MediaOrganizerService
 
             foreach (var file in mediaFiles)
             {
-                _console.WriteLine($"   {file.FullName}");
+                _console.WriteLine($"   {Path.GetRelativePath(_settings.SourceDirectory, file.FullName)}");
             }
         }
         catch (Exception ex)

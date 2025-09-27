@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using MediaOrganizer.Configuration;
+using MediaOrganizer.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -33,7 +34,8 @@ public class MediaFileOrganizer
         {
             processedCount++;
             
-            if (OrganizeFile(fileInfo))
+            var result = OrganizeFile(fileInfo);
+            if (result is not null)
             {
                 successCount++;
             }
@@ -43,7 +45,7 @@ public class MediaFileOrganizer
         return successCount > 0 || processedCount == 0;
     }
 
-    public bool OrganizeFile(IFileInfo fileInfo)
+    public TvShowEpisode? OrganizeFile(IFileInfo fileInfo)
     {
         var mediaFile = _parser.Parse(fileInfo);
 
@@ -57,7 +59,7 @@ public class MediaFileOrganizer
         if (!mediaFile.IsValid)
         {
             _logger.LogWarning("Failed to move {FileName} - unparsable file", fileInfo.Name);
-            return false;
+            return null;
         }
 
         string mediaFileRelativePath = mediaFile.GenerateRelativePath(_settings.TvShowPathTemplate);
@@ -67,31 +69,33 @@ public class MediaFileOrganizer
         if (string.IsNullOrEmpty(mediaFileDestinationDir))
         {
             _logger.LogError("Failed to move {FileName} - invalid destination path has no directory component: {FileDestinationPath}", fileInfo.Name, mediaFileDestinationPath);
-            return false;
+            return null;
         }
 
-        if (_settings.DryRun)
+        if (!_settings.DryRun)
         {
-            _logger.LogInformation("[DRY RUN] Would move: {FileName} -> {FileDestinationPath}", fileInfo.Name, mediaFileDestinationPath);
-            return true;
-        }
-
-        try
-        {
-            if (!_fileSystem.Directory.Exists(mediaFileDestinationDir))
+            try
             {
-                _fileSystem.Directory.CreateDirectory(mediaFileDestinationDir);
-            }
+                if (!_fileSystem.Directory.Exists(mediaFileDestinationDir))
+                {
+                    _fileSystem.Directory.CreateDirectory(mediaFileDestinationDir);
+                }
 
-            _fileSystem.File.Move(fileInfo.FullName, mediaFileDestinationPath);
-            _logger.LogInformation("Moved: {FileName} -> {FileDestinationPath}", fileInfo.Name, mediaFileDestinationPath);
-            // TODO: update current file info on model object
-            return true;
+                _fileSystem.File.Move(fileInfo.FullName, mediaFileDestinationPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to move {FileName}", fileInfo.FullName);
+                return null;
+            }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to move {FileName}", fileInfo.FullName);
-            return false;
-        }
+
+        _logger.LogInformation("{Prefix} {FileName} -> {FileDestinationPath}",
+                               _settings.DryRun ? "[DRY RUN] Would move:" : "Moved:",
+                               fileInfo.Name,
+                               mediaFileDestinationPath);
+
+        mediaFile.CurrentFile = _fileSystem.FileInfo.New(mediaFileDestinationPath);
+        return mediaFile;
     }
 }

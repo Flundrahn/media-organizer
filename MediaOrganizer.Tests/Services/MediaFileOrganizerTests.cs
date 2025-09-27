@@ -57,7 +57,8 @@ public class MediaFileOrganizerTests
         var result = _sut.OrganizeFile(fileInfo);
 
         // Assert
-        Assert.True(result, "OrganizeFile should return true for successful operation");
+        Assert.NotNull(result);
+        Assert.True(result.IsValid, "Returned episode should be valid");
         Assert.False(_mockFileSystem.File.Exists(sourceFilePath), "Source file should be moved");
         Assert.True(_mockFileSystem.File.Exists(expectedDestinationPath), $"File should exist at destination: {expectedDestinationPath}");
         Assert.Equal(VideoFileContent, _mockFileSystem.File.ReadAllText(expectedDestinationPath));
@@ -75,7 +76,7 @@ public class MediaFileOrganizerTests
         var result = _sut.OrganizeFile(fileInfo);
 
         // Assert
-        Assert.False(result, "OrganizeFile should return false for unparsable file");
+        Assert.Null(result);
         Assert.True(_mockFileSystem.File.Exists(sourceFilePath), "Unparsable file should remain in source");
 
         var destinationFiles = _mockFileSystem.Directory.GetFiles(DestinationDirectory, "*", SearchOption.AllDirectories);
@@ -95,10 +96,37 @@ public class MediaFileOrganizerTests
         var result = _sut.OrganizeFile(fileInfo);
 
         // Assert
-        Assert.True(result, "OrganizeFile should return true even in dry run mode");
+        Assert.NotNull(result);
+        Assert.True(result.IsValid, "Returned episode should be valid in dry run mode");
         Assert.True(_mockFileSystem.File.Exists(sourceFilePath), "In dry run mode, file should not be moved");
         
         var destinationFiles = _mockFileSystem.Directory.GetFiles(DestinationDirectory, "*", SearchOption.AllDirectories);
         Assert.Empty(destinationFiles);
+    }
+
+    [Fact]
+    public void OrganizeFile_WithValidTvShowFile_UpdatesCurrentFileInfoAfterMove()
+    {
+        // Arrange
+        var sourceFilePath = Path.Combine(SourceDirectory, "Breaking.Bad.S01E01.720p.HDTV.x264-CTU.mkv");
+        _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
+        var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
+        var expectedDestinationPath = Path.Combine(DestinationDirectory, "Breaking Bad", "Season 1", "Breaking Bad - S01E01.mkv");
+
+        // Act
+        var result = _sut.OrganizeFile(fileInfo);
+
+        // Assert - verify the operation succeeded and returned a valid episode
+        Assert.NotNull(result);
+        Assert.True(result.IsValid, "Returned episode should be valid");
+        
+        // Assert - verify file was actually moved
+        Assert.False(_mockFileSystem.File.Exists(sourceFilePath), "Source file should be moved");
+        Assert.True(_mockFileSystem.File.Exists(expectedDestinationPath), $"File should exist at destination: {expectedDestinationPath}");
+        
+        // Assert - verify CurrentFile property points to the new location
+        Assert.Equal(expectedDestinationPath, result.CurrentFile.FullName);
+        Assert.Equal(sourceFilePath, result.OriginalFile.FullName);
+        Assert.NotEqual(result.OriginalFile.FullName, result.CurrentFile.FullName);
     }
 }

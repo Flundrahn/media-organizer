@@ -304,4 +304,37 @@ public class TvShowEpisodeParserTests
         Assert.Equal(1, result.Episode);
         Assert.Equal("", result.Title); // No episode title in this format
     }
+
+    [Fact]
+    public void Parse_WithRepeatedSxxExxPattern_ShouldParseCorrectly()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var testFile = mockFileSystem.FileInfo.New(@"C:\Test\The Lord of the Rings The Rings of Power - S01E01 S01E01 - A Shadow of the Past.avi");
+        var parser = new TvShowEpisodeParser();
+
+        // Act
+        var result = parser.Parse(testFile);
+
+        // Assert
+        Assert.True(result.IsValid, "Should be able to parse repeated SxxExx pattern");
+        Assert.Equal("The Lord Of The Rings The Rings Of Power", result.TvShowName);
+        Assert.Equal(1, result.Season);
+        Assert.Equal(1, result.Episode);
+        Assert.Equal("A Shadow of the Past", result.Title);
+    }
+
+    [Fact]
+    public void CanParse_WithRepeatedSxxExxPattern_ShouldReturnTrue()
+    {
+        // Arrange
+        var parser = new TvShowEpisodeParser();
+        var filename = "The Lord of the Rings The Rings of Power - S01E01 S01E01 - A Shadow of the Past.avi";
+
+        // Act
+        var canParse = parser.CanParse(filename);
+
+        // Assert
+        Assert.True(canParse, "Should be able to identify repeated SxxExx pattern format");
+    }
 }

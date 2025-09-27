@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using System.IO.Abstractions;
 using MediaOrganizer.Models;
+using System.Globalization;
 
 namespace MediaOrganizer.Services;
 
@@ -27,7 +28,7 @@ public class TvShowEpisodeParser : ITvShowEpisodeParser
         RegexOptions.IgnoreCase);
     
     private static readonly Regex DashedSxxExxWithTitlePattern = new(
-        @"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+-\s+(?<episodeTitle>.+?)(?:\.[^.]+)?$", 
+        @"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+S(?<season>\d{1,2})E(?<episode>\d{1,2}))?\s+-\s+(?<episodeTitle>.+?)(?:\.[^.]+)?$", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex SpacedSxxExxWithQualityPattern = new(
@@ -106,17 +107,7 @@ public class TvShowEpisodeParser : ITvShowEpisodeParser
         // Remove extra spaces
         cleaned = Regex.Replace(cleaned, @"\s+", " ");
 
-        // Convert to proper case - capitalize first letter of each word
-        var words = cleaned.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        for (int i = 0; i < words.Length; i++)
-        {
-            if (words[i].Length > 0)
-            {
-                words[i] = char.ToUpper(words[i][0]) + (words[i].Length > 1 ? words[i][1..].ToLower() : "");
-            }
-        }
-
-        return string.Join(" ", words);
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cleaned);
     }
 
     private static string CleanEpisodeTitle(string episodeTitle)

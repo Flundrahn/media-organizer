@@ -19,15 +19,16 @@
 - [x] Different file renaming patterns
 - [x] Fix bug with unparse-able file spaced with spaces instead of dots
 - [x] Use env dependent path separation character
+- [x] Fix bugs with certain unparse-able files
+- [x] Support using full paths for organizing tv show files to search within existing show and episode directories
 
 ## Doing
-- [ ] Fix bugs with certain unparse-able files
 
 ## TODO - Core Features
 
 - [ ] Organize one file at a time or skip or all
 - [ ] File organization/moving: Strategy pattern for different organization methods
-- [ ] Support using full paths for organizing tv show files to search within existing show and episode directories
+- [ ] Add support to configure allowed video file extensions
 
 ## Nice to Have 🌟
 

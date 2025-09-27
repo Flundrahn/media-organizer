@@ -1,3 +1,4 @@
+using MediaOrganizer.Configuration;
 using MediaOrganizer.Models;
 using System.IO.Abstractions.TestingHelpers;
 
@@ -224,5 +225,96 @@ public class TvShowEpisodeTests
 
         // Assert
         Assert.Equal(expectedPath, result);
+    }
+
+    [Fact]
+    public void IsOrganized_WithFileInCorrectLocation_ReturnsTrue()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var correctPath = @"C:\destination\The Office\Season 1\The Office - S01E01.mkv";
+        var fileInfo = mockFileSystem.FileInfo.New(correctPath);
+        
+        var episode = new TvShowEpisode(fileInfo);
+        episode.TvShowName = "The Office";
+        episode.Season = 1;
+        episode.Episode = 1;
+
+        var settings = new MediaOrganizerSettings
+        {
+            DestinationDirectory = @"C:\destination",
+            TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}"
+        };
+
+        // Act
+        var result = episode.IsOrganized(settings);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsOrganized_WithFileInWrongLocation_ReturnsFalse()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var wrongPath = @"C:\source\The.Office.S01E01.mkv";
+        var fileInfo = mockFileSystem.FileInfo.New(wrongPath);
+        
+        var episode = new TvShowEpisode(fileInfo);
+        episode.TvShowName = "The Office";
+        episode.Season = 1;
+        episode.Episode = 1;
+
+        var settings = new MediaOrganizerSettings
+        {
+            DestinationDirectory = @"C:\destination",
+            TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}"
+        };
+
+        // Act
+        var result = episode.IsOrganized(settings);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void IsOrganized_WithInvalidEpisode_ReturnsFalse()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\invalid.mkv");
+        var episode = new TvShowEpisode(fileInfo); // Invalid episode (no properties set)
+
+        var settings = new MediaOrganizerSettings
+        {
+            DestinationDirectory = @"C:\destination",
+            TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}"
+        };
+
+        // Act
+        var result = episode.IsOrganized(settings);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void IsOrganized_WithNullSettings_ReturnsFalse()
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\The.Office.S01E01.mkv");
+        var episode = new TvShowEpisode(fileInfo);
+        episode.TvShowName = "The Office";
+        episode.Season = 1;
+        episode.Episode = 1;
+
+        // Act
+        var result = episode.IsOrganized(null!);
+
+        // Assert
+        Assert.False(result);
     }
 }

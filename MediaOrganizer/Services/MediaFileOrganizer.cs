@@ -72,6 +72,13 @@ public class MediaFileOrganizer
             return null;
         }
 
+        // Skip if file is already organized in the correct location
+        if (mediaFile.IsOrganized(_settings))
+        {
+            _logger.LogInformation("Skipped {FileName} - already organized in correct location", fileInfo.Name);
+            return mediaFile;
+        }
+
         if (!_settings.DryRun)
         {
             try

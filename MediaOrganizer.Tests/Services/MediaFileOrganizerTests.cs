@@ -129,4 +129,26 @@ public class MediaFileOrganizerTests
         Assert.Equal(sourceFilePath, result.OriginalFile.FullName);
         Assert.NotEqual(result.OriginalFile.FullName, result.CurrentFile.FullName);
     }
+
+    [Fact]
+    public void OrganizeFile_WithFileAlreadyOrganized_SkipsAndReturnsSuccess()
+    {
+        // Arrange - file is already in the correct organized location
+        var correctDestinationPath = Path.Combine(DestinationDirectory, "Breaking Bad", "Season 1", "Breaking Bad - S01E01.mkv");
+        _mockFileSystem.AddFile(correctDestinationPath, new MockFileData(VideoFileContent));
+        var fileInfo = _mockFileSystem.FileInfo.New(correctDestinationPath);
+
+        // Act
+        var result = _sut.OrganizeFile(fileInfo);
+
+        // Assert - verify the operation succeeded without moving the file
+        Assert.NotNull(result);
+        Assert.True(result.IsValid, "Returned episode should be valid");
+        Assert.True(_mockFileSystem.File.Exists(correctDestinationPath), "File should remain in correct location");
+        
+        // Assert - verify no additional files were created or moved
+        var allFiles = _mockFileSystem.Directory.GetFiles(DestinationDirectory, "*", SearchOption.AllDirectories);
+        Assert.Single(allFiles); // Only the original file should exist
+        Assert.Equal(correctDestinationPath, allFiles[0]);
+    }
 }

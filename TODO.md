@@ -14,20 +14,25 @@
 - [x] Clean architecture with proper service separation
 - [x] Console output abstraction for testability
 - [x] Tv show file parser.
+- [x] File organization/moving functionality
+- [x] Basic logging system
+- [x] Different file renaming patterns
+
+## Doing
+- [ ] Fix bugs with certain unparse-able files
 
 ## TODO - Core Features
-- [ ] File organization/moving functionality
+
+- [ ] Organize one file at a time or skip or all
 - [ ] File organization/moving: Strategy pattern for different organization methods
-- [ ] Basic logging system
+- [ ] Support using full paths for organizing tv show files to search within existing show and episode directories
 
 ## Nice to Have 🌟
 
 ### Core Features
-- [ ] Different file renaming patterns
 - [ ] Batch operations with progress tracking
 - [ ] Better error handling and user feedback
 - [ ] Undo operations for file moves
-- [ ] Support for additional media formats (images, audio)
 - [ ] Fetch metedata from online databases (e.g., TheMovieDB, IMDb)
 - [ ] Duplicate file detection and handling
 
@@ -68,3 +73,4 @@
 - Prioritize core functionality over nice-to-have features
 
 ## Won't Do
+- [ ] Support for additional media formats (images, audio)

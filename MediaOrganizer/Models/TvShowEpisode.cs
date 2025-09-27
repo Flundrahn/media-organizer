@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
+using MediaOrganizer.Configuration;
 
 namespace MediaOrganizer.Models;
 
@@ -56,6 +57,31 @@ public class TvShowEpisode
     /// Whether the parsing was successful
     /// </summary>
     public bool IsValid => !string.IsNullOrWhiteSpace(TvShowName) && Season > 0 && Episode > 0;
+
+    /// <summary>
+    /// Determines if the file is already organized (i.e., in its correct destination location)
+    /// </summary>
+    /// <param name="settings">The media organizer settings containing destination directory and path templates</param>
+    /// <returns>True if the current file is already in the correct organized location</returns>
+    public bool IsOrganized(MediaOrganizerSettings settings)
+    {
+        if (!IsValid
+            || settings == null
+            || string.IsNullOrWhiteSpace(settings.DestinationDirectory)
+            || string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))
+            return false;
+
+        try
+        {
+            var expectedRelativePath = GenerateRelativePath(settings.TvShowPathTemplate);
+            var expectedFullPath = Path.Combine(settings.DestinationDirectory, expectedRelativePath);
+            return CurrentFile.FullName.Equals(expectedFullPath, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     /// <summary>
     /// Generates a relative file path based on the provided template string.

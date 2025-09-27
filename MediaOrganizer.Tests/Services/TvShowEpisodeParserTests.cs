@@ -1,5 +1,4 @@
 using MediaOrganizer.Services;
-using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 
 namespace MediaOrganizer.Tests.Services;
@@ -187,5 +186,38 @@ public class TvShowEpisodeParserTests
 
         // Assert - Using the SpacedSxxExxWithTitlePattern
         Assert.True(canParse, "Should be able to identify episode format with SpacedSxxExxWithTitlePattern");
+    }
+
+    [Fact]
+    public void Parse_WithDashedSxxExxWithTitlePattern_ShouldParseCorrectly()
+    {
+        // Arrange
+        var parser = new TvShowEpisodeParser();
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\The Mandalorian - S02E02 - Chapter 10 The Passenger.mkv");
+
+        // Act
+        var result = parser.Parse(fileInfo);
+
+        // Assert
+        Assert.True(result.IsValid, "Should be able to parse dashed SxxExx format with title");
+        Assert.Equal("The Mandalorian", result.TvShowName);
+        Assert.Equal(2, result.Season);
+        Assert.Equal(2, result.Episode);
+        Assert.Equal("Chapter 10 The Passenger", result.Title);
+    }
+
+    [Fact]
+    public void CanParse_WithDashedSxxExxWithTitlePattern_ShouldReturnTrue()
+    {
+        // Arrange
+        var parser = new TvShowEpisodeParser();
+        var filename = "The Mandalorian - S02E02 - Chapter 10 The Passenger.mkv";
+
+        // Act
+        var canParse = parser.CanParse(filename);
+
+        // Assert
+        Assert.True(canParse, "Should be able to identify dashed SxxExx format with title");
     }
 }

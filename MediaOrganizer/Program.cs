@@ -1,5 +1,5 @@
 ﻿using MediaOrganizer.Configuration;
-using MediaOrganizer.Output;
+using MediaOrganizer.IO;
 using MediaOrganizer.Services;
 using MediaOrganizer.Validations;
 using Microsoft.Extensions.Configuration;
@@ -27,7 +27,7 @@ var serviceProvider = services
         builder.AddConfiguration(configuration.GetSection("Logging"))
                .AddSimpleConsole();
     })
-    .AddSingleton<IOutputWriter, ConsoleOutputWriter>()
+    .AddSingleton<IConsoleIO, ConsoleIO>()
     .AddTransient<IFileSystem, FileSystem>()
     .AddTransient<FileSystemValidator>()
     .AddTransient<IMediaFileProvider, MediaFileProvider>()

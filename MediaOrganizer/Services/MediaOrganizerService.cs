@@ -1,24 +1,24 @@
 using System.IO.Abstractions;
 using MediaOrganizer.Configuration;
-using MediaOrganizer.Output;
+using MediaOrganizer.IO;
 using MediaOrganizer.Validations;
 using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Services;
 public class MediaOrganizerService
 {
-    private readonly IOutputWriter _output;
+    private readonly IConsoleIO _console;
     private readonly MediaOrganizerSettings _settings;
     private readonly IMediaFileProvider _mediaFileProvider;
     private readonly MediaFileOrganizer _organizer;
 
-    public MediaOrganizerService(IOutputWriter output,
+    public MediaOrganizerService(IConsoleIO console,
                                  IOptions<MediaOrganizerSettings> settings,
                                  IMediaFileProvider mediaFileProvider,
                                  FileSystemValidator fileSystemValidator,
                                  MediaFileOrganizer organizer)
     {
-        _output = output;
+        _console = console;
         _settings = settings.Value;
         _settings.SetValidator(fileSystemValidator);
         _mediaFileProvider = mediaFileProvider;
@@ -27,24 +27,24 @@ public class MediaOrganizerService
 
     public int Run()
     {
-        _output.WriteLine("Media Organizer");
-        _output.WriteLine("===============");
+        _console.WriteLine("Media Organizer");
+        _console.WriteLine("===============");
 
         if (!_settings.IsValid())
         {
-            _output.WriteError("Configuration validation failed:");
+            _console.WriteError("Configuration validation failed:");
             foreach (var error in _settings.GetValidationErrors())
             {
-                _output.WriteLine($"   • {error}");
+                _console.WriteLine($"   • {error}");
             }
             return 1;
         }
 
-        _output.WriteSuccess("Configuration loaded successfully");
-        _output.WriteLine($"Source Directory: {_settings.SourceDirectory}");
-        _output.WriteLine($"Destination Directory: {_settings.DestinationDirectory}");
-        _output.WriteLine($"Dry Run Mode: {(_settings.DryRun ? "Enabled" : "Disabled")}");
-        _output.WriteLine("");
+        _console.WriteSuccess("Configuration loaded successfully");
+        _console.WriteLine($"Source Directory: {_settings.SourceDirectory}");
+        _console.WriteLine($"Destination Directory: {_settings.DestinationDirectory}");
+        _console.WriteLine($"Dry Run Mode: {(_settings.DryRun ? "Enabled" : "Disabled")}");
+        _console.WriteLine("");
 
         return ShowMainMenu();
     }
@@ -55,15 +55,15 @@ public class MediaOrganizerService
         {
             var mediaFiles = _mediaFileProvider.GetMediaFiles(_settings.SourceDirectory);
             
-            _output.WriteLine("Main Menu");
-            _output.WriteLine("---------");
-            _output.WriteLine($"1. List video files ({mediaFiles.Count()} found)");
-            _output.WriteLine($"2. Organize files ({mediaFiles.Count()} found)");
-            _output.WriteLine("3. Exit");
-            _output.WriteLine("");
-            _output.WriteLine("Choose an option (1-3):");
+            _console.WriteLine("Main Menu");
+            _console.WriteLine("---------");
+            _console.WriteLine($"1. List video files ({mediaFiles.Count()} found)");
+            _console.WriteLine($"2. Organize files ({mediaFiles.Count()} found)");
+            _console.WriteLine("3. Exit");
+            _console.WriteLine("");
+            _console.WriteLine("Choose an option (1-3):");
 
-            var input = Console.ReadLine();
+            var input = _console.ReadLine();
 
             switch (input?.Trim())
             {
@@ -74,51 +74,51 @@ public class MediaOrganizerService
                     OrganizeMediaFiles(mediaFiles);
                     break;
                 case "3":
-                    _output.WriteLine("Goodbye!");
+                    _console.WriteLine("Goodbye!");
                     return 0;
                 default:
-                    _output.WriteError("Invalid option. Please choose 1, 2, or 3.");
+                    _console.WriteError("Invalid option. Please choose 1, 2, or 3.");
                     break;
             }
 
             if (input != "3")
             {
-                _output.WriteLine("");
-                _output.WriteLine("Press any key to continue...");
-                Console.ReadKey(true);
-                _output.WriteLine("");
+                _console.WriteLine("");
+                _console.WriteLine("Press any key to continue...");
+                _console.ReadKey(true);
+                _console.WriteLine("");
             }
         }
     }
 
     private void ListMediaFiles(IEnumerable<IFileInfo> mediaFiles)
     {
-        _output.WriteLine("");
-        _output.WriteLine($"Source Directory: {_settings.SourceDirectory}");
+        _console.WriteLine("");
+        _console.WriteLine($"Source Directory: {_settings.SourceDirectory}");
 
         try
         {
             if (!mediaFiles.Any())
             {
-                _output.WriteLine("No video files found.");
+                _console.WriteLine("No video files found.");
                 return;
             }
 
             foreach (var file in mediaFiles)
             {
-                _output.WriteLine($"   {file.FullName}");
+                _console.WriteLine($"   {file.FullName}");
             }
         }
         catch (Exception ex)
         {
-            _output.WriteError($"Error listing files: {ex.Message}");
+            _console.WriteError($"Error listing files: {ex.Message}");
         }
     }
 
     private void OrganizeMediaFiles(IEnumerable<IFileInfo> mediaFiles)
     {
-        _output.WriteLine("");
-        _output.WriteLine("Starting file organization...");
+        _console.WriteLine("");
+        _console.WriteLine("Starting file organization...");
         
         try
         {
@@ -126,16 +126,16 @@ public class MediaOrganizerService
             
             if (result)
             {
-                _output.WriteSuccess("File organization completed successfully!");
+                _console.WriteSuccess("File organization completed successfully!");
             }
             else
             {
-                _output.WriteError("File organization completed with some issues. Check logs for details.");
+                _console.WriteError("File organization completed with some issues. Check logs for details.");
             }
         }
         catch (Exception ex)
         {
-            _output.WriteError($"Error during file organization: {ex.Message}");
+            _console.WriteError($"Error during file organization: {ex.Message}");
         }
     }
 

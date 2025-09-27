@@ -65,7 +65,7 @@ public class MediaOrganizerService
 
             var input = Console.ReadLine();
 
-            switch (input)
+            switch (input?.Trim())
             {
                 case "1":
                     ListMediaFiles(mediaFiles);

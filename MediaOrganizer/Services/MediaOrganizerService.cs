@@ -41,9 +41,9 @@ public class MediaOrganizerService
         }
 
         _output.WriteSuccess("Configuration loaded successfully");
-        _output.WriteLine($"📂 Source Directory: {_settings.SourceDirectory}");
-        _output.WriteLine($"📂 Destination Directory: {_settings.DestinationDirectory}");
-        _output.WriteLine($"🧪 Dry Run Mode: {(_settings.DryRun ? "Enabled" : "Disabled")}");
+        _output.WriteLine($"Source Directory: {_settings.SourceDirectory}");
+        _output.WriteLine($"Destination Directory: {_settings.DestinationDirectory}");
+        _output.WriteLine($"Dry Run Mode: {(_settings.DryRun ? "Enabled" : "Disabled")}");
         _output.WriteLine("");
 
         return ShowMainMenu();
@@ -94,7 +94,7 @@ public class MediaOrganizerService
     private void ListMediaFiles(IEnumerable<IFileInfo> mediaFiles)
     {
         _output.WriteLine("");
-        _output.WriteLine($"📂 Source Directory: {_settings.SourceDirectory}");
+        _output.WriteLine($"Source Directory: {_settings.SourceDirectory}");
 
         try
         {
@@ -118,7 +118,7 @@ public class MediaOrganizerService
     private void OrganizeMediaFiles(IEnumerable<IFileInfo> mediaFiles)
     {
         _output.WriteLine("");
-        _output.WriteLine("🚀 Starting file organization...");
+        _output.WriteLine("Starting file organization...");
         
         try
         {
@@ -126,16 +126,16 @@ public class MediaOrganizerService
             
             if (result)
             {
-                _output.WriteSuccess("✅ File organization completed successfully!");
+                _output.WriteSuccess("File organization completed successfully!");
             }
             else
             {
-                _output.WriteError("❌ File organization completed with some issues. Check logs for details.");
+                _output.WriteError("File organization completed with some issues. Check logs for details.");
             }
         }
         catch (Exception ex)
         {
-            _output.WriteError($"❌ Error during file organization: {ex.Message}");
+            _output.WriteError($"Error during file organization: {ex.Message}");
         }
     }
 

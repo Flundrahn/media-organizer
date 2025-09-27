@@ -142,7 +142,7 @@ public class TvShowEpisodeParserTests
     {
         // Arrange
         var parser = new TvShowEpisodeParser();
-        var realFilePath = @"D:\fredr\Videos\TV Programmes\Its Always Sunny in Philadelphia S17E08 The Golden Bachelor Live 1080p AMZN WEB-DL DDP5 1 H 264-FLUX[EZTVx.to].mkv";
+        var realFilePath = @"C:\Videos\TV Programmes\Its Always Sunny in Philadelphia S17E08 The Golden Bachelor Live 1080p AMZN WEB-DL DDP5 1 H 264-FLUX[EZTVx.to].mkv";
 
         // Act - Use mock file system for testing, but with the real filename
         var mockFileSystem = new MockFileSystem();
@@ -219,5 +219,89 @@ public class TvShowEpisodeParserTests
 
         // Assert
         Assert.True(canParse, "Should be able to identify dashed SxxExx format with title");
+    }
+
+    [Fact]
+    public void Parse_WithSpacedSxxExxWithQualityPattern_ShouldParseCorrectly()
+    {
+        // Arrange
+        var parser = new TvShowEpisodeParser();
+        var realFilePath = @"C:\Videos\TV Programmes\The Sandman\Season 2\The Sandman S02E07 1080p.mkv";
+
+        // Act - Use mock file system for testing, but with the real filename
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New(realFilePath);
+        var result = parser.Parse(fileInfo);
+
+        // Debug output to understand what's happening
+        var filename = fileInfo.Name;
+        var canParse = parser.CanParse(filename);
+        
+        // Output debug information
+        if (!result.IsValid)
+        {
+            Assert.Fail(
+                $"Parser failed to parse: {filename}\n" +
+                $"CanParse: {canParse}\n" +
+                $"IsValid: {result.IsValid}\n" +
+                $"TvShowName: '{result.TvShowName}'\n" +
+                $"Season: {result.Season}\n" +
+                $"Episode: {result.Episode}\n" +
+                $"Title: '{result.Title}'");
+        }
+
+        // Assert - Expected values for SpacedSxxExxWithQualityPattern
+        Assert.True(result.IsValid, "Should be able to parse SpacedSxxExxWithQualityPattern");
+        Assert.Equal("The Sandman", result.TvShowName);
+        Assert.Equal(2, result.Season);
+        Assert.Equal(7, result.Episode);
+        Assert.Equal("", result.Title); // No episode title in this format
+    }
+
+    [Fact]
+    public void CanParse_WithSpacedSxxExxWithQualityPattern_ShouldReturnTrue()
+    {
+        // Arrange
+        var parser = new TvShowEpisodeParser();
+        var filename = "The Sandman S02E07 1080p.mkv";
+
+        // Act
+        var canParse = parser.CanParse(filename);
+
+        // Assert
+        Assert.True(canParse, "Should be able to identify SpacedSxxExxWithQualityPattern format");
+    }
+
+    [Fact]
+    public void CanParse_WithDashedSxxExxPattern_ShouldReturnTrue()
+    {
+        // Arrange
+        var parser = new TvShowEpisodeParser();
+        var filename = "Breaking Bad - S01E01.mkv";
+
+        // Act
+        var canParse = parser.CanParse(filename);
+
+        // Assert
+        Assert.True(canParse, "Should be able to identify DashedSxxExxPattern format");
+    }
+
+    [Fact]
+    public void Parse_WithDashedSxxExxPattern_ShouldParseCorrectly()
+    {
+        // Arrange
+        var parser = new TvShowEpisodeParser();
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New(@"C:\Videos\TV Programmes\Breaking Bad\Season 1\Breaking Bad - S01E01.mkv");
+
+        // Act
+        var result = parser.Parse(fileInfo);
+
+        // Assert
+        Assert.True(result.IsValid, "Should be able to parse DashedSxxExxPattern");
+        Assert.Equal("Breaking Bad", result.TvShowName);
+        Assert.Equal(1, result.Season);
+        Assert.Equal(1, result.Episode);
+        Assert.Equal("", result.Title); // No episode title in this format
     }
 }

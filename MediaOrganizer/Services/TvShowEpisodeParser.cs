@@ -29,6 +29,14 @@ public class TvShowEpisodeParser : ITvShowEpisodeParser
     private static readonly Regex DashedSxxExxWithTitlePattern = new(
         @"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+-\s+(?<episodeTitle>.+?)(?:\.[^.]+)?$", 
         RegexOptions.IgnoreCase);
+    
+    private static readonly Regex SpacedSxxExxWithQualityPattern = new(
+        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?:\d{4}p|1080p|720p|480p|4K|UHD|HDR|WEB|BluRay|HDTV|BDRip|DVDRip)(?:\.[^.]+)?$", 
+        RegexOptions.IgnoreCase);
+    
+    private static readonly Regex DashedSxxExxPattern = new(
+        @"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.[^.]+)?$", 
+        RegexOptions.IgnoreCase);
 
     private static readonly Regex[] AllPatterns = [
         StandardSxxExxPattern,
@@ -36,7 +44,9 @@ public class TvShowEpisodeParser : ITvShowEpisodeParser
         YearInParenthesesPattern,
         SeasonXEpisodePattern,
         SpacedSxxExxWithTitlePattern,
-        DashedSxxExxWithTitlePattern
+        DashedSxxExxWithTitlePattern,
+        SpacedSxxExxWithQualityPattern,
+        DashedSxxExxPattern
     ];
 
     public bool CanParse(string filename)

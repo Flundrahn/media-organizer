@@ -59,29 +59,30 @@ public class MediaOrganizerService
             _console.WriteLine("---------");
             _console.WriteLine($"1. List video files ({mediaFiles.Count()} found)");
             _console.WriteLine($"2. Organize files ({mediaFiles.Count()} found)");
-            _console.WriteLine("3. Exit");
+            _console.WriteLine("Q. Quit");
             _console.WriteLine("");
-            _console.WriteLine("Choose an option (1-3):");
+            _console.Write("Choose an option: ");
 
-            var input = _console.ReadLine();
+            var key = _console.ReadKey();
+            _console.WriteLine(); // Add newline after key press
 
-            switch (input?.Trim())
+            switch (char.ToUpper(key.KeyChar))
             {
-                case "1":
+                case '1':
                     ListMediaFiles(mediaFiles);
                     break;
-                case "2":
+                case '2':
                     OrganizeMediaFiles(mediaFiles);
                     break;
-                case "3":
+                case 'Q':
                     _console.WriteLine("Goodbye!");
                     return 0;
                 default:
-                    _console.WriteError("Invalid option. Please choose 1, 2, or 3.");
+                    _console.WriteError("Invalid option. Please try again.");
                     break;
             }
 
-            if (input != "3")
+            if (char.ToUpper(key.KeyChar) != 'Q')
             {
                 _console.WriteLine("");
                 _console.WriteLine("Press any key to continue...");

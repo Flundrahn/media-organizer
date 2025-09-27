@@ -10,16 +10,19 @@ public class MediaOrganizerService
     private readonly IOutputWriter _output;
     private readonly MediaOrganizerSettings _settings;
     private readonly IMediaFileProvider _mediaFileProvider;
+    private readonly MediaFileOrganizer _organizer;
 
     public MediaOrganizerService(IOutputWriter output,
                                  IOptions<MediaOrganizerSettings> settings,
                                  IMediaFileProvider mediaFileProvider,
-                                 FileSystemValidator fileSystemValidator)
+                                 FileSystemValidator fileSystemValidator,
+                                 MediaFileOrganizer organizer)
     {
         _output = output;
         _settings = settings.Value;
         _settings.SetValidator(fileSystemValidator);
         _mediaFileProvider = mediaFileProvider;
+        _organizer = organizer;
     }
 
     public int Run()
@@ -55,9 +58,10 @@ public class MediaOrganizerService
             _output.WriteLine("Main Menu");
             _output.WriteLine("---------");
             _output.WriteLine($"1. List video files ({mediaFiles.Count()} found)");
-            _output.WriteLine("2. Exit");
+            _output.WriteLine($"2. Organize files ({mediaFiles.Count()} found)");
+            _output.WriteLine("3. Exit");
             _output.WriteLine("");
-            _output.WriteLine("Choose an option (1-2):");
+            _output.WriteLine("Choose an option (1-3):");
 
             var input = Console.ReadLine();
 
@@ -67,14 +71,17 @@ public class MediaOrganizerService
                     ListMediaFiles(mediaFiles);
                     break;
                 case "2":
+                    OrganizeMediaFiles(mediaFiles);
+                    break;
+                case "3":
                     _output.WriteLine("Goodbye!");
                     return 0;
                 default:
-                    _output.WriteError("Invalid option. Please choose 1 or 2.");
+                    _output.WriteError("Invalid option. Please choose 1, 2, or 3.");
                     break;
             }
 
-            if (input != "2")
+            if (input != "3")
             {
                 _output.WriteLine("");
                 _output.WriteLine("Press any key to continue...");
@@ -105,6 +112,30 @@ public class MediaOrganizerService
         catch (Exception ex)
         {
             _output.WriteError($"Error listing files: {ex.Message}");
+        }
+    }
+
+    private void OrganizeMediaFiles(IEnumerable<IFileInfo> mediaFiles)
+    {
+        _output.WriteLine("");
+        _output.WriteLine("🚀 Starting file organization...");
+        
+        try
+        {
+            var result = _organizer.OrganizeFiles(mediaFiles);
+            
+            if (result)
+            {
+                _output.WriteSuccess("✅ File organization completed successfully!");
+            }
+            else
+            {
+                _output.WriteError("❌ File organization completed with some issues. Check logs for details.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _output.WriteError($"❌ Error during file organization: {ex.Message}");
         }
     }
 

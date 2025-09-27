@@ -39,12 +39,12 @@ public class FileSystemValidator
             return false;
 
         // Check for invalid path characters
-        if (pathSegment.IndexOfAny(InvalidPathChars) >= 0)
+        if (pathSegment.IndexOfAny(InvalidPathChars) > -1)
             return false;
 
         // ALL segments (both directory names and filenames) must follow filename character restrictions
         // because directory names also cannot contain filename invalid characters in Windows
-        if (pathSegment.IndexOfAny(InvalidFileNameChars) >= 0)
+        if (pathSegment.IndexOfAny(InvalidFileNameChars) > -1)
             return false;
 
         return true;

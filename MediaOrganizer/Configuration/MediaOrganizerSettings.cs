@@ -11,18 +11,30 @@ public class MediaOrganizerSettings
 {
     private List<string> _validationErrors = [];
     private FileSystemValidator? _validator;
+    private string _sourceDirectory = string.Empty;
+    private string _destinationDirectory = string.Empty;
 
     public const string SectionName = "MediaOrganizer";
 
     /// <summary>
     /// The source directory to scan for media files
+    /// Automatically converts relative paths to absolute paths
     /// </summary>
-    public string SourceDirectory { get; set; } = string.Empty;
+    public string SourceDirectory 
+    { 
+        get => _sourceDirectory;
+        set => _sourceDirectory = string.IsNullOrWhiteSpace(value) ? string.Empty : Path.GetFullPath(value);
+    }
 
     /// <summary>
     /// The destination directory where organized files will be placed
+    /// Automatically converts relative paths to absolute paths
     /// </summary>
-    public string DestinationDirectory { get; set; } = string.Empty;
+    public string DestinationDirectory 
+    { 
+        get => _destinationDirectory;
+        set => _destinationDirectory = string.IsNullOrWhiteSpace(value) ? string.Empty : Path.GetFullPath(value);
+    }
 
     /// <summary>
     /// When true, only shows what would be done without actually moving files
@@ -70,7 +82,7 @@ public class MediaOrganizerSettings
         }
         else if (!_validator.DirectoryExists(SourceDirectory))
         {
-            _validationErrors.Add("SourceDirectory does not exist");
+            _validationErrors.Add($"SourceDirectory does not exist: {SourceDirectory}");
             isValid = false;
         }
 
@@ -106,7 +118,7 @@ public class MediaOrganizerSettings
             }
 
             // Validate path characters by removing placeholders and checking segments
-            var templateWithoutPlaceholders = System.Text.RegularExpressions.Regex.Replace(
+            var templateWithoutPlaceholders = Regex.Replace(
                 TvShowPathTemplate, 
                 @"\{[^}]*\}", 
                 "X"); // Replace placeholders with a safe character

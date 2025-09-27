@@ -4,6 +4,7 @@ using MediaOrganizer.Services;
 using MediaOrganizer.Validations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO.Abstractions;
 
@@ -21,7 +22,11 @@ var services = new ServiceCollection();
 var serviceProvider = services
     .AddSingleton<IConfiguration>(configuration)
     .Configure<MediaOrganizerSettings>(configuration.GetSection(MediaOrganizerSettings.SectionName))
-    .AddLogging()
+    .AddLogging(builder =>
+    {
+        builder.AddConfiguration(configuration.GetSection("Logging"))
+               .AddSimpleConsole();
+    })
     .AddSingleton<IOutputWriter, ConsoleOutputWriter>()
     .AddTransient<IFileSystem, FileSystem>()
     .AddTransient<FileSystemValidator>()

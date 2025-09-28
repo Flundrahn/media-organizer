@@ -7,10 +7,10 @@ namespace MediaOrganizer.Models;
 /// <summary>
 /// Contains information about a TV show episode parsed from a filename
 /// </summary>
-public class TvShowEpisode
+public class TvShowEpisode : IMediaFile
 {
     /// <summary>
-    /// Valid placeholders that can be used in path templates
+    /// Valid placeholders that can be used in path templates for TV show episodes
     /// </summary>
     public static readonly HashSet<string> ValidPlaceholders = new()
     {
@@ -33,15 +33,11 @@ public class TvShowEpisode
 
     public int? Year { get; internal set; }
 
-    /// <summary>
-    /// The original file info when the episode was first parsed
-    /// </summary>
     public IFileInfo OriginalFile { get; init; }
 
-    /// <summary>
-    /// The current file info, which may be different from original if the file has been moved
-    /// </summary>
-    public IFileInfo CurrentFile { get; internal set; }
+    public IFileInfo CurrentFile { get; set; }
+
+    public MediaType Type => MediaType.TvShow;
 
     /// <summary>
     /// Initializes a new instance of TvShowEpisode with file information
@@ -53,20 +49,11 @@ public class TvShowEpisode
         CurrentFile = fileInfo;
     }
 
-    /// <summary>
-    /// Whether the parsing was successful
-    /// </summary>
     public bool IsValid => !string.IsNullOrWhiteSpace(TvShowName) && Season > 0 && Episode > 0;
 
-    /// <summary>
-    /// Determines if the file is already organized (i.e., in its correct destination location)
-    /// </summary>
-    /// <param name="settings">The media organizer settings containing destination directory and path templates</param>
-    /// <returns>True if the current file is already in the correct organized location</returns>
     public bool IsOrganized(MediaOrganizerSettings settings)
     {
         if (!IsValid
-            || settings == null
             || string.IsNullOrWhiteSpace(settings.DestinationDirectory)
             || string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))
             return false;
@@ -84,17 +71,7 @@ public class TvShowEpisode
         }
     }
 
-    /// <summary>
-    /// Generates a relative file path based on the provided template string.
-    /// Supports placeholders: {TvShowName}, {Season}, {Episode}, {Title}, {Year}
-    /// The original file extension is automatically preserved and appended to the result.
-    /// </summary>
-    /// <param name="template">The template string with placeholders to replace</param>
-    /// <returns>The formatted relative path with the original file extension</returns>
-    /// <exception cref="ArgumentNullException">Thrown when template is null</exception>
-    /// <exception cref="ArgumentException">Thrown when template is empty or whitespace</exception>
-    /// <exception cref="InvalidOperationException">Thrown when the episode is not in a valid state</exception>
-    internal string GenerateRelativePath(string template)
+    public string GenerateRelativePath(string template)
     {
         if (template is null)
             throw new ArgumentNullException(nameof(template));

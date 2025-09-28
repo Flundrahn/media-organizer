@@ -51,7 +51,7 @@ public class MediaFileOrganizer
     public int RemainingCount => _fileStack.Count;
     public OrganizationResult Result => _result;
 
-    public TvShowEpisode? PeekFile()
+    public IMediaFile? PeekFile()
     {
         if (_fileStack.Count == 0) return null;
         
@@ -59,7 +59,7 @@ public class MediaFileOrganizer
         return _parser.Parse(nextFile);
     }
 
-    public TvShowEpisode? OrganizeFile()
+    public IMediaFile? OrganizeFile()
     {
         if (_fileStack.Count == 0) return null;
         
@@ -93,7 +93,7 @@ public class MediaFileOrganizer
         return _result;
     }
 
-    private TvShowEpisode? OrganizeFileInternal(IFileInfo fileInfo)
+    private IMediaFile? OrganizeFileInternal(IFileInfo fileInfo)
     {
         var mediaFile = _parser.Parse(fileInfo);
 
@@ -111,7 +111,8 @@ public class MediaFileOrganizer
             return null;
         }
 
-        string mediaFileRelativePath = mediaFile.GenerateRelativePath(_settings.TvShowPathTemplate);
+        string pathTemplate = GetPathTemplate(mediaFile.Type);
+        string mediaFileRelativePath = mediaFile.GenerateRelativePath(pathTemplate);
         string mediaFileDestinationPath = _fileSystem.Path.Combine(_settings.DestinationDirectory, mediaFileRelativePath);
         string? mediaFileDestinationDir = _fileSystem.Path.GetDirectoryName(mediaFileDestinationPath);
 
@@ -163,5 +164,15 @@ public class MediaFileOrganizer
         mediaFile.CurrentFile = _fileSystem.FileInfo.New(mediaFileDestinationPath);
         _result.OrganizedCount++;
         return mediaFile;
+    }
+
+    private string GetPathTemplate(MediaType mediaType)
+    {
+        return mediaType switch
+        {
+            MediaType.TvShow => _settings.TvShowPathTemplate,
+            MediaType.Movie => throw new NotSupportedException("Movie support is not yet implemented"),
+            _ => throw new ArgumentException($"Unknown media type: {mediaType}", nameof(mediaType))
+        };
     }
 }

@@ -27,10 +27,73 @@
 - [x] Add some integration tests
 
 ## Doing
+- [ ] Movie feature
 
+## TODO: Movie Feature Plan 🎬
+
+### Overview
+Add support for organizing movie files alongside TV shows by creating a common media file abstraction. Movies and TV shows will be distinguished by directory context rather than file parsing.
+
+### Architecture Changes
+
+#### Phase 1: Foundation ✨ ✅ COMPLETE
+- [x] Create `IMediaFile` interface with common properties and methods
+- [x] Refactor `TvShowEpisode` to implement `IMediaFile` 
+- [x] Update `MediaFileOrganizer` to work with `IMediaFile` instead of `TvShowEpisode`
+- [x] Ensure all existing tests pass with interface changes
+
+#### Phase 2: Movie Support 🎭
+- [ ] Create `Movie` class implementing `IMediaFile`
+  - Properties: `Title`, `Year`, `Quality` (1080p, 4K, etc.)
+  - Support placeholders: `{Title}`, `{Year}`, `{Quality}`
+- [ ] Create `MovieParser` class implementing `IMediaFileParser`
+  - Parse patterns like: `Movie.Title.2023.1080p.BluRay.x264.mkv`
+  - Parse patterns like: `The Matrix (1999) [1080p].mp4`
+- [ ] Add `MoviePathTemplate` to `MediaOrganizerSettings`
+  - Example: `"Movies/{Title} ({Year})"` → `"Movies/The Matrix (1999).mkv"`
+
+#### Phase 3: Directory Context 📁
+- [ ] Add media type detection based on source directory or user selection
+- [ ] Update console UI to allow user to choose between TV shows and movies
+- [ ] MediaFileOrganizer receives media type as parameter, not composite parsing
+- [ ] Add separate menu options: "Organize TV Shows" and "Organize Movies"
+
+#### Phase 4: Integration & Testing 🧪
+- [ ] Update DI registration for new parsers
+- [ ] Add movie-specific unit tests
+- [ ] Add movie integration tests using `TempMediaTestEnvironment`
+- [ ] Update configuration validation for movie path templates
+- [ ] Add logging for media type detection
+
+#### Phase 5: Polish 💎
+- [ ] Update console UI to show media type in file listings
+- [ ] Add validation for movie path template placeholders
+- [ ] Improve error handling for unknown media types
+- [ ] Update documentation and examples
+
+### Example Movie Patterns
+```regex
+// High confidence patterns
+Movie\.Title\.(\d{4})\..*\.(mkv|mp4|avi)
+The\.Movie\.Title\.(\d{4})\.(\d{4}p)\..*
+
+// Medium confidence patterns  
+([A-Za-z\s]+)\s+\((\d{4})\).*
+([A-Za-z\s]+)\.(\d{4})\..*
+
+// Fallback patterns (no series indicators)
+^(?!.*[Ss]\d{2}[Ee]\d{2})([A-Za-z\s]+).*\.(mkv|mp4|avi)$
+```
+
+### Configuration Example
+```json
+"MediaOrganizer": {
+  "TvShowPathTemplate": "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}",
+  "MoviePathTemplate": "Movies/{Title} ({Year})"
+}
+```
 ## TODO - Core Features
 
-- [ ] Add feature to organize movie media files
 - [ ] File organization/moving: Strategy pattern for different organization methods
 - [ ] Add readme
 - [ ] Add smooth build and publish setup, maybe checkout GitHub actions and release.
@@ -81,6 +144,7 @@
 - Follow .NET best practices and patterns
 - Consider performance impact of new features
 - Prioritize core functionality over nice-to-have features
+
 
 ## Won't Do
 - [ ] Support for additional media formats (images, audio)

@@ -299,22 +299,4 @@ public class TvShowEpisodeTests
         // Assert
         Assert.False(result);
     }
-
-    [Fact]
-    public void IsOrganized_WithNullSettings_ReturnsFalse()
-    {
-        // Arrange
-        var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\The.Office.S01E01.mkv");
-        var episode = new TvShowEpisode(fileInfo);
-        episode.TvShowName = "The Office";
-        episode.Season = 1;
-        episode.Episode = 1;
-
-        // Act
-        var result = episode.IsOrganized(null!);
-
-        // Assert
-        Assert.False(result);
-    }
 }

@@ -67,15 +67,32 @@ public class MediaOrganizerService
             var key = _console.ReadKey();
             _console.WriteLine(); // Add newline after key press
 
-            switch (char.ToUpper(key.KeyChar))
+            switch (key.Key)
             {
-                case '1':
-                    ListMediaFiles(mediaFiles);
+                case ConsoleKey.D1:
+                case ConsoleKey.NumPad1:
+                    if (count == 0)
+                    {
+                        _console.WriteWarning("No video files found in the source directory.");
+                    }
+                    else
+                    {
+                        ListMediaFiles(mediaFiles);
+                    }
                     break;
-                case '2':
-                    OrganizeMediaFiles(mediaFiles);
+                case ConsoleKey.D2:
+                case ConsoleKey.NumPad2:
+                    if (count == 0)
+                    {
+                        _console.WriteWarning("No video files found to organize.");
+                    }
+                    else
+                    {
+                        OrganizeMediaFiles(mediaFiles);
+                    }
                     break;
-                case 'Q':
+                case ConsoleKey.Q:
+                case ConsoleKey.Escape:
                     _console.WriteLine("Goodbye!");
                     return 0;
                 default:
@@ -100,12 +117,11 @@ public class MediaOrganizerService
 
         try
         {
-            // TODO: validate this and show feedback in main menu instead using count
-            // if (!mediaFiles.Any())
-            // {
-            //     _console.WriteLine("No video files found.");
-            //     return;
-            // }
+            if (!mediaFiles.Any())
+            {
+                _console.WriteError("No video files found to organize.");
+                return;
+            }
 
             foreach (var file in mediaFiles)
             {
@@ -160,7 +176,7 @@ public class MediaOrganizerService
             if (currentFile != null && currentFile.IsValid)
             {
                 _console.WriteLine($"Next file: {currentFile.OriginalFile.Name}");
-                _console.WriteLine($"Will organize as: {currentFile.TvShowName} | S{currentFile.Season:D2}E{currentFile.Episode:D2} | {currentFile.Title}");
+                _console.WriteLine($"Will organize as: {currentFile}");
             }
             else
             {
@@ -180,7 +196,7 @@ public class MediaOrganizerService
                     var result = _organizer.OrganizeFile();
                     if (result != null && result.IsValid)
                     {
-                        _console.WriteSuccess($"Organized: {result.TvShowName} - S{result.Season:D2}E{result.Episode:D2}");
+                        _console.WriteSuccess($"Organized: {result}");
                     }
                     else
                     {
@@ -194,7 +210,7 @@ public class MediaOrganizerService
                     return;
                 case ConsoleKey.S:
                     _organizer.SkipFile();
-                    _console.WriteLine("Skipped file");
+                    _console.WriteInformation("Skipped file");
                     break;
                 case ConsoleKey.Escape:
                     _console.WriteLine("Organization cancelled by user");

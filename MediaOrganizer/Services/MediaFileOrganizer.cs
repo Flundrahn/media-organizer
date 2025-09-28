@@ -74,7 +74,7 @@ public class MediaFileOrganizer
         _result.ProcessedCount++;
         _result.SkippedCount++;
         
-        _logger.LogInformation("Skipped {FileName} by user request", fileInfo.Name);
+        _logger.LogDebug("Skipped {FileName} by user request", fileInfo.Name);
     }
 
     public OrganizationResult OrganizeAllFiles()

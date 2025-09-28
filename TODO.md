@@ -21,9 +21,9 @@
 - [x] Use env dependent path separation character
 - [x] Fix bugs with certain unparse-able files
 - [x] Support using full paths for organizing tv show files to search within existing show and episode directories
+- [x] Interactive file organization with options to organize one file at a time, skip files, or organize all remaining files
 
 ## Doing
-- [ ] Interactive file organization with options to organize one file at a time, skip files, or organize all remaining files
 
 ## TODO - Core Features
 

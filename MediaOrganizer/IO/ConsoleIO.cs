@@ -2,12 +2,12 @@ namespace MediaOrganizer.IO;
 
 public class ConsoleIO : IConsoleIO
 {
-
-    public void WriteLine(string message = "")
+    public void WriteInformation(string message)
     {
-        Console.WriteLine(message);
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine($"[INFO] {message}");
+        Console.ResetColor();
     }
-
     public void WriteSuccess(string message)
     {
         Console.ForegroundColor = ConsoleColor.Green;
@@ -29,18 +29,11 @@ public class ConsoleIO : IConsoleIO
         Console.ResetColor();
     }
 
-    public void Write(string message)
-    {
-        Console.Write(message);
-    }
+    public void WriteLine(string message = "") => Console.WriteLine(message);
 
-    public string? ReadLine()
-    {
-        return Console.ReadLine();
-    }
+    public void Write(string message) => Console.Write(message);
 
-    public ConsoleKeyInfo ReadKey(bool intercept = false)
-    {
-        return Console.ReadKey(intercept);
-    }
+    public string? ReadLine() => Console.ReadLine();
+
+    public ConsoleKeyInfo ReadKey(bool intercept = false) => Console.ReadKey(intercept);
 }

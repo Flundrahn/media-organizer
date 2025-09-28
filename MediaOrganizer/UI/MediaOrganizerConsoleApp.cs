@@ -1,11 +1,17 @@
 using System.IO.Abstractions;
 using MediaOrganizer.Configuration;
 using MediaOrganizer.IO;
+using MediaOrganizer.Services;
 using MediaOrganizer.Validations;
 using Microsoft.Extensions.Options;
 
-namespace MediaOrganizer.Services;
-public class MediaOrganizerService
+namespace MediaOrganizer.UI;
+
+/// <summary>
+/// Console-based user interface for the Media Organizer application.
+/// Handles user interaction, menu navigation, and presentation of results.
+/// </summary>
+public class MediaOrganizerConsoleApp
 {
     private readonly IConsoleIO _console;
     private readonly MediaOrganizerSettings _settings;
@@ -13,12 +19,12 @@ public class MediaOrganizerService
     private readonly MediaFileOrganizer _organizer;
     private readonly IDirectoryCleaner _directoryCleaner;
 
-    public MediaOrganizerService(IConsoleIO console,
-                                 IOptions<MediaOrganizerSettings> settings,
-                                 IMediaFileProvider mediaFileProvider,
-                                 FileSystemValidator fileSystemValidator,
-                                 MediaFileOrganizer organizer,
-                                 IDirectoryCleaner directoryCleaner)
+    public MediaOrganizerConsoleApp(IConsoleIO console,
+                                    IOptions<MediaOrganizerSettings> settings,
+                                    IMediaFileProvider mediaFileProvider,
+                                    FileSystemValidator fileSystemValidator,
+                                    MediaFileOrganizer organizer,
+                                    IDirectoryCleaner directoryCleaner)
     {
         _console = console;
         _settings = settings.Value;

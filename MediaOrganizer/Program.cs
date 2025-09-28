@@ -1,6 +1,7 @@
 ﻿using MediaOrganizer.Configuration;
 using MediaOrganizer.IO;
 using MediaOrganizer.Services;
+using MediaOrganizer.UI;
 using MediaOrganizer.Validations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +35,7 @@ var serviceProvider = services
     .AddTransient<ITvShowEpisodeParser, TvShowEpisodeParser>()
     .AddTransient<IDirectoryCleaner, DirectoryCleaner>()
     .AddTransient<MediaFileOrganizer>()
-    .AddTransient<MediaOrganizerService>()
+    .AddTransient<MediaOrganizerConsoleApp>()
     .BuildServiceProvider();
 
 // Validate settings early
@@ -48,6 +49,6 @@ if (settings is null)
 }
 
 
-var mediaService = serviceProvider.GetRequiredService<MediaOrganizerService>();
+var mediaService = serviceProvider.GetRequiredService<MediaOrganizerConsoleApp>();
 
 return mediaService.Run();

@@ -3,6 +3,7 @@ using MediaOrganizer.Configuration;
 using MediaOrganizer.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Moq;
 
 namespace MediaOrganizer.Tests.Services;
 
@@ -35,12 +36,14 @@ public class MediaFileOrganizerTests
         var optionsWrapper = Options.Create(_settings);
         var logger = NullLogger<MediaFileOrganizer>.Instance;
         var parser = new TvShowEpisodeParser();
+        var mockDirectoryCleaner = new Mock<IDirectoryCleaner>();
         
         _sut = new MediaFileOrganizer(
             _mockFileSystem,
             logger,
             parser,
-            optionsWrapper);
+            optionsWrapper,
+            mockDirectoryCleaner.Object);
     }
 
     [Fact]
@@ -155,5 +158,86 @@ public class MediaFileOrganizerTests
         var allFiles = _mockFileSystem.Directory.GetFiles(DestinationDirectory, "*", SearchOption.AllDirectories);
         Assert.Single(allFiles); // Only the original file should exist
         Assert.Equal(correctDestinationPath, allFiles[0]);
+    }
+
+    [Fact]
+    public void OrganizeFile_WithCleanupEnabled_CallsDirectoryCleaner()
+    {
+        // Arrange
+        var sourceFilePath = Path.Combine(SourceDirectory, "The.Office.S01E01.Pilot.mkv");
+        _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
+        
+        _settings.AutoCleanupEmptyDirectories = true;
+
+        var mockDirectoryCleaner = new Mock<IDirectoryCleaner>();
+        var organizer = new MediaFileOrganizer(
+            _mockFileSystem,
+            NullLogger<MediaFileOrganizer>.Instance,
+            new TvShowEpisodeParser(),
+            Options.Create(_settings),
+            mockDirectoryCleaner.Object);
+
+        var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
+
+        // Act
+        organizer.Initialize([fileInfo]);
+        organizer.OrganizeFile();
+
+        // Assert
+        mockDirectoryCleaner.Verify(x => x.CleanEmptyDirectories(), Times.Once);
+    }
+
+    [Fact]
+    public void OrganizeFile_WithCleanupDisabled_DoesNotCallDirectoryCleaner()
+    {
+        // Arrange
+        var sourceFilePath = Path.Combine(SourceDirectory, "The.Office.S01E01.Pilot.mkv");
+        _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
+        
+        _settings.AutoCleanupEmptyDirectories = false;
+
+        var mockDirectoryCleaner = new Mock<IDirectoryCleaner>();
+        var organizer = new MediaFileOrganizer(
+            _mockFileSystem,
+            NullLogger<MediaFileOrganizer>.Instance,
+            new TvShowEpisodeParser(),
+            Options.Create(_settings),
+            mockDirectoryCleaner.Object);
+
+        var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
+
+        // Act
+        organizer.Initialize([fileInfo]);
+        organizer.OrganizeFile();
+
+        // Assert
+        mockDirectoryCleaner.Verify(x => x.CleanEmptyDirectories(), Times.Never);
+    }
+
+    [Fact]
+    public void OrganizeFile_WithCleanupEnabled_CallsDirectoryCleanerRegardlessOfDirectoryState()
+    {
+        // Arrange
+        var sourceFilePath = Path.Combine(SourceDirectory, "The.Office.S01E01.Pilot.mkv");
+        _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
+        
+        _settings.AutoCleanupEmptyDirectories = true;
+
+        var mockDirectoryCleaner = new Mock<IDirectoryCleaner>();
+        var organizer = new MediaFileOrganizer(
+            _mockFileSystem,
+            NullLogger<MediaFileOrganizer>.Instance,
+            new TvShowEpisodeParser(),
+            Options.Create(_settings),
+            mockDirectoryCleaner.Object);
+
+        var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
+
+        // Act
+        organizer.Initialize([fileInfo]);
+        organizer.OrganizeFile();
+
+        // Assert
+        mockDirectoryCleaner.Verify(x => x.CleanEmptyDirectories(), Times.Once);
     }
 }

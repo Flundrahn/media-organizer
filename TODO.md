@@ -23,12 +23,12 @@
 - [x] Support using full paths for organizing tv show files to search within existing show and episode directories
 - [x] Interactive file organization with options to organize one file at a time, skip files, or organize all remaining files
 - [x] Add support to configure allowed video file extensions
+- [x] Add support to clean up empty directories after moving files
 
 ## Doing
 
 ## TODO - Core Features
 
-- [ ] Add support to clean up empty directories after moving files
 - [ ] Add feature to organize movie media files
 - [ ] File organization/moving: Strategy pattern for different organization methods
 - [ ] Add readme

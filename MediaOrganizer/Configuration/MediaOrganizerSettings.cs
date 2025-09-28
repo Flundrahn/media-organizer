@@ -58,7 +58,14 @@ public class MediaOrganizerSettings
     /// Extensions should include the dot (e.g., ".mp4", ".avi").
     /// Case-insensitive matching is used.
     /// </summary>
-    public List<string> VideoFileExtensions { get; set; } = [];
+    public List<string> VideoFileExtensions { get; set; } = new List<string>();
+
+    /// <summary>
+    /// When true, automatically removes empty directories after finishing OrganizeFiles operation.
+    /// Only removes directories that become empty as a result of the file organization process.
+    /// Note: Directory cleanup can also be run manually through the application menu.
+    /// </summary>
+    public bool AutoCleanupEmptyDirectories { get; set; } = false;
 
     public ICollection<string> GetValidationErrors() => _validationErrors;
 

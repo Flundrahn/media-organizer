@@ -32,6 +32,7 @@ var serviceProvider = services
     .AddTransient<FileSystemValidator>()
     .AddTransient<IMediaFileProvider, MediaFileProvider>()
     .AddTransient<ITvShowEpisodeParser, TvShowEpisodeParser>()
+    .AddTransient<IDirectoryCleaner, DirectoryCleaner>()
     .AddTransient<MediaFileOrganizer>()
     .AddTransient<MediaOrganizerService>()
     .BuildServiceProvider();

@@ -11,18 +11,21 @@ public class MediaOrganizerService
     private readonly MediaOrganizerSettings _settings;
     private readonly IMediaFileProvider _mediaFileProvider;
     private readonly MediaFileOrganizer _organizer;
+    private readonly IDirectoryCleaner _directoryCleaner;
 
     public MediaOrganizerService(IConsoleIO console,
                                  IOptions<MediaOrganizerSettings> settings,
                                  IMediaFileProvider mediaFileProvider,
                                  FileSystemValidator fileSystemValidator,
-                                 MediaFileOrganizer organizer)
+                                 MediaFileOrganizer organizer,
+                                 IDirectoryCleaner directoryCleaner)
     {
         _console = console;
         _settings = settings.Value;
         _settings.SetValidator(fileSystemValidator);
         _mediaFileProvider = mediaFileProvider;
         _organizer = organizer;
+        _directoryCleaner = directoryCleaner;
     }
 
     public int Run()
@@ -60,6 +63,7 @@ public class MediaOrganizerService
             _console.WriteLine("---------");
             _console.WriteLine($"1. List video files ({count} found)");
             _console.WriteLine($"2. Organize files ({count} found)");
+            _console.WriteLine("3. Clean empty directories");
             _console.WriteLine("Q. Quit");
             _console.WriteLine("");
             _console.Write("Choose an option: ");
@@ -91,6 +95,10 @@ public class MediaOrganizerService
                         OrganizeMediaFiles(mediaFiles);
                     }
                     break;
+                case ConsoleKey.D3:
+                case ConsoleKey.NumPad3:
+                    CleanEmptyDirectories();
+                    break;
                 case ConsoleKey.Q:
                 case ConsoleKey.Escape:
                     _console.WriteLine("Goodbye!");
@@ -115,22 +123,15 @@ public class MediaOrganizerService
         _console.WriteLine("");
         _console.WriteLine($"Source Directory: {_settings.SourceDirectory}");
 
-        try
+        if (!mediaFiles.Any())
         {
-            if (!mediaFiles.Any())
-            {
-                _console.WriteError("No video files found to organize.");
-                return;
-            }
-
-            foreach (var file in mediaFiles)
-            {
-                _console.WriteLine($"   {Path.GetRelativePath(_settings.SourceDirectory, file.FullName)}");
-            }
+            _console.WriteError("No video files found to organize.");
+            return;
         }
-        catch (Exception ex)
+
+        foreach (var file in mediaFiles)
         {
-            _console.WriteError($"Error listing files: {ex.Message}");
+            _console.WriteLine($"   {Path.GetRelativePath(_settings.SourceDirectory, file.FullName)}");
         }
     }
 
@@ -140,29 +141,22 @@ public class MediaOrganizerService
         _console.WriteLine("Interactive File Organization");
         _console.WriteLine("============================");
         
-        try
+        _organizer.Initialize(mediaFiles);
+        
+        if (_organizer.RemainingCount == 0)
         {
-            _organizer.Initialize(mediaFiles);
-            
-            if (_organizer.RemainingCount == 0)
-            {
-                _console.WriteLine("No files to organize.");
-                return;
-            }
-            
-            _console.WriteLine("Controls:");
-            _console.WriteLine("  ENTER - Organize current file");
-            _console.WriteLine("  A     - Organize all remaining files");
-            _console.WriteLine("  S     - Skip current file");
-            _console.WriteLine("  ESC   - Exit organization");
-            _console.WriteLine("");
-            
-            ProcessFilesInteractively();
+            _console.WriteLine("No files to organize.");
+            return;
         }
-        catch (Exception ex)
-        {
-            _console.WriteError($"Error during file organization: {ex.Message}");
-        }
+        
+        _console.WriteLine("Controls:");
+        _console.WriteLine("  ENTER - Organize current file");
+        _console.WriteLine("  A     - Organize all remaining files");
+        _console.WriteLine("  S     - Skip current file");
+        _console.WriteLine("  ESC   - Exit organization");
+        _console.WriteLine("");
+        
+        ProcessFilesInteractively();
     }
 
     private void ProcessFilesInteractively()
@@ -227,16 +221,19 @@ public class MediaOrganizerService
         _console.WriteSuccess($"Organization complete: {stats.OrganizedCount} organized, {stats.SkippedCount} skipped, {stats.FailedCount} failed out of {stats.ProcessedCount} total files");
     }
 
-    private string FormatFileSize(long bytes)
+    private void CleanEmptyDirectories()
     {
-        string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
-        int counter = 0;
-        decimal number = bytes;
-        while (Math.Round(number / 1024) >= 1)
-        {
-            number /= 1024;
-            counter++;
-        }
-        return $"{number:n1}{suffixes[counter]}";
+        _console.WriteLine("");
+        _console.WriteLine("Clean Empty Directories");
+        _console.WriteLine("=======================");
+        
+        _console.WriteLine($"Scanning directories in:");
+        _console.WriteLine($"  Source: {_settings.SourceDirectory}");
+        _console.WriteLine($"  Destination: {_settings.DestinationDirectory}");
+        _console.WriteLine("");
+        
+        _directoryCleaner.CleanEmptyDirectories();
+        
+        _console.WriteSuccess("Empty directory cleanup completed");
     }
 }

@@ -21,6 +21,7 @@ public class MediaFileOrganizer
     private readonly ILogger<MediaFileOrganizer> _logger;
     private readonly ITvShowEpisodeParser _parser;
     private readonly MediaOrganizerSettings _settings;
+    private readonly IDirectoryCleaner _directoryCleaner;
     
     private Stack<IFileInfo> _fileStack;
     private OrganizationResult _result;
@@ -29,12 +30,14 @@ public class MediaFileOrganizer
         IFileSystem fileSystem,
         ILogger<MediaFileOrganizer> logger,
         ITvShowEpisodeParser parser,
-        IOptions<MediaOrganizerSettings> settings)
+        IOptions<MediaOrganizerSettings> settings,
+        IDirectoryCleaner directoryCleaner)
     {
         _fileSystem = fileSystem;
         _logger = logger;
         _parser = parser;
         _settings = settings.Value;
+        _directoryCleaner = directoryCleaner;
         _fileStack = new Stack<IFileInfo>();
         _result = new OrganizationResult();
     }
@@ -136,7 +139,8 @@ public class MediaFileOrganizer
                     _fileSystem.Directory.CreateDirectory(mediaFileDestinationDir);
                 }
 
-                _fileSystem.File.Move(fileInfo.FullName, mediaFileDestinationPath);
+                var originalFilePath = fileInfo.FullName;
+                _fileSystem.File.Move(originalFilePath, mediaFileDestinationPath);
             }
             catch (Exception ex)
             {
@@ -144,6 +148,11 @@ public class MediaFileOrganizer
                 _result.FailedCount++;
                 return null;
             }
+        }
+
+        if (_settings.AutoCleanupEmptyDirectories)
+        {
+            _directoryCleaner.CleanEmptyDirectories();
         }
 
         _logger.LogInformation("{Prefix} {FileName} -> {FileDestinationPath}",

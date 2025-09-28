@@ -53,6 +53,13 @@ public class MediaOrganizerSettings
     /// </summary>
     public string TvShowPathTemplate { get; set; } = string.Empty;
 
+    /// <summary>
+    /// List of video file extensions to include when scanning for media files.
+    /// Extensions should include the dot (e.g., ".mp4", ".avi").
+    /// Case-insensitive matching is used.
+    /// </summary>
+    public List<string> VideoFileExtensions { get; set; } = [];
+
     public ICollection<string> GetValidationErrors() => _validationErrors;
 
     // Set manually since options need empty ctor
@@ -128,6 +135,43 @@ public class MediaOrganizerSettings
             {
                 _validationErrors.Add("TvShowPathTemplate contains invalid path characters");
                 isValid = false;
+            }
+        }
+
+        // Validate video file extensions
+        if (VideoFileExtensions == null || VideoFileExtensions.Count == 0)
+        {
+            _validationErrors.Add("VideoFileExtensions must contain at least one extension");
+            isValid = false;
+        }
+        else
+        {
+            foreach (var extension in VideoFileExtensions)
+            {
+                if (string.IsNullOrWhiteSpace(extension))
+                {
+                    _validationErrors.Add("VideoFileExtensions cannot contain empty or whitespace extensions");
+                    isValid = false;
+                    break;
+                }
+                
+                if (!extension.StartsWith('.'))
+                {
+                    _validationErrors.Add($"VideoFileExtensions must start with a dot: '{extension}'");
+                    isValid = false;
+                }
+                
+                if (extension.Length < 2)
+                {
+                    _validationErrors.Add($"VideoFileExtensions must have at least one character after the dot: '{extension}'");
+                    isValid = false;
+                }
+
+                if (_validator != null && !_validator.IsValidPathSegment(extension))
+                {
+                    _validationErrors.Add($"VideoFileExtensions contains invalid characters: '{extension}'");
+                    isValid = false;
+                }
             }
         }
 

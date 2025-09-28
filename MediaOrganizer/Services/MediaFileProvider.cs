@@ -13,15 +13,13 @@ public class MediaFileProvider : IMediaFileProvider
 {
     private readonly IFileSystem _fileSystem;
     private readonly bool _includeSubdirectories;
-    private readonly HashSet<string> _videoExtensions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm", ".m4v", ".3gp"
-    };
+    private readonly HashSet<string> _videoExtensions;
 
     public MediaFileProvider(IFileSystem fileSystem, IOptions<MediaOrganizerSettings> settings)
     {
         _fileSystem = fileSystem;
         _includeSubdirectories = settings.Value.IncludeSubdirectories;
+        _videoExtensions = new HashSet<string>(settings.Value.VideoFileExtensions, StringComparer.OrdinalIgnoreCase);
     }
 
     public IEnumerable<IFileInfo> GetMediaFiles(string directoryPath)

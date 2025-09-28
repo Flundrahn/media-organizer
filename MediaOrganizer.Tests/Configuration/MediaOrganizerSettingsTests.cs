@@ -30,6 +30,7 @@ public class MediaOrganizerSettingsTests
         Assert.True(settings.DryRun);
         Assert.True(settings.IncludeSubdirectories);
         Assert.Equal(string.Empty, settings.TvShowPathTemplate);
+        Assert.Empty(settings.VideoFileExtensions);
     }
 
     [Fact]
@@ -62,6 +63,7 @@ public class MediaOrganizerSettingsTests
         _settings.SourceDirectory = sourceDir;
         _settings.DestinationDirectory = destDir;
         _settings.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _settings.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
 
         // Act
         var result = _settings.IsValid();
@@ -162,6 +164,7 @@ public class MediaOrganizerSettingsTests
         _settings.SourceDirectory = "";
         _settings.DestinationDirectory = "";
         _settings.TvShowPathTemplate = "";
+        _settings.VideoFileExtensions = new List<string>(); // Empty list
 
         // Act
         var result = _settings.IsValid();
@@ -172,7 +175,8 @@ public class MediaOrganizerSettingsTests
         Assert.Contains("SourceDirectory is required", errors);
         Assert.Contains("DestinationDirectory is required", errors);
         Assert.Contains("TvShowPathTemplate is required", errors);
-        Assert.Equal(3, errors.Count);
+        Assert.Contains("VideoFileExtensions must contain at least one extension", errors);
+        Assert.Equal(4, errors.Count);
     }
 
     [Fact]
@@ -185,6 +189,7 @@ public class MediaOrganizerSettingsTests
         _settings.SourceDirectory = "";
         _settings.DestinationDirectory = destDir;
         _settings.TvShowPathTemplate = "{TvShowName}";
+        _settings.VideoFileExtensions = new List<string> { ".mp4" };
 
         // Act - First call with error
         var firstResult = _settings.IsValid();
@@ -221,6 +226,7 @@ public class MediaOrganizerSettingsTests
         _settings.SourceDirectory = sourceDir;
         _settings.DestinationDirectory = destDir;
         _settings.TvShowPathTemplate = pattern;
+        _settings.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
 
         // Act
         var result = _settings.IsValid();
@@ -248,6 +254,7 @@ public class MediaOrganizerSettingsTests
         settings.SourceDirectory = sourceDir;
         settings.DestinationDirectory = destDir;
         settings.TvShowPathTemplate = "{TvShowName}";
+        settings.VideoFileExtensions = new List<string> { ".mp4" };
 
         // Should not throw since validator is set
         var result = settings.IsValid();
@@ -302,6 +309,7 @@ public class MediaOrganizerSettingsTests
         _settings.SourceDirectory = sourceDir;
         _settings.DestinationDirectory = destDir;
         _settings.TvShowPathTemplate = validTemplate;
+        _settings.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
 
         // Act
         var result = _settings.IsValid();
@@ -326,6 +334,7 @@ public class MediaOrganizerSettingsTests
         _settings.SourceDirectory = sourceDir;
         _settings.DestinationDirectory = destDir;
         _settings.TvShowPathTemplate = template;
+        _settings.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
 
         // Act
         var result = _settings.IsValid();
@@ -342,6 +351,7 @@ public class MediaOrganizerSettingsTests
         _settings.SourceDirectory = "";
         _settings.DestinationDirectory = "";
         _settings.TvShowPathTemplate = "{TvShowName}/<>Invalid";  // Invalid characters
+        // VideoFileExtensions is empty by default, which will add another error
 
         // Act
         var result = _settings.IsValid();
@@ -352,7 +362,8 @@ public class MediaOrganizerSettingsTests
         Assert.Contains("SourceDirectory is required", errors);
         Assert.Contains("DestinationDirectory is required", errors);
         Assert.Contains("TvShowPathTemplate contains invalid path characters", errors);
-        Assert.Equal(3, errors.Count);
+        Assert.Contains("VideoFileExtensions must contain at least one extension", errors);
+        Assert.Equal(4, errors.Count);
     }
 
     [Fact]
@@ -463,5 +474,75 @@ public class MediaOrganizerSettingsTests
         // Assert
         Assert.Equal(currentDir, settings.SourceDirectory);
         Assert.Equal(currentDir, settings.DestinationDirectory);
+    }
+
+    [Theory]
+    [InlineData(null, false, "VideoFileExtensions must contain at least one extension")] // Null list
+    [InlineData(new string[0], false, "VideoFileExtensions must contain at least one extension")] // Empty list
+    [InlineData(new string[] { "" }, false, "VideoFileExtensions cannot contain empty or whitespace extensions")] // Empty string extension
+    [InlineData(new string[] { "   " }, false, "VideoFileExtensions cannot contain empty or whitespace extensions")] // Whitespace extension
+    [InlineData(new string[] { "mp4" }, false, "VideoFileExtensions must start with a dot: 'mp4'")] // Extension without dot
+    [InlineData(new string[] { "avi" }, false, "VideoFileExtensions must start with a dot: 'avi'")] // Extension without dot
+    [InlineData(new string[] { "." }, false, "VideoFileExtensions must have at least one character after the dot: '.'")] // Dot only extension
+    [InlineData(new string[] { ".mp*" }, false, "VideoFileExtensions contains invalid characters: '.mp*'")] // Extension with asterisk
+    [InlineData(new string[] { ".avi?" }, false, "VideoFileExtensions contains invalid characters: '.avi?'")] // Extension with question mark
+    [InlineData(new string[] { ".mkv<" }, false, "VideoFileExtensions contains invalid characters: '.mkv<'")] // Extension with less than
+    [InlineData(new string[] { ".mp4>" }, false, "VideoFileExtensions contains invalid characters: '.mp4>'")] // Extension with greater than
+    [InlineData(new string[] { ".avi|" }, false, "VideoFileExtensions contains invalid characters: '.avi|'")] // Extension with pipe
+    [InlineData(new string[] { ".mkv:" }, false, "VideoFileExtensions contains invalid characters: '.mkv:'")] // Extension with colon
+    [InlineData(new string[] { ".mp4\"" }, false, "VideoFileExtensions contains invalid characters: '.mp4\"'")] // Extension with quote
+    [InlineData(new string[] { ".avi\\" }, false, "VideoFileExtensions contains invalid characters: '.avi\\'")] // Extension with backslash
+    [InlineData(new string[] { ".mkv/" }, false, "VideoFileExtensions contains invalid characters: '.mkv/'")] // Extension with forward slash
+    [InlineData(new string[] { ".mp4" }, true, null)] // Valid mp4 extension
+    [InlineData(new string[] { ".avi" }, true, null)] // Valid avi extension
+    [InlineData(new string[] { ".mkv" }, true, null)] // Valid mkv extension
+    [InlineData(new string[] { ".mov" }, true, null)] // Valid mov extension
+    [InlineData(new string[] { ".wmv" }, true, null)] // Valid wmv extension
+    [InlineData(new string[] { ".flv" }, true, null)] // Valid flv extension
+    [InlineData(new string[] { ".webm" }, true, null)] // Valid webm extension
+    [InlineData(new string[] { ".m4v" }, true, null)] // Valid m4v extension
+    [InlineData(new string[] { ".3gp" }, true, null)] // Valid 3gp extension
+    [InlineData(new string[] { ".MP4" }, true, null)] // Valid uppercase extension
+    [InlineData(new string[] { ".mp4v" }, true, null)] // Valid multi-character extension
+    [InlineData(new string[] { ".mp4", ".avi", ".mkv", ".mov", ".wmv" }, true, null)] // Multiple valid extensions
+    public void IsValid_VideoFileExtensionsValidation(string[]? extensions, bool expectedValid, string? expectedErrorSubstring)
+    {
+        // Arrange
+        var sourceDir = @"C:\Source";
+        var destDir = @"C:\Destination";
+        _mockFileSystem.AddDirectory(sourceDir);
+        _mockFileSystem.AddDirectory(destDir);
+        
+        _settings.SourceDirectory = sourceDir;
+        _settings.DestinationDirectory = destDir;
+        _settings.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        
+        if (extensions == null)
+        {
+            _settings.VideoFileExtensions = null!;
+        }
+        else if (extensions.Length == 0)
+        {
+            _settings.VideoFileExtensions = new List<string>();
+        }
+        else
+        {
+            _settings.VideoFileExtensions = new List<string>(extensions);
+        }
+
+        // Act
+        var result = _settings.IsValid();
+
+        // Assert
+        Assert.Equal(expectedValid, result);
+        
+        if (expectedErrorSubstring != null)
+        {
+            Assert.Contains(expectedErrorSubstring, _settings.GetValidationErrors());
+        }
+        else
+        {
+            Assert.Empty(_settings.GetValidationErrors());
+        }
     }
 }

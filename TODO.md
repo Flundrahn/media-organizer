@@ -22,13 +22,15 @@
 - [x] Fix bugs with certain unparse-able files
 - [x] Support using full paths for organizing tv show files to search within existing show and episode directories
 - [x] Interactive file organization with options to organize one file at a time, skip files, or organize all remaining files
+- [x] Add support to configure allowed video file extensions
 
 ## Doing
 
 ## TODO - Core Features
 
+- [ ] Add support to clean up empty directories after moving files
+- [ ] Add feature to organize movie media files
 - [ ] File organization/moving: Strategy pattern for different organization methods
-- [ ] Add support to configure allowed video file extensions
 - [ ] Add readme
 - [ ] Add smooth build and publish setup, maybe checkout GitHub actions and release.
 - [ ] Possibly refactor MediaOrganizerService into Program.cs, just extract parts that build app and so on, make clear which parts are logic and which parts are UI.

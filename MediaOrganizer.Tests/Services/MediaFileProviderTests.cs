@@ -13,7 +13,10 @@ public class MediaFileProviderTests
     public MediaFileProviderTests()
     {
         _mockFileSystem = new MockFileSystem();
-        _settings = new MediaOrganizerSettings();
+        _settings = new MediaOrganizerSettings
+        {
+            VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" }
+        };
     }
 
     [Fact]

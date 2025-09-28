@@ -23,12 +23,15 @@
 - [x] Support using full paths for organizing tv show files to search within existing show and episode directories
 
 ## Doing
+- [ ] Interactive file organization with options to organize one file at a time, skip files, or organize all remaining files
 
 ## TODO - Core Features
 
-- [ ] Organize one file at a time or skip or all
 - [ ] File organization/moving: Strategy pattern for different organization methods
 - [ ] Add support to configure allowed video file extensions
+- [ ] Add readme
+- [ ] Add smooth build and publish setup, maybe checkout GitHub actions and release.
+- [ ] Possibly refactor MediaOrganizerService into Program.cs, just extract parts that build app and so on, make clear which parts are logic and which parts are UI.
 
 ## Nice to Have 🌟
 

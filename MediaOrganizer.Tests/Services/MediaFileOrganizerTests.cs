@@ -54,7 +54,8 @@ public class MediaFileOrganizerTests
         var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
 
         // Act
-        var result = _sut.OrganizeFile(fileInfo);
+        _sut.Initialize([fileInfo]);
+        var result = _sut.OrganizeFile();
 
         // Assert
         Assert.NotNull(result);
@@ -73,7 +74,8 @@ public class MediaFileOrganizerTests
         var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
 
         // Act
-        var result = _sut.OrganizeFile(fileInfo);
+        _sut.Initialize([fileInfo]);
+        var result = _sut.OrganizeFile();
 
         // Assert
         Assert.Null(result);
@@ -93,7 +95,8 @@ public class MediaFileOrganizerTests
         var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
 
         // Act
-        var result = _sut.OrganizeFile(fileInfo);
+        _sut.Initialize([fileInfo]);
+        var result = _sut.OrganizeFile();
 
         // Assert
         Assert.NotNull(result);
@@ -114,7 +117,8 @@ public class MediaFileOrganizerTests
         var expectedDestinationPath = Path.Combine(DestinationDirectory, "Breaking Bad", "Season 1", "Breaking Bad - S01E01.mkv");
 
         // Act
-        var result = _sut.OrganizeFile(fileInfo);
+        _sut.Initialize([fileInfo]);
+        var result = _sut.OrganizeFile();
 
         // Assert - verify the operation succeeded and returned a valid episode
         Assert.NotNull(result);
@@ -139,7 +143,8 @@ public class MediaFileOrganizerTests
         var fileInfo = _mockFileSystem.FileInfo.New(correctDestinationPath);
 
         // Act
-        var result = _sut.OrganizeFile(fileInfo);
+        _sut.Initialize([fileInfo]);
+        var result = _sut.OrganizeFile();
 
         // Assert - verify the operation succeeded without moving the file
         Assert.NotNull(result);

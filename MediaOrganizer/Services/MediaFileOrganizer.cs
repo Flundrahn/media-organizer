@@ -6,12 +6,24 @@ using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Services;
 
+public class OrganizationResult
+{
+    public int ProcessedCount { get; set; }
+    public int OrganizedCount { get; set; }
+    public int SkippedCount { get; set; }
+    public int FailedCount { get; set; }
+    public bool Success => OrganizedCount > 0 || ProcessedCount == 0;
+}
+
 public class MediaFileOrganizer
 {
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<MediaFileOrganizer> _logger;
     private readonly ITvShowEpisodeParser _parser;
     private readonly MediaOrganizerSettings _settings;
+    
+    private Stack<IFileInfo> _fileStack;
+    private OrganizationResult _result;
 
     public MediaFileOrganizer(
         IFileSystem fileSystem,
@@ -23,29 +35,62 @@ public class MediaFileOrganizer
         _logger = logger;
         _parser = parser;
         _settings = settings.Value;
+        _fileStack = new Stack<IFileInfo>();
+        _result = new OrganizationResult();
     }
 
-    public bool OrganizeFiles(IEnumerable<IFileInfo> mediaFiles)
+    public void Initialize(IEnumerable<IFileInfo> mediaFiles)
     {
-        var successCount = 0;
-        var processedCount = 0;
-
-        foreach (var fileInfo in mediaFiles)
-        {
-            processedCount++;
-            
-            var result = OrganizeFile(fileInfo);
-            if (result is not null)
-            {
-                successCount++;
-            }
-        }
-
-        _logger.LogInformation("Organization complete: {SuccessCount}/{ProcessedCount} files processed successfully", successCount, processedCount);
-        return successCount > 0 || processedCount == 0;
+        _fileStack = new Stack<IFileInfo>(mediaFiles.Reverse());
+        _result = new OrganizationResult();
     }
 
-    public TvShowEpisode? OrganizeFile(IFileInfo fileInfo)
+    public int RemainingCount => _fileStack.Count;
+    public OrganizationResult Result => _result;
+
+    public TvShowEpisode? PeekFile()
+    {
+        if (_fileStack.Count == 0) return null;
+        
+        var nextFile = _fileStack.Peek();
+        return _parser.Parse(nextFile);
+    }
+
+    public TvShowEpisode? OrganizeFile()
+    {
+        if (_fileStack.Count == 0) return null;
+        
+        var fileInfo = _fileStack.Pop();
+        _result.ProcessedCount++;
+        
+        return OrganizeFileInternal(fileInfo);
+    }
+
+    public void SkipFile()
+    {
+        if (_fileStack.Count == 0) return;
+        
+        var fileInfo = _fileStack.Pop();
+        _result.ProcessedCount++;
+        _result.SkippedCount++;
+        
+        _logger.LogInformation("Skipped {FileName} by user request", fileInfo.Name);
+    }
+
+    public OrganizationResult OrganizeAllFiles()
+    {
+        while (_fileStack.Count > 0)
+        {
+            OrganizeFile();
+        }
+        
+        _logger.LogInformation("Organization complete: {OrganizedCount} organized, {SkippedCount} skipped, {FailedCount} failed out of {ProcessedCount} total files", 
+            _result.OrganizedCount, _result.SkippedCount, _result.FailedCount, _result.ProcessedCount);
+        
+        return _result;
+    }
+
+    private TvShowEpisode? OrganizeFileInternal(IFileInfo fileInfo)
     {
         var mediaFile = _parser.Parse(fileInfo);
 
@@ -59,6 +104,7 @@ public class MediaFileOrganizer
         if (!mediaFile.IsValid)
         {
             _logger.LogWarning("Failed to move {FileName} - unparsable file", fileInfo.Name);
+            _result.FailedCount++;
             return null;
         }
 
@@ -69,6 +115,7 @@ public class MediaFileOrganizer
         if (string.IsNullOrEmpty(mediaFileDestinationDir))
         {
             _logger.LogError("Failed to move {FileName} - invalid destination path has no directory component: {FileDestinationPath}", fileInfo.Name, mediaFileDestinationPath);
+            _result.FailedCount++;
             return null;
         }
 
@@ -76,6 +123,7 @@ public class MediaFileOrganizer
         if (mediaFile.IsOrganized(_settings))
         {
             _logger.LogInformation("Skipped {FileName} - already organized in correct location", fileInfo.Name);
+            _result.OrganizedCount++;
             return mediaFile;
         }
 
@@ -93,6 +141,7 @@ public class MediaFileOrganizer
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to move {FileName}", fileInfo.FullName);
+                _result.FailedCount++;
                 return null;
             }
         }
@@ -103,6 +152,7 @@ public class MediaFileOrganizer
                                mediaFileDestinationPath);
 
         mediaFile.CurrentFile = _fileSystem.FileInfo.New(mediaFileDestinationPath);
+        _result.OrganizedCount++;
         return mediaFile;
     }
 }

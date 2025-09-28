@@ -54,11 +54,12 @@ public class MediaOrganizerService
         while (true)
         {
             var mediaFiles = _mediaFileProvider.GetMediaFiles(_settings.SourceDirectory);
+            int count = mediaFiles.Count();
             
             _console.WriteLine("Main Menu");
             _console.WriteLine("---------");
-            _console.WriteLine($"1. List video files ({mediaFiles.Count()} found)");
-            _console.WriteLine($"2. Organize files ({mediaFiles.Count()} found)");
+            _console.WriteLine($"1. List video files ({count} found)");
+            _console.WriteLine($"2. Organize files ({count} found)");
             _console.WriteLine("Q. Quit");
             _console.WriteLine("");
             _console.Write("Choose an option: ");
@@ -99,11 +100,12 @@ public class MediaOrganizerService
 
         try
         {
-            if (!mediaFiles.Any())
-            {
-                _console.WriteLine("No video files found.");
-                return;
-            }
+            // TODO: validate this and show feedback in main menu instead using count
+            // if (!mediaFiles.Any())
+            // {
+            //     _console.WriteLine("No video files found.");
+            //     return;
+            // }
 
             foreach (var file in mediaFiles)
             {
@@ -119,25 +121,94 @@ public class MediaOrganizerService
     private void OrganizeMediaFiles(IEnumerable<IFileInfo> mediaFiles)
     {
         _console.WriteLine("");
-        _console.WriteLine("Starting file organization...");
+        _console.WriteLine("Interactive File Organization");
+        _console.WriteLine("============================");
         
         try
         {
-            var result = _organizer.OrganizeFiles(mediaFiles);
+            _organizer.Initialize(mediaFiles);
             
-            if (result)
+            if (_organizer.RemainingCount == 0)
             {
-                _console.WriteSuccess("File organization completed successfully!");
+                _console.WriteLine("No files to organize.");
+                return;
             }
-            else
-            {
-                _console.WriteError("File organization completed with some issues. Check logs for details.");
-            }
+            
+            _console.WriteLine("Controls:");
+            _console.WriteLine("  ENTER - Organize current file");
+            _console.WriteLine("  A     - Organize all remaining files");
+            _console.WriteLine("  S     - Skip current file");
+            _console.WriteLine("  ESC   - Exit organization");
+            _console.WriteLine("");
+            
+            ProcessFilesInteractively();
         }
         catch (Exception ex)
         {
             _console.WriteError($"Error during file organization: {ex.Message}");
         }
+    }
+
+    private void ProcessFilesInteractively()
+    {
+        while (_organizer.RemainingCount > 0)
+        {
+            var currentFile = _organizer.PeekFile();
+            
+            _console.WriteLine($"Files remaining: {_organizer.RemainingCount}");
+            
+            if (currentFile != null && currentFile.IsValid)
+            {
+                _console.WriteLine($"Next file: {currentFile.OriginalFile.Name}");
+                _console.WriteLine($"Will organize as: {currentFile.TvShowName} | S{currentFile.Season:D2}E{currentFile.Episode:D2} | {currentFile.Title}");
+            }
+            else
+            {
+                _console.WriteLine($"Next file: {currentFile?.OriginalFile.Name}");
+                _console.WriteError("Cannot parse this file - it will be skipped or failed");
+            }
+            
+            _console.WriteLine("");
+            _console.Write("Action (ENTER/A/S/ESC): ");
+            
+            var key = _console.ReadKey();
+            _console.WriteLine();
+            
+            switch (key.Key)
+            {
+                case ConsoleKey.Enter:
+                    var result = _organizer.OrganizeFile();
+                    if (result != null && result.IsValid)
+                    {
+                        _console.WriteSuccess($"Organized: {result.TvShowName} - S{result.Season:D2}E{result.Episode:D2}");
+                    }
+                    else
+                    {
+                        _console.WriteError("Failed to organize file");
+                    }
+                    break;
+                case ConsoleKey.A:
+                    _console.WriteLine("Organizing all remaining files...");
+                    var finalResult = _organizer.OrganizeAllFiles();
+                    _console.WriteSuccess($"Batch complete: {finalResult.OrganizedCount} organized, {finalResult.SkippedCount} skipped, {finalResult.FailedCount} failed");
+                    return;
+                case ConsoleKey.S:
+                    _organizer.SkipFile();
+                    _console.WriteLine("Skipped file");
+                    break;
+                case ConsoleKey.Escape:
+                    _console.WriteLine("Organization cancelled by user");
+                    return;
+                default:
+                    _console.WriteError("Invalid key. Use ENTER, A, S, or ESC");
+                    continue;
+            }
+            
+            _console.WriteLine("");
+        }
+        
+        var stats = _organizer.Result;
+        _console.WriteSuccess($"Organization complete: {stats.OrganizedCount} organized, {stats.SkippedCount} skipped, {stats.FailedCount} failed out of {stats.ProcessedCount} total files");
     }
 
     private string FormatFileSize(long bytes)

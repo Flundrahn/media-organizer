@@ -114,7 +114,7 @@ public class MediaOrganizerConsoleApp
                     break;
             }
 
-            if (char.ToUpper(key.KeyChar) != 'Q')
+            if (key.Key != ConsoleKey.Q)
             {
                 _console.WriteLine("");
                 _console.WriteLine("Press any key to continue...");

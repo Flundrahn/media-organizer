@@ -1,13 +1,9 @@
 ﻿using MediaOrganizer.Configuration;
-using MediaOrganizer.IO;
-using MediaOrganizer.Services;
 using MediaOrganizer.UI;
-using MediaOrganizer.Validations;
+using MediaOrganizer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.IO.Abstractions;
 
 var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
 Console.WriteLine($"Running in environment: {environment}");
@@ -21,21 +17,7 @@ var configuration = new ConfigurationBuilder()
 
 var services = new ServiceCollection();
 var serviceProvider = services
-    .AddSingleton<IConfiguration>(configuration)
-    .Configure<MediaOrganizerSettings>(configuration.GetSection(MediaOrganizerSettings.SectionName))
-    .AddLogging(builder =>
-    {
-        builder.AddConfiguration(configuration.GetSection("Logging"))
-               .AddSimpleConsole();
-    })
-    .AddSingleton<IConsoleIO, ConsoleIO>()
-    .AddTransient<IFileSystem, FileSystem>()
-    .AddTransient<FileSystemValidator>()
-    .AddTransient<IMediaFileProvider, MediaFileProvider>()
-    .AddTransient<ITvShowEpisodeParser, TvShowEpisodeParser>()
-    .AddTransient<IDirectoryCleaner, DirectoryCleaner>()
-    .AddTransient<MediaFileOrganizer>()
-    .AddTransient<MediaOrganizerConsoleApp>()
+    .AddMediaOrganizerServices(configuration)
     .BuildServiceProvider();
 
 // Validate settings early
@@ -48,7 +30,5 @@ if (settings is null)
     return 1;
 }
 
-
 var mediaService = serviceProvider.GetRequiredService<MediaOrganizerConsoleApp>();
-
 return mediaService.Run();

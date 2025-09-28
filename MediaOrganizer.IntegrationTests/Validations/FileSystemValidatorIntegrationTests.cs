@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using MediaOrganizer.IntegrationTests.TestHelpers;
 using MediaOrganizer.Validations;
 
 namespace MediaOrganizer.IntegrationTests.Validations;
@@ -7,25 +8,22 @@ namespace MediaOrganizer.IntegrationTests.Validations;
 /// Integration tests for FileSystemValidations using real file system I/O
 /// Focus: Critical real-world scenarios that mocks cannot adequately test
 /// </summary>
-public class FileSystemValidatorIntegrationTests : IDisposable
+public class FileSystemValidatorIntegrationTests
 {
     private readonly FileSystemValidator _sut;
-    private readonly string _testDirectory;
 
     public FileSystemValidatorIntegrationTests()
     {
         var fileSystem = new FileSystem();
         _sut = new FileSystemValidator(fileSystem);
-        
-        _testDirectory = Directory.CreateTempSubdirectory("MediaOrganizerTests_").FullName;
-        Directory.CreateDirectory(_testDirectory);
     }
 
     [Fact]
     public void DirectoryIsWriteable_WhenDirectoryDoesNotExist_LeavesNoTestFiles()
     {
+        using var environment = new TempMediaTestEnvironment();
         // Arrange
-        var newDirPath = Path.Combine(_testDirectory, "NewDirectory");
+        var newDirPath = Path.Combine(environment.DestinationDirectory, "NewDirectory");
 
         // Act
         var result = _sut.DirectoryIsWriteable(newDirPath);
@@ -38,8 +36,9 @@ public class FileSystemValidatorIntegrationTests : IDisposable
     [Fact]
     public void DirectoryIsWriteable_WithExistingDirectory_LeavesNoTestFiles()
     {
+        using var environment = new TempMediaTestEnvironment();
         // Arrange
-        var existingDir = Path.Combine(_testDirectory, "ExistingDir");
+        var existingDir = Path.Combine(environment.DestinationDirectory, "ExistingDir");
         Directory.CreateDirectory(existingDir);
 
         // Act
@@ -48,20 +47,5 @@ public class FileSystemValidatorIntegrationTests : IDisposable
         // Assert
         Assert.True(result);
         Assert.Empty(Directory.GetFiles(existingDir)); // No leftover test files
-    }
-
-    public void Dispose()
-    {
-        try
-        {
-            if (Directory.Exists(_testDirectory))
-            {
-                Directory.Delete(_testDirectory, recursive: true);
-            }
-        }
-        catch
-        {
-            // Ignore cleanup errors in integration test that for now only needs run manually
-        }
     }
 }

@@ -44,7 +44,7 @@ public class MediaFileOrganizer
 
     public void Initialize(IEnumerable<IFileInfo> mediaFiles)
     {
-        _fileStack = new Stack<IFileInfo>(mediaFiles.Reverse());
+        _fileStack = new Stack<IFileInfo>(mediaFiles);
         _result = new OrganizationResult();
     }
 

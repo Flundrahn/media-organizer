@@ -24,6 +24,7 @@
 - [x] Interactive file organization with options to organize one file at a time, skip files, or organize all remaining files
 - [x] Add support to configure allowed video file extensions
 - [x] Add support to clean up empty directories after moving files
+- [x] Add some integration tests
 
 ## Doing
 

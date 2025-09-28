@@ -5,63 +5,53 @@ using MediaOrganizer.Configuration;
 namespace MediaOrganizer.Models;
 
 /// <summary>
-/// Contains information about a TV show episode parsed from a filename
+/// Contains information about a movie parsed from a filename
 /// </summary>
-public class TvShowEpisode : IMediaFile
+public class Movie : IMediaFile
 {
     /// <summary>
-    /// Valid placeholders that can be used in path templates for TV show episodes
+    /// Valid placeholders that can be used in path templates for movies
     /// </summary>
     public static readonly HashSet<string> ValidPlaceholders = new()
     {
-        "TvShowName", "Season", "Episode", "Title", "Year"
+        "Title", "Year", "Quality"
     };
-
-    public string TvShowName { get; internal set; } = string.Empty;
-
-    /// <summary>
-    /// The season number (1-based)
-    /// </summary>
-    public int Season { get; internal set; }
-
-    /// <summary>
-    /// The episode number within the season (1-based)
-    /// </summary>
-    public int Episode { get; internal set; }
 
     public string Title { get; internal set; } = string.Empty;
 
     public int? Year { get; internal set; }
 
+    public string Quality { get; internal set; } = string.Empty;
+
     public IFileInfo OriginalFile { get; init; }
 
     public IFileInfo CurrentFile { get; set; }
 
-    public MediaType Type => MediaType.TvShow;
+    public MediaType Type => MediaType.Movie;
 
     /// <summary>
-    /// Initializes a new instance of TvShowEpisode with file information
+    /// Initializes a new instance of Movie with file information
     /// </summary>
     /// <param name="fileInfo">The file information to set as both original and current file</param>
-    public TvShowEpisode(IFileInfo fileInfo)
+    public Movie(IFileInfo fileInfo)
     {
         OriginalFile = fileInfo;
         CurrentFile = fileInfo;
     }
 
-    public bool IsValid => !string.IsNullOrWhiteSpace(TvShowName) && Season > 0 && Episode > 0;
+    public bool IsValid => !string.IsNullOrWhiteSpace(Title) && Year.HasValue && Year > 0;
 
     public bool IsOrganized(MediaOrganizerSettings settings)
     {
         if (!IsValid
             || string.IsNullOrWhiteSpace(settings.DestinationDirectory)
-            || string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))
+            || string.IsNullOrWhiteSpace(settings.MoviePathTemplate))
             return false;
 
         try
         {
             var organizedFullPath = Path.GetFullPath(Path.Combine(settings.DestinationDirectory, GenerateRelativePath(settings)));
-            var currentFullPath = Path.GetFullPath(CurrentFile.FullName); // Helps normalize for path comparison
+            var currentFullPath = Path.GetFullPath(CurrentFile.FullName);
 
             return string.Equals(currentFullPath, organizedFullPath, StringComparison.OrdinalIgnoreCase);
         }
@@ -73,10 +63,10 @@ public class TvShowEpisode : IMediaFile
 
     public string GenerateRelativePath(MediaOrganizerSettings settings)
     {
-        if (string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))
-            throw new ArgumentException("TvShowPathTemplate cannot be empty or whitespace.", nameof(settings));
+        if (string.IsNullOrWhiteSpace(settings.MoviePathTemplate))
+            throw new ArgumentException("MoviePathTemplate cannot be empty or whitespace.", nameof(settings));
             
-        return GenerateRelativePathInternal(settings.TvShowPathTemplate);
+        return GenerateRelativePathInternal(settings.MoviePathTemplate);
     }
 
     private string GenerateRelativePathInternal(string template)
@@ -88,17 +78,13 @@ public class TvShowEpisode : IMediaFile
             throw new ArgumentException("Template cannot be empty or whitespace.", nameof(template));
             
         if (!IsValid)
-            throw new InvalidOperationException("Cannot generate path for an invalid TV show episode.");
+            throw new InvalidOperationException("Cannot generate path for an invalid movie.");
 
         var replacements = new Dictionary<string, string>
         {
-            { "{TvShowName}", TvShowName },
-            { "{Season}", Season.ToString() },
-            { "{Season:D2}", Season.ToString("D2") },
-            { "{Episode}", Episode.ToString() },
-            { "{Episode:D2}", Episode.ToString("D2") },
-            { "{Title}", Title ?? string.Empty },
-            { "{Year}", Year?.ToString() ?? string.Empty }
+            { "{Title}", Title },
+            { "{Year}", Year?.ToString() ?? string.Empty },
+            { "{Quality}", Quality ?? string.Empty }
         };
 
         var result = template;
@@ -111,8 +97,8 @@ public class TvShowEpisode : IMediaFile
         var doublePathSep = $"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}";
         result = result.Replace(doublePathSep, Path.DirectorySeparatorChar.ToString());
         
-        // Clean up patterns where Year was empty - remove empty parentheses
-        result = Regex.Replace(result, @"\s*\(\s*\)", "");
+        // Clean up patterns where Quality was empty - remove empty brackets
+        result = Regex.Replace(result, @"\s*\[\s*\]", "");
         
         // Clean up extra spaces
         result = Regex.Replace(result, @"\s+", " ").Trim();
@@ -129,14 +115,10 @@ public class TvShowEpisode : IMediaFile
 
     public override string ToString()
     {
-        var result = $"{TvShowName} S{Season:D2}E{Episode:D2}";
-        if (!string.IsNullOrWhiteSpace(Title))
+        var result = $"{Title} ({Year})";
+        if (!string.IsNullOrWhiteSpace(Quality))
         {
-            result += $" - {Title}";
-        }
-        if (Year.HasValue)
-        {
-            result += $" ({Year})";
+            result += $" [{Quality}]";
         }
         return result;
     }

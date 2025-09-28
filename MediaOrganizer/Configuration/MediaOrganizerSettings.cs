@@ -54,6 +54,13 @@ public class MediaOrganizerSettings
     public string TvShowPathTemplate { get; set; } = string.Empty;
 
     /// <summary>
+    /// The template used to generate relative paths for movies.
+    /// Supports placeholders: {Title}, {Year}, {Quality}
+    /// The file extension from the original file is automatically appended.
+    /// </summary>
+    public string MoviePathTemplate { get; set; } = string.Empty;
+
+    /// <summary>
     /// List of video file extensions to include when scanning for media files.
     /// Extensions should include the dot (e.g., ".mp4", ".avi").
     /// Case-insensitive matching is used.

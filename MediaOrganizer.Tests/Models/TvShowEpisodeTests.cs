@@ -106,8 +106,13 @@ public class TvShowEpisodeTests
         episode.Title = "Pilot";
         episode.Year = 2005;
 
+        var settings = new MediaOrganizerSettings
+        {
+            TvShowPathTemplate = pattern
+        };
+
         // Act
-        var result = episode.GenerateRelativePath(pattern);
+        var result = episode.GenerateRelativePath(settings);
 
         // Assert
         Assert.Equal(expectedPath, result);
@@ -129,8 +134,13 @@ public class TvShowEpisodeTests
         episode.Episode = 13;
         episode.Title = "";
 
+        var settings = new MediaOrganizerSettings
+        {
+            TvShowPathTemplate = pattern
+        };
+
         // Act
-        var result = episode.GenerateRelativePath(pattern);
+        var result = episode.GenerateRelativePath(settings);
 
         // Assert
         Assert.Equal(expectedPath, result);
@@ -153,8 +163,13 @@ public class TvShowEpisodeTests
         episode.Title = "";
         episode.Year = null;
 
+        var settings = new MediaOrganizerSettings
+        {
+            TvShowPathTemplate = pattern
+        };
+
         // Act
-        var result = episode.GenerateRelativePath(pattern);
+        var result = episode.GenerateRelativePath(settings);
 
         // Assert
         Assert.Equal(expectedPath, result);
@@ -169,9 +184,14 @@ public class TvShowEpisodeTests
         var episode = new TvShowEpisode(fileInfo);
         // Leave properties at default values (invalid state)
 
+        var settings = new MediaOrganizerSettings
+        {
+            TvShowPathTemplate = "{TvShowName}/Season {Season}/{Episode:D2}"
+        };
+
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => 
-            episode.GenerateRelativePath("{TvShowName}/Season {Season}/{Episode:D2}"));
+            episode.GenerateRelativePath(settings));
     }
 
     [Theory]
@@ -187,12 +207,17 @@ public class TvShowEpisodeTests
         episode.Season = 1;
         episode.Episode = 1;
 
+        var settings = new MediaOrganizerSettings
+        {
+            TvShowPathTemplate = pattern
+        };
+
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => episode.GenerateRelativePath(pattern));
+        Assert.Throws<ArgumentException>(() => episode.GenerateRelativePath(settings));
     }
 
     [Fact]
-    public void GenerateRelativePath_WithNullPattern_ThrowsArgumentNullException()
+    public void GenerateRelativePath_WithNullSettings_ThrowsNullReferenceException()
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
@@ -203,7 +228,7 @@ public class TvShowEpisodeTests
         episode.Episode = 1;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => episode.GenerateRelativePath(null!));
+        Assert.Throws<NullReferenceException>(() => episode.GenerateRelativePath(null!));
     }
 
     [Theory]
@@ -220,8 +245,13 @@ public class TvShowEpisodeTests
         episode.Season = 1;
         episode.Episode = 1;
 
+        var settings = new MediaOrganizerSettings
+        {
+            TvShowPathTemplate = pattern
+        };
+
         // Act
-        var result = episode.GenerateRelativePath(pattern);
+        var result = episode.GenerateRelativePath(settings);
 
         // Assert
         Assert.Equal(expectedPath, result);

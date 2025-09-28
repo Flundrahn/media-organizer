@@ -111,8 +111,7 @@ public class MediaFileOrganizer
             return null;
         }
 
-        string pathTemplate = GetPathTemplate(mediaFile.Type);
-        string mediaFileRelativePath = mediaFile.GenerateRelativePath(pathTemplate);
+        string mediaFileRelativePath = mediaFile.GenerateRelativePath(_settings);
         string mediaFileDestinationPath = _fileSystem.Path.Combine(_settings.DestinationDirectory, mediaFileRelativePath);
         string? mediaFileDestinationDir = _fileSystem.Path.GetDirectoryName(mediaFileDestinationPath);
 
@@ -164,15 +163,5 @@ public class MediaFileOrganizer
         mediaFile.CurrentFile = _fileSystem.FileInfo.New(mediaFileDestinationPath);
         _result.OrganizedCount++;
         return mediaFile;
-    }
-
-    private string GetPathTemplate(MediaType mediaType)
-    {
-        return mediaType switch
-        {
-            MediaType.TvShow => _settings.TvShowPathTemplate,
-            MediaType.Movie => throw new NotSupportedException("Movie support is not yet implemented"),
-            _ => throw new ArgumentException($"Unknown media type: {mediaType}", nameof(mediaType))
-        };
     }
 }

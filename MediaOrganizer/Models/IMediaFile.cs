@@ -30,15 +30,15 @@ public interface IMediaFile
     MediaType Type { get; }
 
     /// <summary>
-    /// Generates a relative file path based on the provided template string.
+    /// Generates a relative file path based on the appropriate template from settings.
+    /// The media file automatically selects the correct template based on its type.
     /// The original file extension is automatically preserved and appended to the result.
     /// </summary>
-    /// <param name="template">The template string with placeholders to replace</param>
+    /// <param name="settings">The media organizer settings containing path templates</param>
     /// <returns>The formatted relative path with the original file extension</returns>
-    /// <exception cref="ArgumentNullException">Thrown when template is null</exception>
-    /// <exception cref="ArgumentException">Thrown when template is empty or whitespace</exception>
+    /// <exception cref="ArgumentException">Thrown when the appropriate template is empty or whitespace</exception>
     /// <exception cref="InvalidOperationException">Thrown when the media file is not in a valid state</exception>
-    string GenerateRelativePath(string template);
+    string GenerateRelativePath(MediaOrganizerSettings settings);
 
     /// <summary>
     /// Determines if the file is already organized (i.e., in its correct destination location)

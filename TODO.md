@@ -43,13 +43,13 @@ Add support for organizing movie files alongside TV shows by creating a common m
 - [x] Ensure all existing tests pass with interface changes
 
 #### Phase 2: Movie Support 🎭
-- [ ] Create `Movie` class implementing `IMediaFile`
+- [x] Create `Movie` class implementing `IMediaFile`
   - Properties: `Title`, `Year`, `Quality` (1080p, 4K, etc.)
   - Support placeholders: `{Title}`, `{Year}`, `{Quality}`
 - [ ] Create `MovieParser` class implementing `IMediaFileParser`
   - Parse patterns like: `Movie.Title.2023.1080p.BluRay.x264.mkv`
   - Parse patterns like: `The Matrix (1999) [1080p].mp4`
-- [ ] Add `MoviePathTemplate` to `MediaOrganizerSettings`
+- [x] Add `MoviePathTemplate` to `MediaOrganizerSettings`
   - Example: `"Movies/{Title} ({Year})"` → `"Movies/The Matrix (1999).mkv"`
 
 #### Phase 3: Directory Context 📁

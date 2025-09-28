@@ -1,0 +1,72 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "test-watch",
+			"command": "dotnet",
+			"type": "shell",
+			"args": [
+				"watch",
+				"test"
+			],
+			"group": "test",
+			"isBackground": true,
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": false,
+				"clear": false
+			},
+			"problemMatcher": "$msCompile",
+			"options": {
+				"cwd": "${workspaceFolder}/MediaOrganizer.Tests"
+			}
+		},
+		{
+			"label": "build-solution",
+			"command": "dotnet",
+			"type": "shell",
+			"args": [
+				"build"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"focus": false,
+				"panel": "shared"
+			},
+			"problemMatcher": "$msCompile",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "run-app-dev",
+			"command": "dotnet",
+			"type": "shell",
+			"args": [
+				"run"
+			],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "dedicated"
+			},
+			"dependsOn": "build-solution",
+			"options": {
+				"cwd": "${workspaceFolder}/MediaOrganizer",
+				"env": {
+					"DOTNET_ENVIRONMENT": "Development"
+				}
+			}
+		}
+	]
+}

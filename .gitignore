@@ -2,7 +2,9 @@ bin/
 obj/
 /node_modules
 /wwwroot/node_modules
-.vscode/
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
 .history/
 *.vsix
 .history

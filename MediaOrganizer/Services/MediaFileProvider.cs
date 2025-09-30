@@ -6,7 +6,8 @@ namespace MediaOrganizer.Services;
 
 public interface IMediaFileProvider
 {
-    IEnumerable<IFileInfo> GetMediaFiles(string directoryPath);
+    IEnumerable<IFileInfo> GetTvShowFiles();
+    IEnumerable<IFileInfo> GetMovieFiles();
 }
 
 public class MediaFileProvider : IMediaFileProvider
@@ -14,15 +15,27 @@ public class MediaFileProvider : IMediaFileProvider
     private readonly IFileSystem _fileSystem;
     private readonly bool _includeSubdirectories;
     private readonly HashSet<string> _videoExtensions;
+    private readonly MediaOrganizerSettings _settings;
 
     public MediaFileProvider(IFileSystem fileSystem, IOptions<MediaOrganizerSettings> settings)
     {
         _fileSystem = fileSystem;
         _includeSubdirectories = settings.Value.IncludeSubdirectories;
         _videoExtensions = new HashSet<string>(settings.Value.VideoFileExtensions, StringComparer.OrdinalIgnoreCase);
+        _settings = settings.Value;
     }
 
-    public IEnumerable<IFileInfo> GetMediaFiles(string directoryPath)
+    public IEnumerable<IFileInfo> GetTvShowFiles()
+    {
+        return GetMediaFilesFromDirectory(_settings.TvShowSourceDirectory);
+    }
+
+    public IEnumerable<IFileInfo> GetMovieFiles()
+    {
+        return GetMediaFilesFromDirectory(_settings.MovieSourceDirectory);
+    }
+
+    private IEnumerable<IFileInfo> GetMediaFilesFromDirectory(string directoryPath)
     {
         if (!_fileSystem.Directory.Exists(directoryPath))
             throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");

@@ -50,21 +50,38 @@ public class MediaOrganizerConsoleApp
         }
 
         _console.WriteSuccess("Configuration loaded successfully");
-        _console.WriteLine($"Source Directory: {_settings.SourceDirectory}");
-        _console.WriteLine($"Destination Directory: {_settings.DestinationDirectory}");
+
+        _console.WriteLine($"TV Show Source Directory: {_settings.TvShowSourceDirectory}");
+        if (!string.Equals(_settings.TvShowSourceDirectory, _settings.TvShowDestinationDirectory, StringComparison.OrdinalIgnoreCase))
+        {
+            _console.WriteLine($"TV Show Destination Directory: {_settings.TvShowDestinationDirectory}");
+        }
+
+        _console.WriteLine($"Movie Source Directory: {_settings.MovieSourceDirectory}");
+        if (!string.Equals(_settings.MovieSourceDirectory, _settings.MovieDestinationDirectory, StringComparison.OrdinalIgnoreCase))
+        {
+            _console.WriteLine($"Movie Destination Directory: {_settings.MovieDestinationDirectory}");
+        }
+
         _console.WriteLine($"Dry Run Mode: {(_settings.DryRun ? "Enabled" : "Disabled")}");
         _console.WriteLine("");
 
         return ShowMainMenu();
     }
 
+    // TODO: List tv and movie separately
+    // TODO: Organize tv and movie separately
+    // TODO: Clean tv and movie separately
+    // NOTE: 'All' options? Leave until realize actually useful
     private int ShowMainMenu()
     {
         while (true)
         {
-            var mediaFiles = _mediaFileProvider.GetMediaFiles(_settings.SourceDirectory);
+            var tvShowFiles = _mediaFileProvider.GetTvShowFiles();
+            var movieFiles = _mediaFileProvider.GetMovieFiles();
+            var mediaFiles = tvShowFiles.Concat(movieFiles);
             int count = mediaFiles.Count();
-            
+
             _console.WriteLine("Main Menu");
             _console.WriteLine("---------");
             _console.WriteLine($"1. List video files ({count} found)");
@@ -127,7 +144,8 @@ public class MediaOrganizerConsoleApp
     private void ListMediaFiles(IEnumerable<IFileInfo> mediaFiles)
     {
         _console.WriteLine("");
-        _console.WriteLine($"Source Directory: {_settings.SourceDirectory}");
+        _console.WriteLine($"TV Show Source Directory: {_settings.TvShowSourceDirectory}");
+        _console.WriteLine($"Movie Source Directory: {_settings.MovieSourceDirectory}");
 
         if (!mediaFiles.Any())
         {
@@ -234,8 +252,10 @@ public class MediaOrganizerConsoleApp
         _console.WriteLine("=======================");
         
         _console.WriteLine($"Scanning directories in:");
-        _console.WriteLine($"  Source: {_settings.SourceDirectory}");
-        _console.WriteLine($"  Destination: {_settings.DestinationDirectory}");
+        _console.WriteLine($"  TV Show Source: {_settings.TvShowSourceDirectory}");
+        _console.WriteLine($"  TV Show Destination: {_settings.TvShowDestinationDirectory}");
+        _console.WriteLine($"  Movie Source: {_settings.MovieSourceDirectory}");
+        _console.WriteLine($"  Movie Destination: {_settings.MovieDestinationDirectory}");
         _console.WriteLine("");
         
         _directoryCleaner.CleanEmptyDirectories();

@@ -8,14 +8,14 @@ public class MediaOrganizerSettingsTests
 {
     private readonly MockFileSystem _mockFileSystem;
     private readonly FileSystemValidator _validator;
-    private readonly MediaOrganizerSettings _settings;
+    private readonly MediaOrganizerSettings _sut;
 
     public MediaOrganizerSettingsTests()
     {
         _mockFileSystem = new MockFileSystem();
         _validator = new FileSystemValidator(_mockFileSystem);
-        _settings = new MediaOrganizerSettings();
-        _settings.SetValidator(_validator);
+        _sut = new MediaOrganizerSettings();
+        _sut.SetValidator(_validator);
     }
 
     [Fact]
@@ -25,11 +25,14 @@ public class MediaOrganizerSettingsTests
         var settings = new MediaOrganizerSettings();
 
         // Assert
-        Assert.Equal(string.Empty, settings.SourceDirectory);
-        Assert.Equal(string.Empty, settings.DestinationDirectory);
+        Assert.Equal(string.Empty, settings.TvShowSourceDirectory);
+        Assert.Equal(string.Empty, settings.TvShowDestinationDirectory);
+        Assert.Equal(string.Empty, settings.MovieSourceDirectory);
+        Assert.Equal(string.Empty, settings.MovieDestinationDirectory);
         Assert.True(settings.DryRun);
         Assert.True(settings.IncludeSubdirectories);
         Assert.Equal(string.Empty, settings.TvShowPathTemplate);
+        Assert.Equal(string.Empty, settings.MoviePathTemplate);
         Assert.Empty(settings.VideoFileExtensions);
     }
 
@@ -54,84 +57,115 @@ public class MediaOrganizerSettingsTests
     public void IsValid_WithValidSettings_ReturnsTrue()
     {
         // Arrange
-        var sourceDir = @"C:\Source";
-        var destDir = @"C:\Destination";
+        var tvSourceDir = @"C:\TvSource";
+        var tvDestDir = @"C:\TvDestination";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
         
-        _mockFileSystem.AddDirectory(sourceDir);
-        _mockFileSystem.AddDirectory(destDir);
+        _mockFileSystem.AddDirectory(tvSourceDir);
+        _mockFileSystem.AddDirectory(tvDestDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
         
-        _settings.SourceDirectory = sourceDir;
-        _settings.DestinationDirectory = destDir;
-        _settings.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
-        _settings.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
+        _sut.TvShowSourceDirectory = tvSourceDir;
+        _sut.TvShowDestinationDirectory = tvDestDir;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _sut.MoviePathTemplate = "{Title} ({Year})";
+        _sut.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.True(result);
-        Assert.Empty(_settings.GetValidationErrors());
+        Assert.Empty(_sut.GetValidationErrors());
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void IsValid_WithEmptySourceDirectory_ReturnsFalseAndAddsError(string sourceDirectory)
+    public void IsValid_WithEmptyTvShowSourceDirectory_ReturnsFalseAndAddsError(string tvShowSourceDirectory)
     {
         // Arrange
-        var destDir = @"C:\Destination";
-        _mockFileSystem.AddDirectory(destDir);
+        var tvDestDir = @"C:\TvDestination";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
         
-        _settings.SourceDirectory = sourceDirectory;
-        _settings.DestinationDirectory = destDir;
-        _settings.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _mockFileSystem.AddDirectory(tvDestDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
+        
+        _sut.TvShowSourceDirectory = tvShowSourceDirectory;
+        _sut.TvShowDestinationDirectory = tvDestDir;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _sut.MoviePathTemplate = "{Title} ({Year})";
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.False(result);
-        Assert.Contains("SourceDirectory is required", _settings.GetValidationErrors());
+        Assert.Contains("TvShowSourceDirectory is required", _sut.GetValidationErrors());
     }
 
     [Fact]
-    public void IsValid_WithNonExistentSourceDirectory_ReturnsFalseAndAddsErrorWithNonExistentDirectoryPath()
+    public void IsValid_WithNonExistentTvShowSourceDirectory_ReturnsFalseAndAddsErrorWithNonExistentDirectoryPath()
     {
         // Arrange
-        var destDir = @"C:\Destination";
-        _mockFileSystem.AddDirectory(destDir);
+        var tvDestDir = @"C:\TvDestination";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
         
-        _settings.SourceDirectory = @"C:\NonExistent";
-        _settings.DestinationDirectory = destDir;
-        _settings.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _mockFileSystem.AddDirectory(tvDestDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
+        
+        _sut.TvShowSourceDirectory = @"C:\NonExistent";
+        _sut.TvShowDestinationDirectory = tvDestDir;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _sut.MoviePathTemplate = "{Title} ({Year})";
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.False(result);
-        Assert.Contains("SourceDirectory does not exist: C:\\NonExistent", _settings.GetValidationErrors());
+        Assert.Contains("TvShowSourceDirectory does not exist: C:\\NonExistent", _sut.GetValidationErrors());
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void IsValid_WithEmptyDestinationDirectory_ReturnsFalseAndAddsError(string destinationDirectory)
+    public void IsValid_WithEmptyTvShowDestinationDirectory_ReturnsFalseAndAddsError(string tvShowDestinationDirectory)
     {
         // Arrange
-        var sourceDir = @"C:\Source";
-        _mockFileSystem.AddDirectory(sourceDir);
+        var tvSourceDir = @"C:\TvSource";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
         
-        _settings.SourceDirectory = sourceDir;
-        _settings.DestinationDirectory = destinationDirectory;
-        _settings.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _mockFileSystem.AddDirectory(tvSourceDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
+        
+        _sut.TvShowSourceDirectory = tvSourceDir;
+        _sut.TvShowDestinationDirectory = tvShowDestinationDirectory;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _sut.MoviePathTemplate = "{Title} ({Year})";
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.False(result);
-        Assert.Contains("DestinationDirectory is required", _settings.GetValidationErrors());
+        Assert.Contains("TvShowDestinationDirectory is required", _sut.GetValidationErrors());
     }
 
     [Theory]
@@ -140,73 +174,95 @@ public class MediaOrganizerSettingsTests
     public void IsValid_WithEmptyTvShowPathTemplate_ReturnsFalseAndAddsError(string pattern)
     {
         // Arrange
-        var sourceDir = @"C:\Source";
-        var destDir = @"C:\Destination";
-        _mockFileSystem.AddDirectory(sourceDir);
-        _mockFileSystem.AddDirectory(destDir);
+        var tvSourceDir = @"C:\TvSource";
+        var tvDestDir = @"C:\TvDestination";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
         
-        _settings.SourceDirectory = sourceDir;
-        _settings.DestinationDirectory = destDir;
-        _settings.TvShowPathTemplate = pattern;
+        _mockFileSystem.AddDirectory(tvSourceDir);
+        _mockFileSystem.AddDirectory(tvDestDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
+        
+        _sut.TvShowSourceDirectory = tvSourceDir;
+        _sut.TvShowDestinationDirectory = tvDestDir;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = pattern;
+        _sut.MoviePathTemplate = "{Title} ({Year})";
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.False(result);
-        Assert.Contains("TvShowPathTemplate is required", _settings.GetValidationErrors());
+        Assert.Contains("TvShowPathTemplate is required", _sut.GetValidationErrors());
     }
 
     [Fact]
     public void IsValid_WithMultipleErrors_ReturnsFalseAndAddsAllErrors()
     {
         // Arrange
-        _settings.SourceDirectory = "";
-        _settings.DestinationDirectory = "";
-        _settings.TvShowPathTemplate = "";
-        _settings.VideoFileExtensions = new List<string>(); // Empty list
+        _sut.TvShowSourceDirectory = "";
+        _sut.TvShowDestinationDirectory = "";
+        _sut.MovieSourceDirectory = "";
+        _sut.MovieDestinationDirectory = "";
+        _sut.TvShowPathTemplate = "";
+        _sut.MoviePathTemplate = "";
+        _sut.VideoFileExtensions = new List<string>(); // Empty list
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.False(result);
-        var errors = _settings.GetValidationErrors();
-        Assert.Contains("SourceDirectory is required", errors);
-        Assert.Contains("DestinationDirectory is required", errors);
+        var errors = _sut.GetValidationErrors();
+        Assert.Contains("TvShowSourceDirectory is required", errors);
+        Assert.Contains("TvShowDestinationDirectory is required", errors);
+        Assert.Contains("MovieSourceDirectory is required", errors);
+        Assert.Contains("MovieDestinationDirectory is required", errors);
         Assert.Contains("TvShowPathTemplate is required", errors);
+        Assert.Contains("MoviePathTemplate is required", errors);
         Assert.Contains("VideoFileExtensions must contain at least one extension", errors);
-        Assert.Equal(4, errors.Count);
+        Assert.Equal(7, errors.Count);
     }
 
     [Fact]
     public void IsValid_ClearsErrorsOnEachCall()
     {
-        // Arrange
-        var destDir = @"C:\Destination";
-        _mockFileSystem.AddDirectory(destDir);
+        // Arrange - setup with missing TV show source directory only
+        var tvDestDir = @"C:\TvDestination";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
         
-        _settings.SourceDirectory = "";
-        _settings.DestinationDirectory = destDir;
-        _settings.TvShowPathTemplate = "{TvShowName}";
-        _settings.VideoFileExtensions = new List<string> { ".mp4" };
+        _mockFileSystem.AddDirectory(tvDestDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
+        
+        _sut.TvShowSourceDirectory = ""; // This will cause the single error
+        _sut.TvShowDestinationDirectory = tvDestDir;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = "{TvShowName}";
+        _sut.MoviePathTemplate = "{Title} ({Year})";
+        _sut.VideoFileExtensions = new List<string> { ".mp4" };
 
         // Act - First call with error
-        var firstResult = _settings.IsValid();
+        var firstResult = _sut.IsValid();
         Assert.False(firstResult);
-        Assert.Single(_settings.GetValidationErrors());
+        Assert.Single(_sut.GetValidationErrors());
 
         // Fix the error
-        var sourceDir = @"C:\Source";
-        _mockFileSystem.AddDirectory(sourceDir);
-        _settings.SourceDirectory = sourceDir;
+        var tvSourceDir = @"C:\TvSource";
+        _mockFileSystem.AddDirectory(tvSourceDir);
+        _sut.TvShowSourceDirectory = tvSourceDir;
 
         // Act - Second call should clear previous errors
-        var secondResult = _settings.IsValid();
+        var secondResult = _sut.IsValid();
 
         // Assert
         Assert.True(secondResult);
-        Assert.Empty(_settings.GetValidationErrors());
+        Assert.Empty(_sut.GetValidationErrors());
     }
 
     [Theory]
@@ -218,22 +274,30 @@ public class MediaOrganizerSettingsTests
     public void TvShowPathTemplate_AcceptsValidPatterns(string pattern)
     {
         // Arrange
-        var sourceDir = @"C:\Source";
-        var destDir = @"C:\Destination";
-        _mockFileSystem.AddDirectory(sourceDir);
-        _mockFileSystem.AddDirectory(destDir);
+        var tvSourceDir = @"C:\TvSource";
+        var tvDestDir = @"C:\TvDestination";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
         
-        _settings.SourceDirectory = sourceDir;
-        _settings.DestinationDirectory = destDir;
-        _settings.TvShowPathTemplate = pattern;
-        _settings.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
+        _mockFileSystem.AddDirectory(tvSourceDir);
+        _mockFileSystem.AddDirectory(tvDestDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
+        
+        _sut.TvShowSourceDirectory = tvSourceDir;
+        _sut.TvShowDestinationDirectory = tvDestDir;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = pattern;
+        _sut.MoviePathTemplate = "{Title} ({Year})";
+        _sut.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.True(result);
-        Assert.Equal(pattern, _settings.TvShowPathTemplate);
+        Assert.Equal(pattern, _sut.TvShowPathTemplate);
     }
 
     [Fact]
@@ -251,9 +315,12 @@ public class MediaOrganizerSettingsTests
 
         // Act
         settings.SetValidator(validator);
-        settings.SourceDirectory = sourceDir;
-        settings.DestinationDirectory = destDir;
+        settings.TvShowSourceDirectory = sourceDir;
+        settings.TvShowDestinationDirectory = destDir;
+        settings.MovieSourceDirectory = sourceDir;
+        settings.MovieDestinationDirectory = destDir;
         settings.TvShowPathTemplate = "{TvShowName}";
+        settings.MoviePathTemplate = "{Title} ({Year})";
         settings.VideoFileExtensions = new List<string> { ".mp4" };
 
         // Should not throw since validator is set
@@ -278,16 +345,16 @@ public class MediaOrganizerSettingsTests
         _mockFileSystem.AddDirectory(sourceDir);
         _mockFileSystem.AddDirectory(destDir);
         
-        _settings.SourceDirectory = sourceDir;
-        _settings.DestinationDirectory = destDir;
-        _settings.TvShowPathTemplate = invalidTemplate;
+        _sut.SourceDirectory = sourceDir;
+        _sut.DestinationDirectory = destDir;
+        _sut.TvShowPathTemplate = invalidTemplate;
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.False(result);
-        Assert.Contains("TvShowPathTemplate contains invalid path characters", _settings.GetValidationErrors());
+        Assert.Contains("TvShowPathTemplate contains invalid path characters", _sut.GetValidationErrors());
     }
 
     [Theory]
@@ -301,22 +368,30 @@ public class MediaOrganizerSettingsTests
     public void IsValid_WithValidTemplateCharacters_ReturnsTrue(string validTemplate)
     {
         // Arrange
-        var sourceDir = @"C:\Source";
-        var destDir = @"C:\Destination";
-        _mockFileSystem.AddDirectory(sourceDir);
-        _mockFileSystem.AddDirectory(destDir);
+        var tvSourceDir = @"C:\TvSource";
+        var tvDestDir = @"C:\TvDestination";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
         
-        _settings.SourceDirectory = sourceDir;
-        _settings.DestinationDirectory = destDir;
-        _settings.TvShowPathTemplate = validTemplate;
-        _settings.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
+        _mockFileSystem.AddDirectory(tvSourceDir);
+        _mockFileSystem.AddDirectory(tvDestDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
+        
+        _sut.TvShowSourceDirectory = tvSourceDir;
+        _sut.TvShowDestinationDirectory = tvDestDir;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = validTemplate;
+        _sut.MoviePathTemplate = "{Title} ({Year})";
+        _sut.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.True(result);
-        Assert.Empty(_settings.GetValidationErrors());
+        Assert.Empty(_sut.GetValidationErrors());
     }
 
     [Theory]
@@ -326,44 +401,58 @@ public class MediaOrganizerSettingsTests
     public void IsValid_WithDifferentPathSeparators_ReturnsTrue(string template)
     {
         // Arrange
-        var sourceDir = @"C:\Source";
-        var destDir = @"C:\Destination";
-        _mockFileSystem.AddDirectory(sourceDir);
-        _mockFileSystem.AddDirectory(destDir);
+        var tvSourceDir = @"C:\TvSource";
+        var tvDestDir = @"C:\TvDestination";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
         
-        _settings.SourceDirectory = sourceDir;
-        _settings.DestinationDirectory = destDir;
-        _settings.TvShowPathTemplate = template;
-        _settings.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
+        _mockFileSystem.AddDirectory(tvSourceDir);
+        _mockFileSystem.AddDirectory(tvDestDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
+        
+        _sut.TvShowSourceDirectory = tvSourceDir;
+        _sut.TvShowDestinationDirectory = tvDestDir;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = template;
+        _sut.MoviePathTemplate = "{Title} ({Year})";
+        _sut.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.True(result);
-        Assert.Empty(_settings.GetValidationErrors());
+        Assert.Empty(_sut.GetValidationErrors());
     }
 
     [Fact]
     public void IsValid_WithMultipleErrorsIncludingInvalidTemplate_ReturnsAllErrors()
     {
         // Arrange
-        _settings.SourceDirectory = "";
-        _settings.DestinationDirectory = "";
-        _settings.TvShowPathTemplate = "{TvShowName}/<>Invalid";  // Invalid characters
+        _sut.TvShowSourceDirectory = "";
+        _sut.TvShowDestinationDirectory = "";
+        _sut.MovieSourceDirectory = "";
+        _sut.MovieDestinationDirectory = "";
+        _sut.TvShowPathTemplate = "{TvShowName}/<>Invalid";  // Invalid characters
+        _sut.MoviePathTemplate = "";
         // VideoFileExtensions is empty by default, which will add another error
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.False(result);
-        var errors = _settings.GetValidationErrors();
-        Assert.Contains("SourceDirectory is required", errors);
-        Assert.Contains("DestinationDirectory is required", errors);
+        var errors = _sut.GetValidationErrors();
+        Assert.Contains("TvShowSourceDirectory is required", errors);
+        Assert.Contains("TvShowDestinationDirectory is required", errors);
+        Assert.Contains("MovieSourceDirectory is required", errors);
+        Assert.Contains("MovieDestinationDirectory is required", errors);
         Assert.Contains("TvShowPathTemplate contains invalid path characters", errors);
+        Assert.Contains("MoviePathTemplate is required", errors);
         Assert.Contains("VideoFileExtensions must contain at least one extension", errors);
-        Assert.Equal(4, errors.Count);
+        Assert.Equal(7, errors.Count);
     }
 
     [Fact]
@@ -508,41 +597,162 @@ public class MediaOrganizerSettingsTests
     public void IsValid_VideoFileExtensionsValidation(string[]? extensions, bool expectedValid, string? expectedErrorSubstring)
     {
         // Arrange
-        var sourceDir = @"C:\Source";
-        var destDir = @"C:\Destination";
-        _mockFileSystem.AddDirectory(sourceDir);
-        _mockFileSystem.AddDirectory(destDir);
+        var tvSourceDir = @"C:\TvSource";
+        var tvDestDir = @"C:\TvDestination";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
         
-        _settings.SourceDirectory = sourceDir;
-        _settings.DestinationDirectory = destDir;
-        _settings.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _mockFileSystem.AddDirectory(tvSourceDir);
+        _mockFileSystem.AddDirectory(tvDestDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
+        
+        _sut.TvShowSourceDirectory = tvSourceDir;
+        _sut.TvShowDestinationDirectory = tvDestDir;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _sut.MoviePathTemplate = "{Title} ({Year})";
         
         if (extensions == null)
         {
-            _settings.VideoFileExtensions = null!;
+            _sut.VideoFileExtensions = null!;
         }
         else if (extensions.Length == 0)
         {
-            _settings.VideoFileExtensions = new List<string>();
+            _sut.VideoFileExtensions = new List<string>();
         }
         else
         {
-            _settings.VideoFileExtensions = new List<string>(extensions);
+            _sut.VideoFileExtensions = new List<string>(extensions);
         }
 
         // Act
-        var result = _settings.IsValid();
+        var result = _sut.IsValid();
 
         // Assert
         Assert.Equal(expectedValid, result);
         
         if (expectedErrorSubstring != null)
         {
-            Assert.Contains(expectedErrorSubstring, _settings.GetValidationErrors());
+            Assert.Contains(expectedErrorSubstring, _sut.GetValidationErrors());
         }
         else
         {
-            Assert.Empty(_settings.GetValidationErrors());
+            Assert.Empty(_sut.GetValidationErrors());
+        }
+    }
+
+    [Theory]
+    [InlineData("C:\\Movies\\Source", "C:\\Movies\\Source")]
+    [InlineData("..\\Movies", null)] // Relative path should be converted to absolute
+    [InlineData("", "")]
+    [InlineData("  ", "")]
+    public void MovieSourceDirectory_SetValue_ConvertsToAbsolutePath(string input, string? expectedPrefix)
+    {
+        // Act
+        _sut.MovieSourceDirectory = input;
+
+        // Assert
+        if (expectedPrefix != null)
+        {
+            if (expectedPrefix == "")
+            {
+                Assert.Equal("", _sut.MovieSourceDirectory);
+            }
+            else
+            {
+                Assert.Equal(expectedPrefix, _sut.MovieSourceDirectory);
+            }
+        }
+        else
+        {
+            // For relative paths, just verify it's now absolute
+            Assert.True(Path.IsPathRooted(_sut.MovieSourceDirectory));
+        }
+    }
+
+    [Theory]
+    [InlineData("C:\\Movies\\Destination", "C:\\Movies\\Destination")]
+    [InlineData("..\\MoviesOut", null)] // Relative path should be converted to absolute
+    [InlineData("", "")]
+    [InlineData("  ", "")]
+    public void MovieDestinationDirectory_SetValue_ConvertsToAbsolutePath(string input, string? expectedPrefix)
+    {
+        // Act
+        _sut.MovieDestinationDirectory = input;
+
+        // Assert
+        if (expectedPrefix != null)
+        {
+            if (expectedPrefix == "")
+            {
+                Assert.Equal("", _sut.MovieDestinationDirectory);
+            }
+            else
+            {
+                Assert.Equal(expectedPrefix, _sut.MovieDestinationDirectory);
+            }
+        }
+        else
+        {
+            Assert.True(Path.IsPathRooted(_sut.MovieDestinationDirectory));
+        }
+    }
+
+    [Theory]
+    [InlineData("C:\\TvShows\\Source", "C:\\TvShows\\Source")]
+    [InlineData("..\\TvShows", null)] // Relative path should be converted to absolute
+    [InlineData("", "")]
+    [InlineData("  ", "")]
+    public void TvShowSourceDirectory_SetValue_ConvertsToAbsolutePath(string input, string? expectedPrefix)
+    {
+        // Act
+        _sut.TvShowSourceDirectory = input;
+
+        // Assert
+        if (expectedPrefix != null)
+        {
+            if (expectedPrefix == "")
+            {
+                Assert.Equal("", _sut.TvShowSourceDirectory);
+            }
+            else
+            {
+                Assert.Equal(expectedPrefix, _sut.TvShowSourceDirectory);
+            }
+        }
+        else
+        {
+            Assert.True(Path.IsPathRooted(_sut.TvShowSourceDirectory));
+        }
+    }
+
+    [Theory]
+    [InlineData("C:\\TvShows\\Destination", "C:\\TvShows\\Destination")]
+    [InlineData("..\\TvShowsOut", null)] // Relative path should be converted to absolute
+    [InlineData("", "")]
+    [InlineData("  ", "")]
+    public void TvShowDestinationDirectory_SetValue_ConvertsToAbsolutePath(string input, string? expectedPrefix)
+    {
+        // Act
+        _sut.TvShowDestinationDirectory = input;
+
+        // Assert
+        if (expectedPrefix != null)
+        {
+            if (expectedPrefix == "")
+            {
+                Assert.Equal("", _sut.TvShowDestinationDirectory);
+            }
+            else
+            {
+                Assert.Equal(expectedPrefix, _sut.TvShowDestinationDirectory);
+            }
+        }
+        else
+        {
+            Assert.True(Path.IsPathRooted(_sut.TvShowDestinationDirectory));
         }
     }
 }

@@ -1,6 +1,6 @@
+using System.IO.Abstractions.TestingHelpers;
 using MediaOrganizer.Configuration;
 using MediaOrganizer.Models;
-using System.IO.Abstractions.TestingHelpers;
 
 namespace MediaOrganizer.Tests.Models;
 
@@ -402,7 +402,7 @@ public class MovieTests
 
         var settings = new MediaOrganizerSettings
         {
-            DestinationDirectory = @"C:\destination",
+            MovieDestinationDirectory = @"C:\destination",
             MoviePathTemplate = "Movies/{Title} ({Year})"
         };
 
@@ -427,7 +427,7 @@ public class MovieTests
 
         var settings = new MediaOrganizerSettings
         {
-            DestinationDirectory = @"C:\destination",
+            MovieDestinationDirectory = @"C:\destination",
             MoviePathTemplate = "Movies/{Title} ({Year})"
         };
 

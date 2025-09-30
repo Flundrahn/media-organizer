@@ -50,6 +50,7 @@ Add support for organizing movie files alongside TV shows by creating a common m
   - Parse patterns like: `Movie.Title.2023.1080p.BluRay.x264.mkv`
   - Parse patterns like: `The Matrix (1999) [1080p].mp4`
 - [x] Add `MoviePathTemplate` to `MediaOrganizerSettings`
+- [x] Add specific tv and movie media folders to `MediaOrganizerSettings`
   - Example: `"Movies/{Title} ({Year})"` → `"Movies/The Matrix (1999).mkv"`
 
 #### Phase 3: Directory Context 📁
@@ -92,12 +93,15 @@ The\.Movie\.Title\.(\d{4})\.(\d{4}p)\..*
   "MoviePathTemplate": "Movies/{Title} ({Year})"
 }
 ```
+
 ## TODO - Core Features
 
 - [ ] File organization/moving: Strategy pattern for different organization methods
 - [ ] Add readme
 - [ ] Add smooth build and publish setup, maybe checkout GitHub actions and release.
 - [ ] Possibly refactor MediaOrganizerService into Program.cs, just extract parts that build app and so on, make clear which parts are logic and which parts are UI.
+- [ ] Cleanup double validation TvShow and movie model
+- [ ] Extract cleanup module from MediaFileOrganizer, it should be independend module.
 
 ## Nice to Have 🌟
 
@@ -113,6 +117,7 @@ The\.Movie\.Title\.(\d{4})\.(\d{4}p)\..*
 - [ ] File preview/details view with metadata
 - [ ] Filtering options (by size, date, extension)
 - [ ] Recent operations history
+- [ ] Default to destination folders same as source - unless specified.
 
 ### Advanced Features
 - [ ] Metadata extraction (resolution, duration, codec info)

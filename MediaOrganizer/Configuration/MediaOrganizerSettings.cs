@@ -13,15 +13,21 @@ public class MediaOrganizerSettings
     private FileSystemValidator? _validator;
     private string _sourceDirectory = string.Empty;
     private string _destinationDirectory = string.Empty;
+    private string _tvShowSourceDirectory = string.Empty;
+    private string _tvShowDestinationDirectory = string.Empty;
+    private string _movieSourceDirectory = string.Empty;
+    private string _movieDestinationDirectory = string.Empty;
 
     public const string SectionName = "MediaOrganizer";
+
+    // TODO: clean up "legacy" directories
 
     /// <summary>
     /// The source directory to scan for media files
     /// Automatically converts relative paths to absolute paths
     /// </summary>
-    public string SourceDirectory 
-    { 
+    public string SourceDirectory
+    {
         get => _sourceDirectory;
         set => _sourceDirectory = string.IsNullOrWhiteSpace(value) ? string.Empty : Path.GetFullPath(value);
     }
@@ -34,6 +40,46 @@ public class MediaOrganizerSettings
     { 
         get => _destinationDirectory;
         set => _destinationDirectory = string.IsNullOrWhiteSpace(value) ? string.Empty : Path.GetFullPath(value);
+    }
+
+    /// <summary>
+    /// The source directory to scan for TV show files
+    /// Automatically converts relative paths to absolute paths
+    /// </summary>
+    public string TvShowSourceDirectory 
+    { 
+        get => _tvShowSourceDirectory;
+        set => _tvShowSourceDirectory = string.IsNullOrWhiteSpace(value) ? string.Empty : Path.GetFullPath(value);
+    }
+
+    /// <summary>
+    /// The destination directory where organized TV show files will be placed
+    /// Automatically converts relative paths to absolute paths
+    /// </summary>
+    public string TvShowDestinationDirectory 
+    { 
+        get => _tvShowDestinationDirectory;
+        set => _tvShowDestinationDirectory = string.IsNullOrWhiteSpace(value) ? string.Empty : Path.GetFullPath(value);
+    }
+
+    /// <summary>
+    /// The source directory to scan for movie files
+    /// Automatically converts relative paths to absolute paths
+    /// </summary>
+    public string MovieSourceDirectory 
+    { 
+        get => _movieSourceDirectory;
+        set => _movieSourceDirectory = string.IsNullOrWhiteSpace(value) ? string.Empty : Path.GetFullPath(value);
+    }
+
+    /// <summary>
+    /// The destination directory where organized movie files will be placed
+    /// Automatically converts relative paths to absolute paths
+    /// </summary>
+    public string MovieDestinationDirectory 
+    { 
+        get => _movieDestinationDirectory;
+        set => _movieDestinationDirectory = string.IsNullOrWhiteSpace(value) ? string.Empty : Path.GetFullPath(value);
     }
 
     /// <summary>
@@ -86,6 +132,8 @@ public class MediaOrganizerSettings
     /// Validates the configuration settings
     /// </summary>
     /// <returns>True if configuration is valid</returns>
+    
+    // NOTE: Possibly extract validation to own class
     public bool IsValid()
     {
         if (_validator is null)
@@ -96,25 +144,47 @@ public class MediaOrganizerSettings
         _validationErrors.Clear();
         var isValid = true;
 
-        if (string.IsNullOrWhiteSpace(SourceDirectory))
+        if (string.IsNullOrWhiteSpace(TvShowSourceDirectory))
         {
-            _validationErrors.Add("SourceDirectory is required");
+            _validationErrors.Add("TvShowSourceDirectory is required");
             isValid = false;
         }
-        else if (!_validator.DirectoryExists(SourceDirectory))
+        else if (!_validator.DirectoryExists(TvShowSourceDirectory))
         {
-            _validationErrors.Add($"SourceDirectory does not exist: {SourceDirectory}");
+            _validationErrors.Add($"TvShowSourceDirectory does not exist: {TvShowSourceDirectory}");
             isValid = false;
         }
 
-        if (string.IsNullOrWhiteSpace(DestinationDirectory))
+        if (string.IsNullOrWhiteSpace(TvShowDestinationDirectory))
         {
-            _validationErrors.Add("DestinationDirectory is required");
+            _validationErrors.Add("TvShowDestinationDirectory is required");
             isValid = false;
         }
-        else if (!_validator.DirectoryIsWriteable(DestinationDirectory))
+        else if (!_validator.DirectoryIsWriteable(TvShowDestinationDirectory))
         {
-            _validationErrors.Add("DestinationDirectory is not writable or cannot be created");
+            _validationErrors.Add("TvShowDestinationDirectory is not writable or cannot be created");
+            isValid = false;
+        }
+
+        if (string.IsNullOrWhiteSpace(MovieSourceDirectory))
+        {
+            _validationErrors.Add("MovieSourceDirectory is required");
+            isValid = false;
+        }
+        else if (!_validator.DirectoryExists(MovieSourceDirectory))
+        {
+            _validationErrors.Add($"MovieSourceDirectory does not exist: {MovieSourceDirectory}");
+            isValid = false;
+        }
+
+        if (string.IsNullOrWhiteSpace(MovieDestinationDirectory))
+        {
+            _validationErrors.Add("MovieDestinationDirectory is required");
+            isValid = false;
+        }
+        else if (!_validator.DirectoryIsWriteable(MovieDestinationDirectory))
+        {
+            _validationErrors.Add("MovieDestinationDirectory is not writable or cannot be created");
             isValid = false;
         }
 
@@ -127,7 +197,7 @@ public class MediaOrganizerSettings
         {
             // Validate placeholders in the template using the valid placeholders from TvShowEpisode
             var placeholderMatches = Regex.Matches(TvShowPathTemplate, @"\{([^}:]*)[^}]*\}");
-            
+
             foreach (Match match in placeholderMatches)
             {
                 var placeholderName = match.Groups[1].Value;
@@ -140,14 +210,48 @@ public class MediaOrganizerSettings
 
             // Validate path characters by removing placeholders and checking segments
             var templateWithoutPlaceholders = Regex.Replace(
-                TvShowPathTemplate, 
-                @"\{[^}]*\}", 
+                TvShowPathTemplate,
+                @"\{[^}]*\}",
                 "X"); // Replace placeholders with a safe character
 
             var pathParts = templateWithoutPlaceholders.Split('/', '\\');
             if (_validator != null && !_validator.AreValidPathSegments(pathParts))
             {
                 _validationErrors.Add("TvShowPathTemplate contains invalid path characters");
+                isValid = false;
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(MoviePathTemplate))
+        {
+            _validationErrors.Add("MoviePathTemplate is required");
+            isValid = false;
+        }
+        else
+        {
+            // Validate placeholders in the template using the valid placeholders from Movie
+            var placeholderMatches = Regex.Matches(MoviePathTemplate, @"\{([^}:]*)[^}]*\}");
+
+            foreach (Match match in placeholderMatches)
+            {
+                var placeholderName = match.Groups[1].Value;
+                if (!Movie.ValidPlaceholders.Contains(placeholderName))
+                {
+                    _validationErrors.Add($"MoviePathTemplate contains invalid placeholder: {{{placeholderName}}}");
+                    isValid = false;
+                }
+            }
+
+            // Validate path characters by removing placeholders and checking segments
+            var movieTemplateWithoutPlaceholders = Regex.Replace(
+                MoviePathTemplate,
+                @"\{[^}]*\}",
+                "X"); // Replace placeholders with a safe character
+
+            var moviePathParts = movieTemplateWithoutPlaceholders.Split('/', '\\');
+            if (_validator != null && !_validator.AreValidPathSegments(moviePathParts))
+            {
+                _validationErrors.Add("MoviePathTemplate contains invalid path characters");
                 isValid = false;
             }
         }
@@ -168,13 +272,13 @@ public class MediaOrganizerSettings
                     isValid = false;
                     break;
                 }
-                
+
                 if (!extension.StartsWith('.'))
                 {
                     _validationErrors.Add($"VideoFileExtensions must start with a dot: '{extension}'");
                     isValid = false;
                 }
-                
+
                 if (extension.Length < 2)
                 {
                     _validationErrors.Add($"VideoFileExtensions must have at least one character after the dot: '{extension}'");

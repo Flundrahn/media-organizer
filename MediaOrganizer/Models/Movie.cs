@@ -44,13 +44,13 @@ public class Movie : IMediaFile
     public bool IsOrganized(MediaOrganizerSettings settings)
     {
         if (!IsValid
-            || string.IsNullOrWhiteSpace(settings.DestinationDirectory)
+            || string.IsNullOrWhiteSpace(settings.MovieDestinationDirectory)
             || string.IsNullOrWhiteSpace(settings.MoviePathTemplate))
             return false;
 
         try
         {
-            var organizedFullPath = Path.GetFullPath(Path.Combine(settings.DestinationDirectory, GenerateRelativePath(settings)));
+            var organizedFullPath = Path.GetFullPath(Path.Combine(settings.MovieDestinationDirectory, GenerateRelativePath(settings)));
             var currentFullPath = Path.GetFullPath(CurrentFile.FullName);
 
             return string.Equals(currentFullPath, organizedFullPath, StringComparison.OrdinalIgnoreCase);

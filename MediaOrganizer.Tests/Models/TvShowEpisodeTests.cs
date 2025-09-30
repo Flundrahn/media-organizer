@@ -272,7 +272,7 @@ public class TvShowEpisodeTests
 
         var settings = new MediaOrganizerSettings
         {
-            DestinationDirectory = @"C:\destination",
+            TvShowDestinationDirectory = @"C:\destination",
             TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}"
         };
 
@@ -298,7 +298,7 @@ public class TvShowEpisodeTests
 
         var settings = new MediaOrganizerSettings
         {
-            DestinationDirectory = @"C:\destination",
+            TvShowDestinationDirectory = @"C:\destination",
             TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}"
         };
 
@@ -319,7 +319,7 @@ public class TvShowEpisodeTests
 
         var settings = new MediaOrganizerSettings
         {
-            DestinationDirectory = @"C:\destination",
+            TvShowDestinationDirectory = @"C:\destination",
             TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}"
         };
 

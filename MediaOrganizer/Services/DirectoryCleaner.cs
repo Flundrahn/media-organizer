@@ -25,12 +25,16 @@ public class DirectoryCleaner : IDirectoryCleaner
     }
 
     /// <summary>
-    /// Cleans up empty directories in the source and destination directories and their subdirectories
+    /// Cleans up empty directories in all media source and destination directories and their subdirectories
     /// </summary>
     public void CleanEmptyDirectories()
     {
         CleanEmptyDirectoriesInPath(_settings.SourceDirectory);
         CleanEmptyDirectoriesInPath(_settings.DestinationDirectory);
+        CleanEmptyDirectoriesInPath(_settings.TvShowSourceDirectory);
+        CleanEmptyDirectoriesInPath(_settings.TvShowDestinationDirectory);
+        CleanEmptyDirectoriesInPath(_settings.MovieSourceDirectory);
+        CleanEmptyDirectoriesInPath(_settings.MovieDestinationDirectory);
     }
 
     private void CleanEmptyDirectoriesInPath(string rootPath)

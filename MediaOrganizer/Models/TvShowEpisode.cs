@@ -54,13 +54,13 @@ public class TvShowEpisode : IMediaFile
     public bool IsOrganized(MediaOrganizerSettings settings)
     {
         if (!IsValid
-            || string.IsNullOrWhiteSpace(settings.DestinationDirectory)
+            || string.IsNullOrWhiteSpace(settings.TvShowDestinationDirectory)
             || string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))
             return false;
 
         try
         {
-            var organizedFullPath = Path.GetFullPath(Path.Combine(settings.DestinationDirectory, GenerateRelativePath(settings)));
+            var organizedFullPath = Path.GetFullPath(Path.Combine(settings.TvShowDestinationDirectory, GenerateRelativePath(settings)));
             var currentFullPath = Path.GetFullPath(CurrentFile.FullName); // Helps normalize for path comparison
 
             return string.Equals(currentFullPath, organizedFullPath, StringComparison.OrdinalIgnoreCase);
@@ -71,6 +71,10 @@ public class TvShowEpisode : IMediaFile
         }
     }
 
+    // TODO: possibly change this to just generate the full path immediately, since have settings here anyway
+    // could reason is out of scope for model, and should just take template as before, 
+    // tbh both ways are probably okay 
+    // 
     public string GenerateRelativePath(MediaOrganizerSettings settings)
     {
         if (string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))

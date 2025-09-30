@@ -9,8 +9,10 @@ namespace MediaOrganizer.Tests.Services;
 
 public class MediaFileOrganizerTests
 {
-    private const string SourceDirectory = @"C:\Source";
-    private const string DestinationDirectory = @"C:\Destination";
+    private const string TvShowSourceDirectory = @"C:\TvSource";
+    private const string TvShowDestinationDirectory = @"C:\TvDestination";
+    private const string MovieSourceDirectory = @"C:\MovieSource";
+    private const string MovieDestinationDirectory = @"C:\MovieDestination";
     private const string VideoFileContent = "fake video content";
     
     private readonly MockFileSystem _mockFileSystem;
@@ -22,14 +24,19 @@ public class MediaFileOrganizerTests
         _mockFileSystem = new MockFileSystem();
         
         // Setup test directories
-        _mockFileSystem.AddDirectory(SourceDirectory);
-        _mockFileSystem.AddDirectory(DestinationDirectory);
+        _mockFileSystem.AddDirectory(TvShowSourceDirectory);
+        _mockFileSystem.AddDirectory(TvShowDestinationDirectory);
+        _mockFileSystem.AddDirectory(MovieSourceDirectory);
+        _mockFileSystem.AddDirectory(MovieDestinationDirectory);
         
         _settings = new MediaOrganizerSettings
         {
-            SourceDirectory = SourceDirectory,
-            DestinationDirectory = DestinationDirectory,
+            TvShowSourceDirectory = TvShowSourceDirectory,
+            TvShowDestinationDirectory = TvShowDestinationDirectory,
+            MovieSourceDirectory = MovieSourceDirectory,
+            MovieDestinationDirectory = MovieDestinationDirectory,
             TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}",
+            MoviePathTemplate = "{Title} ({Year})",
             DryRun = false
         };
 
@@ -50,8 +57,8 @@ public class MediaFileOrganizerTests
     public void OrganizeFile_WithValidTvShowFile_MovesAndRenamesCorrectly()
     {
         // Arrange
-        var sourceFilePath = Path.Combine(SourceDirectory, "The.Office.S01E01.Pilot.mkv");
-        var expectedDestinationPath = Path.Combine(DestinationDirectory, "The Office", "Season 1", "The Office - S01E01.mkv");
+        var sourceFilePath = Path.Combine(TvShowSourceDirectory, "The.Office.S01E01.Pilot.mkv");
+        var expectedDestinationPath = Path.Combine(TvShowDestinationDirectory, "The Office", "Season 1", "The Office - S01E01.mkv");
 
         _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
         var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
@@ -72,7 +79,7 @@ public class MediaFileOrganizerTests
     public void OrganizeFile_WithUnparsableFile_ReturnsFalseAndDoesNotMoveFile()
     {
         // Arrange
-        var sourceFilePath = Path.Combine(SourceDirectory, "invalid-file-name.mkv");
+        var sourceFilePath = Path.Combine(TvShowSourceDirectory, "invalid-file-name.mkv");
         _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
         var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
 
@@ -84,7 +91,7 @@ public class MediaFileOrganizerTests
         Assert.Null(result);
         Assert.True(_mockFileSystem.File.Exists(sourceFilePath), "Unparsable file should remain in source");
 
-        var destinationFiles = _mockFileSystem.Directory.GetFiles(DestinationDirectory, "*", SearchOption.AllDirectories);
+        var destinationFiles = _mockFileSystem.Directory.GetFiles(TvShowDestinationDirectory, "*", SearchOption.AllDirectories);
         Assert.Empty(destinationFiles);
     }
 
@@ -93,7 +100,7 @@ public class MediaFileOrganizerTests
     {
         // Arrange
         _settings.DryRun = true;
-        var sourceFilePath = Path.Combine(SourceDirectory, "The.Office.S01E01.Pilot.mkv");
+        var sourceFilePath = Path.Combine(TvShowSourceDirectory, "The.Office.S01E01.Pilot.mkv");
         _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
         var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
 
@@ -106,7 +113,7 @@ public class MediaFileOrganizerTests
         Assert.True(result.IsValid, "Returned episode should be valid in dry run mode");
         Assert.True(_mockFileSystem.File.Exists(sourceFilePath), "In dry run mode, file should not be moved");
         
-        var destinationFiles = _mockFileSystem.Directory.GetFiles(DestinationDirectory, "*", SearchOption.AllDirectories);
+        var destinationFiles = _mockFileSystem.Directory.GetFiles(TvShowDestinationDirectory, "*", SearchOption.AllDirectories);
         Assert.Empty(destinationFiles);
     }
 
@@ -114,10 +121,10 @@ public class MediaFileOrganizerTests
     public void OrganizeFile_WithValidTvShowFile_UpdatesCurrentFileInfoAfterMove()
     {
         // Arrange
-        var sourceFilePath = Path.Combine(SourceDirectory, "Breaking.Bad.S01E01.720p.HDTV.x264-CTU.mkv");
+        var sourceFilePath = Path.Combine(TvShowSourceDirectory, "Breaking.Bad.S01E01.720p.HDTV.x264-CTU.mkv");
         _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
         var fileInfo = _mockFileSystem.FileInfo.New(sourceFilePath);
-        var expectedDestinationPath = Path.Combine(DestinationDirectory, "Breaking Bad", "Season 1", "Breaking Bad - S01E01.mkv");
+        var expectedDestinationPath = Path.Combine(TvShowDestinationDirectory, "Breaking Bad", "Season 1", "Breaking Bad - S01E01.mkv");
 
         // Act
         _sut.Initialize([fileInfo]);
@@ -141,7 +148,7 @@ public class MediaFileOrganizerTests
     public void OrganizeFile_WithFileAlreadyOrganized_SkipsAndReturnsSuccess()
     {
         // Arrange - file is already in the correct organized location
-        var correctDestinationPath = Path.Combine(DestinationDirectory, "Breaking Bad", "Season 1", "Breaking Bad - S01E01.mkv");
+        var correctDestinationPath = Path.Combine(TvShowDestinationDirectory, "Breaking Bad", "Season 1", "Breaking Bad - S01E01.mkv");
         _mockFileSystem.AddFile(correctDestinationPath, new MockFileData(VideoFileContent));
         var fileInfo = _mockFileSystem.FileInfo.New(correctDestinationPath);
 
@@ -155,7 +162,7 @@ public class MediaFileOrganizerTests
         Assert.True(_mockFileSystem.File.Exists(correctDestinationPath), "File should remain in correct location");
         
         // Assert - verify no additional files were created or moved
-        var allFiles = _mockFileSystem.Directory.GetFiles(DestinationDirectory, "*", SearchOption.AllDirectories);
+        var allFiles = _mockFileSystem.Directory.GetFiles(TvShowDestinationDirectory, "*", SearchOption.AllDirectories);
         Assert.Single(allFiles); // Only the original file should exist
         Assert.Equal(correctDestinationPath, allFiles[0]);
     }
@@ -164,7 +171,7 @@ public class MediaFileOrganizerTests
     public void OrganizeFile_WithCleanupEnabled_CallsDirectoryCleaner()
     {
         // Arrange
-        var sourceFilePath = Path.Combine(SourceDirectory, "The.Office.S01E01.Pilot.mkv");
+        var sourceFilePath = Path.Combine(TvShowSourceDirectory, "The.Office.S01E01.Pilot.mkv");
         _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
         
         _settings.AutoCleanupEmptyDirectories = true;
@@ -191,7 +198,7 @@ public class MediaFileOrganizerTests
     public void OrganizeFile_WithCleanupDisabled_DoesNotCallDirectoryCleaner()
     {
         // Arrange
-        var sourceFilePath = Path.Combine(SourceDirectory, "The.Office.S01E01.Pilot.mkv");
+        var sourceFilePath = Path.Combine(TvShowSourceDirectory, "The.Office.S01E01.Pilot.mkv");
         _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
         
         _settings.AutoCleanupEmptyDirectories = false;
@@ -218,7 +225,7 @@ public class MediaFileOrganizerTests
     public void OrganizeFile_WithCleanupEnabled_CallsDirectoryCleanerRegardlessOfDirectoryState()
     {
         // Arrange
-        var sourceFilePath = Path.Combine(SourceDirectory, "The.Office.S01E01.Pilot.mkv");
+        var sourceFilePath = Path.Combine(TvShowSourceDirectory, "The.Office.S01E01.Pilot.mkv");
         _mockFileSystem.AddFile(sourceFilePath, new MockFileData(VideoFileContent));
         
         _settings.AutoCleanupEmptyDirectories = true;

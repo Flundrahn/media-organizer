@@ -23,7 +23,7 @@ public class FileSystemValidatorIntegrationTests
     {
         using var environment = new TempMediaTestEnvironment();
         // Arrange
-        var newDirPath = Path.Combine(environment.DestinationDirectory, "NewDirectory");
+        var newDirPath = Path.Combine(environment.MediaDestinationDirectory, "NewDirectory");
 
         // Act
         var result = _sut.DirectoryIsWriteable(newDirPath);
@@ -38,7 +38,7 @@ public class FileSystemValidatorIntegrationTests
     {
         using var environment = new TempMediaTestEnvironment();
         // Arrange
-        var existingDir = Path.Combine(environment.DestinationDirectory, "ExistingDir");
+        var existingDir = Path.Combine(environment.MediaDestinationDirectory, "ExistingDir");
         Directory.CreateDirectory(existingDir);
 
         // Act

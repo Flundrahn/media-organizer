@@ -87,8 +87,12 @@ public class MediaFileOrganizer
             OrganizeFile();
         }
         
-        _logger.LogInformation("Organization complete: {OrganizedCount} organized, {SkippedCount} skipped, {FailedCount} failed out of {ProcessedCount} total files", 
-            _result.OrganizedCount, _result.SkippedCount, _result.FailedCount, _result.ProcessedCount);
+        _logger.LogInformation(
+            "Organization complete: {OrganizedCount} organized, {SkippedCount} skipped, {FailedCount} failed out of {ProcessedCount} total files",
+            _result.OrganizedCount,
+            _result.SkippedCount,
+            _result.FailedCount,
+            _result.ProcessedCount);
         
         return _result;
     }
@@ -111,8 +115,18 @@ public class MediaFileOrganizer
             return null;
         }
 
+        // TODO: Probably update here as continue implementing movie feature
         string mediaFileRelativePath = mediaFile.GenerateRelativePath(_settings);
-        string mediaFileDestinationPath = _fileSystem.Path.Combine(_settings.DestinationDirectory, mediaFileRelativePath);
+        
+        // Choose the appropriate destination directory based on media type
+        string destinationDirectory = mediaFile.Type switch
+        {
+            MediaType.TvShow => _settings.TvShowDestinationDirectory,
+            MediaType.Movie => _settings.MovieDestinationDirectory,
+            _ => throw new InvalidOperationException("Unsupported media type")
+        };
+        
+        string mediaFileDestinationPath = _fileSystem.Path.Combine(destinationDirectory, mediaFileRelativePath);
         string? mediaFileDestinationDir = _fileSystem.Path.GetDirectoryName(mediaFileDestinationPath);
 
         if (string.IsNullOrEmpty(mediaFileDestinationDir))

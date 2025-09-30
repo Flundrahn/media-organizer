@@ -9,18 +9,18 @@ public sealed class TempMediaTestEnvironment : IDisposable
     private bool _disposed;
 
     public string TempDirectoryRoot { get; }
-    public string SourceDirectory { get; }
-    public string DestinationDirectory { get; }
+    public string MediaSourceDirectory { get; }
+    public string MediaDestinationDirectory { get; }
 
     public TempMediaTestEnvironment()
     {
         TempDirectoryRoot = Path.Combine(Path.GetTempPath(), $"media-organizer-integration-{Guid.NewGuid():N}");
-        SourceDirectory = Path.Combine(TempDirectoryRoot, "source");
-        DestinationDirectory = Path.Combine(TempDirectoryRoot, "media");
+        MediaSourceDirectory = Path.Combine(TempDirectoryRoot, "source");
+        MediaDestinationDirectory = Path.Combine(TempDirectoryRoot, "destination");
 
         Directory.CreateDirectory(TempDirectoryRoot);
-        Directory.CreateDirectory(SourceDirectory);
-        Directory.CreateDirectory(DestinationDirectory);
+        Directory.CreateDirectory(MediaSourceDirectory);
+        Directory.CreateDirectory(MediaDestinationDirectory);
     }
 
     /// <summary>
@@ -37,8 +37,8 @@ public sealed class TempMediaTestEnvironment : IDisposable
             throw new ObjectDisposedException(nameof(TempMediaTestEnvironment));
         }
 
-        var absoluteFilePath = Path.Combine(SourceDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar));
-        var parentDirectoryPath = Path.GetDirectoryName(absoluteFilePath) ?? SourceDirectory;
+        var absoluteFilePath = Path.Combine(MediaSourceDirectory, relativePath.Replace('/', Path.DirectorySeparatorChar));
+        var parentDirectoryPath = Path.GetDirectoryName(absoluteFilePath) ?? MediaSourceDirectory;
         if (!Directory.Exists(parentDirectoryPath))
         {
             Directory.CreateDirectory(parentDirectoryPath);

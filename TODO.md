@@ -25,16 +25,16 @@
 - [x] Add support to configure allowed video file extensions
 - [x] Add support to clean up empty directories after moving files
 - [x] Add some integration tests
-
-## Doing
-- [ ] Refactor before continuing movie feature
+- [x] Refactor before continuing movie feature
     - factory methods to create specific organizer
     - rename parser interface to make generic
     - update config of file provider
-    - inject configured file provider into organizer in factory method
+    - inject configured file provider into organizer in factory method: ended up not doing. Nice and decoupled to inject FileInfos into ctor of organizer.
+
+## Doing
+- [ ] Movie feature
 
 ## TODO: Movie Feature Plan 🎬
-- [ ] Movie feature
 
 ### Overview
 Add support for organizing movie files alongside TV shows by creating a common media file abstraction. Movies and TV shows will be distinguished by directory context rather than file parsing.

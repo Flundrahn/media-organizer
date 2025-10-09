@@ -40,14 +40,8 @@ namespace MediaOrganizer.IntegrationTests
                 .AddSingleton(Options.Create(settings))
                 .BuildServiceProvider();
 
-            var mediaFileProvider = provider.GetRequiredService<IMediaFileProvider>();
-            var organizer = provider.GetRequiredService<MediaFileOrganizer>();
-
-            // Use MediaFileProvider to get media files (same as the actual application)
-            var tvShowFiles = mediaFileProvider.GetTvShowFiles();
-            var movieFiles = mediaFileProvider.GetMovieFiles();
-            var mediaFiles = tvShowFiles.Concat(movieFiles);
-            organizer.Initialize(mediaFiles);
+            var organizerFactory = provider.GetRequiredService<MediaFileOrganizerFactory>();
+            var organizer = organizerFactory.CreateTvShowOrganizer();
 
             // Act
             var result = organizer.OrganizeAllFiles();

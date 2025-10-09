@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace MediaOrganizer.Services;
 
-public class TvShowEpisodeParser : ITvShowEpisodeParser
+public class TvShowEpisodeParser : IMediaFileParser
 {
     private static readonly Regex StandardSxxExxPattern = new(
         @"^(?<showName>.+?)(?:\.(?<year>\d{4}))?\.S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?\.(?:\d{4}p|1080p|720p|480p|REPACK|WEB|BluRay|ATVP|WEB-DL|DD|H\.?264|x264|h264|ETHEL|EZTVx|mkv|mp4|avi|playWEB|\[.*?\]|Atmos|5\.1|successfulcrab)", 

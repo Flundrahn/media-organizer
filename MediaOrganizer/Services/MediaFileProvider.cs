@@ -1,55 +1,42 @@
 using System.IO.Abstractions;
 using MediaOrganizer.Configuration;
+using MediaOrganizer.Models;
 using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Services;
 
 public interface IMediaFileProvider
 {
-    IEnumerable<IFileInfo> GetTvShowFiles();
-    IEnumerable<IFileInfo> GetMovieFiles();
+    IEnumerable<IFileInfo> GetMediaFiles();
 }
 
 public class MediaFileProvider : IMediaFileProvider
 {
+    private readonly string _mediaSourceDirectory;
     private readonly IFileSystem _fileSystem;
-    private readonly bool _includeSubdirectories;
-    private readonly HashSet<string> _videoExtensions;
     private readonly MediaOrganizerSettings _settings;
 
-    public MediaFileProvider(IFileSystem fileSystem, IOptions<MediaOrganizerSettings> settings)
+    public MediaFileProvider(IFileSystem fileSystem, IOptions<MediaOrganizerSettings> settings, MediaType mediaType)
     {
         _fileSystem = fileSystem;
-        _includeSubdirectories = settings.Value.IncludeSubdirectories;
-        _videoExtensions = new HashSet<string>(settings.Value.VideoFileExtensions, StringComparer.OrdinalIgnoreCase);
         _settings = settings.Value;
+        _mediaSourceDirectory = mediaType == MediaType.TvShow
+            ? _settings.TvShowSourceDirectory
+            : _settings.MovieSourceDirectory;
     }
 
-    public IEnumerable<IFileInfo> GetTvShowFiles()
+    public IEnumerable<IFileInfo> GetMediaFiles()
     {
-        return GetMediaFilesFromDirectory(_settings.TvShowSourceDirectory);
-    }
-
-    public IEnumerable<IFileInfo> GetMovieFiles()
-    {
-        return GetMediaFilesFromDirectory(_settings.MovieSourceDirectory);
-    }
-
-    private IEnumerable<IFileInfo> GetMediaFilesFromDirectory(string directoryPath)
-    {
-        if (!_fileSystem.Directory.Exists(directoryPath))
-            throw new DirectoryNotFoundException($"Directory not found: {directoryPath}");
-
-        var searchOption = _includeSubdirectories
-            ? SearchOption.AllDirectories 
+        var searchOption = _settings.IncludeSubdirectories
+            ? SearchOption.AllDirectories
             : SearchOption.TopDirectoryOnly;
-        
-        var files = _fileSystem.Directory.EnumerateFiles(directoryPath, "*", searchOption);
+
+        var files = _fileSystem.Directory.EnumerateFiles(_mediaSourceDirectory, "*", searchOption);
 
         foreach (var file in files)
         {
             var fileInfo = _fileSystem.FileInfo.New(file);
-            if (_videoExtensions.Contains(fileInfo.Extension))
+            if (_settings.VideoFileExtensions.Exists(x => string.Equals(x, fileInfo.Extension, StringComparison.OrdinalIgnoreCase)))
             {
                 yield return fileInfo;
             }

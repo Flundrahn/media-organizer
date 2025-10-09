@@ -27,9 +27,14 @@
 - [x] Add some integration tests
 
 ## Doing
-- [ ] Movie feature
+- [ ] Refactor before continuing movie feature
+    - factory methods to create specific organizer
+    - rename parser interface to make generic
+    - update config of file provider
+    - inject configured file provider into organizer in factory method
 
 ## TODO: Movie Feature Plan 🎬
+- [ ] Movie feature
 
 ### Overview
 Add support for organizing movie files alongside TV shows by creating a common media file abstraction. Movies and TV shows will be distinguished by directory context rather than file parsing.
@@ -86,14 +91,6 @@ The\.Movie\.Title\.(\d{4})\.(\d{4}p)\..*
 ^(?!.*[Ss]\d{2}[Ee]\d{2})([A-Za-z\s]+).*\.(mkv|mp4|avi)$
 ```
 
-### Configuration Example
-```json
-"MediaOrganizer": {
-  "TvShowPathTemplate": "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}",
-  "MoviePathTemplate": "Movies/{Title} ({Year})"
-}
-```
-
 ## TODO - Core Features
 
 - [ ] File organization/moving: Strategy pattern for different organization methods
@@ -102,6 +99,8 @@ The\.Movie\.Title\.(\d{4})\.(\d{4}p)\..*
 - [ ] Possibly refactor MediaOrganizerService into Program.cs, just extract parts that build app and so on, make clear which parts are logic and which parts are UI.
 - [ ] Cleanup double validation TvShow and movie model
 - [ ] Extract cleanup module from MediaFileOrganizer, it should be independend module.
+- [ ] Use microsoft package for console options that can display usage and so on.
+- [ ] Settings validate one property at a time in own method
 
 ## Nice to Have 🌟
 

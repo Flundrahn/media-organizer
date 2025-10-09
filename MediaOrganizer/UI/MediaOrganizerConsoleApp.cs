@@ -1,4 +1,3 @@
-using System.IO.Abstractions;
 using MediaOrganizer.Configuration;
 using MediaOrganizer.IO;
 using MediaOrganizer.Services;
@@ -15,22 +14,20 @@ public class MediaOrganizerConsoleApp
 {
     private readonly IConsoleIO _console;
     private readonly MediaOrganizerSettings _settings;
-    private readonly IMediaFileProvider _mediaFileProvider;
-    private readonly MediaFileOrganizer _organizer;
+    private readonly MediaFileOrganizerFactory _organizerFactory;
     private readonly IDirectoryCleaner _directoryCleaner;
+    private MediaFileOrganizer? _organizer;
 
     public MediaOrganizerConsoleApp(IConsoleIO console,
                                     IOptions<MediaOrganizerSettings> settings,
-                                    IMediaFileProvider mediaFileProvider,
                                     FileSystemValidator fileSystemValidator,
-                                    MediaFileOrganizer organizer,
+                                    MediaFileOrganizerFactory organizerFactory,
                                     IDirectoryCleaner directoryCleaner)
     {
         _console = console;
         _settings = settings.Value;
         _settings.SetValidator(fileSystemValidator);
-        _mediaFileProvider = mediaFileProvider;
-        _organizer = organizer;
+        _organizerFactory = organizerFactory;
         _directoryCleaner = directoryCleaner;
     }
 
@@ -66,8 +63,13 @@ public class MediaOrganizerConsoleApp
         _console.WriteLine($"Dry Run Mode: {(_settings.DryRun ? "Enabled" : "Disabled")}");
         _console.WriteLine("");
 
+        _organizer = _organizerFactory.CreateTvShowOrganizer();
+
         return ShowMainMenu();
     }
+
+    protected MediaFileOrganizer Organizer =>
+        _organizer ?? throw new InvalidOperationException("Organizer not initialized. Call Run() first.");
 
     // TODO: List tv and movie separately
     // TODO: Organize tv and movie separately
@@ -77,10 +79,7 @@ public class MediaOrganizerConsoleApp
     {
         while (true)
         {
-            var tvShowFiles = _mediaFileProvider.GetTvShowFiles();
-            var movieFiles = _mediaFileProvider.GetMovieFiles();
-            var mediaFiles = tvShowFiles.Concat(movieFiles);
-            int count = mediaFiles.Count();
+            int count = Organizer.RemainingCount;
 
             _console.WriteLine("Main Menu");
             _console.WriteLine("---------");
@@ -104,7 +103,7 @@ public class MediaOrganizerConsoleApp
                     }
                     else
                     {
-                        ListMediaFiles(mediaFiles);
+                        ListMediaFiles();
                     }
                     break;
                 case ConsoleKey.D2:
@@ -115,7 +114,7 @@ public class MediaOrganizerConsoleApp
                     }
                     else
                     {
-                        OrganizeMediaFiles(mediaFiles);
+                        OrganizeMediaFiles();
                     }
                     break;
                 case ConsoleKey.D3:
@@ -141,33 +140,31 @@ public class MediaOrganizerConsoleApp
         }
     }
 
-    private void ListMediaFiles(IEnumerable<IFileInfo> mediaFiles)
+    private void ListMediaFiles()
     {
         _console.WriteLine("");
         _console.WriteLine($"TV Show Source Directory: {_settings.TvShowSourceDirectory}");
         _console.WriteLine($"Movie Source Directory: {_settings.MovieSourceDirectory}");
 
-        if (!mediaFiles.Any())
+        if (!Organizer.AllFiles.Any())
         {
             _console.WriteError("No video files found to organize.");
             return;
         }
 
-        foreach (var file in mediaFiles)
+        foreach (var file in Organizer.AllFiles)
         {
             _console.WriteLine($"   {Path.GetRelativePath(_settings.SourceDirectory, file.FullName)}");
         }
     }
 
-    private void OrganizeMediaFiles(IEnumerable<IFileInfo> mediaFiles)
+    private void OrganizeMediaFiles()
     {
         _console.WriteLine("");
         _console.WriteLine("Interactive File Organization");
         _console.WriteLine("============================");
         
-        _organizer.Initialize(mediaFiles);
-        
-        if (_organizer.RemainingCount == 0)
+        if (Organizer.RemainingCount == 0)
         {
             _console.WriteLine("No files to organize.");
             return;
@@ -185,11 +182,11 @@ public class MediaOrganizerConsoleApp
 
     private void ProcessFilesInteractively()
     {
-        while (_organizer.RemainingCount > 0)
+        while (Organizer.RemainingCount > 0)
         {
-            var currentFile = _organizer.PeekFile();
+            var currentFile = Organizer.PeekFile();
             
-            _console.WriteLine($"Files remaining: {_organizer.RemainingCount}");
+            _console.WriteLine($"Files remaining: {Organizer.RemainingCount}");
             
             if (currentFile != null && currentFile.IsValid)
             {
@@ -211,7 +208,7 @@ public class MediaOrganizerConsoleApp
             switch (key.Key)
             {
                 case ConsoleKey.Enter:
-                    var result = _organizer.OrganizeFile();
+                    var result = Organizer.OrganizeFile();
                     if (result != null && result.IsValid)
                     {
                         _console.WriteSuccess($"Organized: {result}");
@@ -223,11 +220,11 @@ public class MediaOrganizerConsoleApp
                     break;
                 case ConsoleKey.A:
                     _console.WriteLine("Organizing all remaining files...");
-                    var finalResult = _organizer.OrganizeAllFiles();
+                    var finalResult = Organizer.OrganizeAllFiles();
                     _console.WriteSuccess($"Batch complete: {finalResult.OrganizedCount} organized, {finalResult.SkippedCount} skipped, {finalResult.FailedCount} failed");
                     return;
                 case ConsoleKey.S:
-                    _organizer.SkipFile();
+                    Organizer.SkipFile();
                     _console.WriteInformation("Skipped file");
                     break;
                 case ConsoleKey.Escape:
@@ -241,7 +238,7 @@ public class MediaOrganizerConsoleApp
             _console.WriteLine("");
         }
         
-        var stats = _organizer.Result;
+        var stats = Organizer.Result;
         _console.WriteSuccess($"Organization complete: {stats.OrganizedCount} organized, {stats.SkippedCount} skipped, {stats.FailedCount} failed out of {stats.ProcessedCount} total files");
     }
 

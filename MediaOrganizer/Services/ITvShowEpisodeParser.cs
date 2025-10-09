@@ -6,7 +6,7 @@ namespace MediaOrganizer.Services;
 /// <summary>
 /// Interface for parsing TV show episode information from filenames
 /// </summary>
-public interface ITvShowEpisodeParser
+public interface IMediaFileParser
 {
     /// <summary>
     /// Determines if the given filename can be parsed as a TV show episode

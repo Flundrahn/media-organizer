@@ -51,6 +51,10 @@ public class TvShowEpisode : IMediaFile
 
     public bool IsValid => !string.IsNullOrWhiteSpace(TvShowName) && Season > 0 && Episode > 0;
 
+    // note: this is a nice method to have, it just troubles me a little bit that it does encourage generating the path multiple times
+    // it might be possible to refactor later to be smarter somehow, cache somehow.
+    // to check if already organized, I need to generate the path from the settings and compare to current file path.
+    // I could return in a try pattern
     public bool IsOrganized(MediaOrganizerSettings settings)
     {
         if (!IsValid
@@ -58,9 +62,11 @@ public class TvShowEpisode : IMediaFile
             || string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))
             return false;
 
+        // TODO: probably remove this try catch, seems better let error propagate with full info
+        // else will just say it is not organzied, when in reality something else may be wrong
         try
         {
-            var organizedFullPath = Path.GetFullPath(Path.Combine(settings.TvShowDestinationDirectory, GenerateRelativePath(settings)));
+            var organizedFullPath = GenerateFullPath(settings);
             var currentFullPath = Path.GetFullPath(CurrentFile.FullName); // Helps normalize for path comparison
 
             return string.Equals(currentFullPath, organizedFullPath, StringComparison.OrdinalIgnoreCase);
@@ -71,10 +77,16 @@ public class TvShowEpisode : IMediaFile
         }
     }
 
+    public string GenerateFullPath(MediaOrganizerSettings settings)
+    {
+        // TODO: possibly use Path.GetFullPath if make a difference, note already use it in settings dir setters
+        return Path.Combine(settings.TvShowDestinationDirectory, GenerateRelativePath(settings));
+    }
+
     // TODO: possibly change this to just generate the full path immediately, since have settings here anyway
     // could reason is out of scope for model, and should just take template as before, 
     // tbh both ways are probably okay 
-    // 
+    // todo: clean up here if continue feel absolute was good way
     public string GenerateRelativePath(MediaOrganizerSettings settings)
     {
         if (string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))

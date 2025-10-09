@@ -6,6 +6,11 @@ using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Services;
 
+// decoupling one class from another class is a virtue if can keep the logic as simple
+// for that reason the MediaFileOrganizer might not have to use a file provider at all
+// if I also create the organizers on my own, i might not need the subclasses
+// say I have a factory, that can generate all the dependencies of an organizer
+
 public class OrganizationResult
 {
     public int ProcessedCount { get; set; }
@@ -17,96 +22,96 @@ public class OrganizationResult
 
 public class MediaFileOrganizer
 {
-    private readonly IFileSystem _fileSystem;
     private readonly ILogger<MediaFileOrganizer> _logger;
-    private readonly ITvShowEpisodeParser _parser;
+    private readonly IFileSystem _fileSystem;
+    private readonly IMediaFileParser _parser;
     private readonly MediaOrganizerSettings _settings;
     private readonly IDirectoryCleaner _directoryCleaner;
-    
-    private Stack<IFileInfo> _fileStack;
-    private OrganizationResult _result;
+    private readonly OrganizationResult _result = new();
+    private readonly Stack<IFileInfo> _files;
+    private readonly IReadOnlyList<IFileInfo> _allFiles;
 
-    public MediaFileOrganizer(
+    public int RemainingCount => _files.Count;
+    public int TotalCount => _allFiles.Count;
+    // todo: decide how do about this
+    public IReadOnlyList<IFileInfo> AllFiles => _allFiles;
+    public OrganizationResult Result => _result;
+
+    internal MediaFileOrganizer(
         IFileSystem fileSystem,
+        // NOTE: Investigate how logger injected from subclass works
         ILogger<MediaFileOrganizer> logger,
-        ITvShowEpisodeParser parser,
+        IMediaFileParser parser,
         IOptions<MediaOrganizerSettings> settings,
-        IDirectoryCleaner directoryCleaner)
+        IDirectoryCleaner directoryCleaner,
+        IEnumerable<IFileInfo> mediaFiles)
     {
         _fileSystem = fileSystem;
         _logger = logger;
         _parser = parser;
         _settings = settings.Value;
         _directoryCleaner = directoryCleaner;
-        _fileStack = new Stack<IFileInfo>();
-        _result = new OrganizationResult();
+        
+        // TODO: performance, later avoid doing toList if possible, although important part is probably when making changes later
+        var mediaFilesList = mediaFiles.ToList();
+        _allFiles = mediaFilesList.AsReadOnly();
+        _files = new Stack<IFileInfo>(mediaFilesList);
     }
-
-    public void Initialize(IEnumerable<IFileInfo> mediaFiles)
-    {
-        _fileStack = new Stack<IFileInfo>(mediaFiles);
-        _result = new OrganizationResult();
-    }
-
-    public int RemainingCount => _fileStack.Count;
-    public OrganizationResult Result => _result;
 
     public IMediaFile? PeekFile()
     {
-        if (_fileStack.Count == 0) return null;
-        
-        var nextFile = _fileStack.Peek();
+        if (_files.Count == 0) return null;
+
+        var nextFile = _files.Peek();
         return _parser.Parse(nextFile);
     }
 
     public IMediaFile? OrganizeFile()
     {
-        if (_fileStack.Count == 0) return null;
-        
-        var fileInfo = _fileStack.Pop();
+        if (_files.Count == 0) return null;
+
+        var fileInfo = _files.Pop();
         _result.ProcessedCount++;
-        
+
         return OrganizeFileInternal(fileInfo);
     }
 
     public void SkipFile()
     {
-        if (_fileStack.Count == 0) return;
-        
-        var fileInfo = _fileStack.Pop();
+        if (_files.Count == 0) return;
+
+        var fileInfo = _files.Pop();
         _result.ProcessedCount++;
         _result.SkippedCount++;
-        
+
         _logger.LogDebug("Skipped {FileName} by user request", fileInfo.Name);
     }
 
     public OrganizationResult OrganizeAllFiles()
     {
-        while (_fileStack.Count > 0)
+        while (_files.Count > 0)
         {
             OrganizeFile();
         }
-        
+
         _logger.LogInformation(
             "Organization complete: {OrganizedCount} organized, {SkippedCount} skipped, {FailedCount} failed out of {ProcessedCount} total files",
             _result.OrganizedCount,
             _result.SkippedCount,
             _result.FailedCount,
             _result.ProcessedCount);
-        
-        return _result;
+
+        return Result;
     }
 
     private IMediaFile? OrganizeFileInternal(IFileInfo fileInfo)
     {
         var mediaFile = _parser.Parse(fileInfo);
 
-        _logger.LogDebug("Parsed {FileName}: Valid={IsValid}, Show={TvShowName}, S{Season}E{Episode}",
+        _logger.LogDebug("Parsed {FileName}: Valid={IsValid}, Type={MediaType}",
                          fileInfo.Name,
                          mediaFile.IsValid,
-                         mediaFile.TvShowName,
-                         mediaFile.Season,
-                         mediaFile.Episode);
+                         mediaFile.Type);
 
         if (!mediaFile.IsValid)
         {
@@ -115,18 +120,7 @@ public class MediaFileOrganizer
             return null;
         }
 
-        // TODO: Probably update here as continue implementing movie feature
-        string mediaFileRelativePath = mediaFile.GenerateRelativePath(_settings);
-        
-        // Choose the appropriate destination directory based on media type
-        string destinationDirectory = mediaFile.Type switch
-        {
-            MediaType.TvShow => _settings.TvShowDestinationDirectory,
-            MediaType.Movie => _settings.MovieDestinationDirectory,
-            _ => throw new InvalidOperationException("Unsupported media type")
-        };
-        
-        string mediaFileDestinationPath = _fileSystem.Path.Combine(destinationDirectory, mediaFileRelativePath);
+        string mediaFileDestinationPath = mediaFile.GenerateFullPath(_settings);
         string? mediaFileDestinationDir = _fileSystem.Path.GetDirectoryName(mediaFileDestinationPath);
 
         if (string.IsNullOrEmpty(mediaFileDestinationDir))
@@ -136,7 +130,6 @@ public class MediaFileOrganizer
             return null;
         }
 
-        // Skip if file is already organized in the correct location
         if (mediaFile.IsOrganized(_settings))
         {
             _logger.LogInformation("Skipped {FileName} - already organized in correct location", fileInfo.Name);
@@ -164,6 +157,8 @@ public class MediaFileOrganizer
             }
         }
 
+        // todo: no need to couple this feature with this class, it is fine to do after completely separately
+        // and that way remove a side effect
         if (_settings.AutoCleanupEmptyDirectories)
         {
             _directoryCleaner.CleanEmptyDirectories();

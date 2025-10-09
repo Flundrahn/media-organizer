@@ -40,6 +40,8 @@ public interface IMediaFile
     /// <exception cref="InvalidOperationException">Thrown when the media file is not in a valid state</exception>
     string GenerateRelativePath(MediaOrganizerSettings settings);
 
+    string GenerateFullPath(MediaOrganizerSettings settings);
+
     /// <summary>
     /// Determines if the file is already organized (i.e., in its correct destination location)
     /// </summary>

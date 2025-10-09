@@ -48,9 +48,11 @@ public class Movie : IMediaFile
             || string.IsNullOrWhiteSpace(settings.MoviePathTemplate))
             return false;
 
+        // TODO: probably remove this try catch, seems better let error propagate with full info
+        // else will just say it is not organzied, when in reality something else may be wrong
         try
         {
-            var organizedFullPath = Path.GetFullPath(Path.Combine(settings.MovieDestinationDirectory, GenerateRelativePath(settings)));
+            var organizedFullPath = GenerateFullPath(settings);
             var currentFullPath = Path.GetFullPath(CurrentFile.FullName);
 
             return string.Equals(currentFullPath, organizedFullPath, StringComparison.OrdinalIgnoreCase);
@@ -59,6 +61,12 @@ public class Movie : IMediaFile
         {
             return false;
         }
+    }
+
+    public string GenerateFullPath(MediaOrganizerSettings settings)
+    {
+        // TODO: possibly use Path.GetFullPath if make a difference, note already use it in settings dir setters
+        return Path.Combine(settings.MovieDestinationDirectory, GenerateRelativePath(settings));
     }
 
     public string GenerateRelativePath(MediaOrganizerSettings settings)

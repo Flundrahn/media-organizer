@@ -2,6 +2,7 @@ using MediaOrganizer.Services;
 using MediaOrganizer.Configuration;
 using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.Options;
+using MediaOrganizer.Models;
 
 namespace MediaOrganizer.Tests.Services;
 
@@ -16,29 +17,25 @@ public class MediaFileProviderTests
         _settings = new MediaOrganizerSettings
         {
             TvShowSourceDirectory = @"C:\TvShows",
-            MovieSourceDirectory = @"C:\Movies",
             VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" }
         };
     }
 
     [Fact]
-    public void GetTvShowFiles_WhenDirectoryDoesNotExist_ThrowsDirectoryNotFoundException()
+    public void GetMediaFiles_WhenDirectoryDoesNotExist_ThrowsDirectoryNotFoundException()
     {
         // Arrange
-        var settingsWithNonExistentDir = new MediaOrganizerSettings
-        {
-            TvShowSourceDirectory = @"C:\NonExistent",
-            MovieSourceDirectory = @"C:\Movies",
-            VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" }
-        };
-        var sut = new MediaFileProvider(_mockFileSystem, Options.Create(settingsWithNonExistentDir));
+        // Default mockFileSystem does not have the directory
+        var sut = new MediaFileProvider(_mockFileSystem,
+                                        Options.Create(_settings),
+                                        MediaType.TvShow);
 
         // Act & Assert
-        Assert.Throws<DirectoryNotFoundException>(() => sut.GetTvShowFiles().ToList());
+        Assert.Throws<DirectoryNotFoundException>(() => sut.GetMediaFiles().ToList());
     }
 
     [Fact]
-    public void GetTvShowFiles_WithVideoFiles_ReturnsOnlyVideoFiles()
+    public void GetMediaFiles_WithVideoFiles_ReturnsOnlyVideoFiles()
     {
         // Arrange
         const string photoFile = @"C:\TvShows\photo.jpg";
@@ -52,10 +49,13 @@ public class MediaFileProviderTests
         _mockFileSystem.AddFile(documentFile, new MockFileData(""));
         _mockFileSystem.AddFile(movieFile, new MockFileData(""));
         _mockFileSystem.AddFile(musicFile, new MockFileData(""));
-        var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
+
+        var sut = new MediaFileProvider(_mockFileSystem,
+                                        Options.Create(_settings),
+                                        MediaType.TvShow);
 
         // Act
-        var result = sut.GetTvShowFiles().ToList();
+        var result = sut.GetMediaFiles().ToList();
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -67,7 +67,7 @@ public class MediaFileProviderTests
     }
 
     [Fact]
-    public void GetTvShowFiles_WithIncludeSubdirectoriesTrue_IncludesSubdirectoryFiles()
+    public void GetMediaFiles_WithIncludeSubdirectoriesTrue_IncludesSubdirectoryFiles()
     {
         // Arrange
         const string videoFile = @"C:\TvShows\video.mp4";
@@ -77,10 +77,12 @@ public class MediaFileProviderTests
         _mockFileSystem.AddFile(subfolderMovieFile, new MockFileData(""));
         _settings.IncludeSubdirectories = true;
 
-        var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
+        var sut = new MediaFileProvider(_mockFileSystem,
+                                        Options.Create(_settings),
+                                        MediaType.TvShow);
 
         // Act
-        var result = sut.GetTvShowFiles().ToList();
+        var result = sut.GetMediaFiles().ToList();
 
         // Assert
         Assert.Equal(2, result.Count);
@@ -89,7 +91,7 @@ public class MediaFileProviderTests
     }
 
     [Fact]
-    public void GetTvShowFiles_WithIncludeSubdirectoriesFalse_ExcludesSubdirectoryFiles()
+    public void GetMediaFiles_WithIncludeSubdirectoriesFalse_ExcludesSubdirectoryFiles()
     {
         // Arrange
         const string videoFile = @"C:\TvShows\video.mp4";
@@ -99,10 +101,12 @@ public class MediaFileProviderTests
         _mockFileSystem.AddFile(subfolderMovieFile, new MockFileData(""));
         _settings.IncludeSubdirectories = false;
         
-        var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
+        var sut = new MediaFileProvider(_mockFileSystem,
+                                        Options.Create(_settings),
+                                        MediaType.TvShow);
 
         // Act
-        var result = sut.GetTvShowFiles().ToList();
+        var result = sut.GetMediaFiles().ToList();
 
         // Assert
         Assert.Single(result);
@@ -110,7 +114,7 @@ public class MediaFileProviderTests
     }
 
     [Fact]
-    public void GetTvShowFiles_WithCaseInsensitiveExtensions_ReturnsAllVideoFiles()
+    public void GetMediaFiles_WithCaseInsensitiveExtensions_ReturnsAllVideoFiles()
     {
         // Arrange
         const string videoFileUpper = @"C:\TvShows\video.MP4";
@@ -118,10 +122,13 @@ public class MediaFileProviderTests
 
         _mockFileSystem.AddFile(videoFileUpper, new MockFileData(""));
         _mockFileSystem.AddFile(movieFileMixed, new MockFileData(""));
-        var sut = new MediaFileProvider(_mockFileSystem, Options.Create(_settings));
+
+        var sut = new MediaFileProvider(_mockFileSystem,
+                                        Options.Create(_settings),
+                                        MediaType.TvShow);
 
         // Act
-        var result = sut.GetTvShowFiles().ToList();
+        var result = sut.GetMediaFiles().ToList();
 
         // Assert
         Assert.Equal(2, result.Count);

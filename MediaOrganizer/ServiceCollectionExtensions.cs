@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.IO.Abstractions;
 using MediaOrganizer.IO;
 using MediaOrganizer.UI;
@@ -25,10 +26,14 @@ public static class ServiceCollectionExtensions
             .AddSingleton<IConsoleIO, ConsoleIO>()
             .AddTransient<IFileSystem, FileSystem>()
             .AddTransient<FileSystemValidator>()
-            .AddTransient<IMediaFileProvider, MediaFileProvider>()
-            .AddTransient<ITvShowEpisodeParser, TvShowEpisodeParser>()
+            .AddTransient<TvShowEpisodeParser>()
             .AddTransient<IDirectoryCleaner, DirectoryCleaner>()
-            .AddTransient<MediaFileOrganizer>()
+            .AddTransient(provider =>
+                new MediaFileOrganizerFactory(
+                    resolveFileSystem: () => provider.GetRequiredService<IFileSystem>(),
+                    resolveLogger: () => provider.GetRequiredService<ILogger<MediaFileOrganizer>>(),
+                    resolveSettings: () => provider.GetRequiredService<IOptions<MediaOrganizerSettings>>(),
+                    resolveDirectoryCleaner: () => provider.GetRequiredService<IDirectoryCleaner>()))
             .AddTransient<MediaOrganizerConsoleApp>();
     }
 }

@@ -259,42 +259,6 @@ public class MovieTests
     }
 
     [Fact]
-    public void GenerateRelativePath_WithEmptyTemplate_ThrowsArgumentException()
-    {
-        // Arrange
-        var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.mkv");
-        var movie = new Movie(fileInfo);
-        movie.Title = "The Matrix";
-        movie.Year = 1999;
-
-        var settings = new MediaOrganizerSettings
-        {
-            MoviePathTemplate = ""
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => movie.GenerateRelativePath(settings));
-    }
-
-    [Fact]
-    public void GenerateRelativePath_WithWhitespaceTemplate_ThrowsArgumentException()
-    {
-        // Arrange
-        var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.mkv");
-        var movie = new Movie(fileInfo);
-        movie.Title = "The Matrix";
-        movie.Year = 1999;
-
-        var settings = new MediaOrganizerSettings
-        {
-            MoviePathTemplate = "   "
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => movie.GenerateRelativePath(settings));
-    }
-
-    [Fact]
     public void GenerateRelativePath_WithNullSettings_ThrowsNullReferenceException()
     {
         // Arrange

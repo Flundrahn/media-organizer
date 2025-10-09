@@ -75,25 +75,9 @@ public class TvShowEpisode : IMediaFile
         return Path.GetFullPath(Path.Combine(settings.TvShowDestinationDirectory, GenerateRelativePath(settings)));
     }
 
-    // TODO: possibly change this to just generate the full path immediately, since have settings here anyway
-    // could reason is out of scope for model, and should just take template as before, 
-    // tbh both ways are probably okay 
-    // todo: clean up here if continue feel absolute was good way
     public string GenerateRelativePath(MediaOrganizerSettings settings)
     {
-        if (string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))
-            throw new ArgumentException("TvShowPathTemplate cannot be empty or whitespace.", nameof(settings));
-
-        return GenerateRelativePathInternal(settings.TvShowPathTemplate);
-    }
-
-    private string GenerateRelativePathInternal(string template)
-    {
-        if (template is null)
-            throw new ArgumentNullException(nameof(template));
-
-        if (string.IsNullOrWhiteSpace(template))
-            throw new ArgumentException("Template cannot be empty or whitespace.", nameof(template));
+        string template = settings.TvShowPathTemplate;
 
         if (!IsValid)
             throw new InvalidOperationException("Cannot generate path for an invalid TV show episode.");

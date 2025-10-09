@@ -194,28 +194,6 @@ public class TvShowEpisodeTests
             episode.GenerateRelativePath(settings));
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void GenerateRelativePath_WithEmptyOrWhitespacePattern_ThrowsArgumentException(string pattern)
-    {
-        // Arrange
-        var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\The.Office.S01E01.mkv");
-        var episode = new TvShowEpisode(fileInfo);
-        episode.TvShowName = "The Office";
-        episode.Season = 1;
-        episode.Episode = 1;
-
-        var settings = new MediaOrganizerSettings
-        {
-            TvShowPathTemplate = pattern
-        };
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => episode.GenerateRelativePath(settings));
-    }
-
     [Fact]
     public void GenerateRelativePath_WithNullSettings_ThrowsNullReferenceException()
     {

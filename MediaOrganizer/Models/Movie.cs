@@ -61,21 +61,7 @@ public class Movie : IMediaFile
 
     public string GenerateRelativePath(MediaOrganizerSettings settings)
     {
-        // TODO: probably cleanup this duplicate validation. it is a public method, but then again this is already validated in settings.
-        // should never ever be null or whitespace
-        if (string.IsNullOrWhiteSpace(settings.MoviePathTemplate))
-            throw new ArgumentException("MoviePathTemplate cannot be empty or whitespace.", nameof(settings));
-
-        return GenerateRelativePathInternal(settings.MoviePathTemplate);
-    }
-
-    private string GenerateRelativePathInternal(string template)
-    {
-        if (template is null)
-            throw new ArgumentNullException(nameof(template));
-
-        if (string.IsNullOrWhiteSpace(template))
-            throw new ArgumentException("Template cannot be empty or whitespace.", nameof(template));
+        string template = settings.MoviePathTemplate;
 
         if (!IsValid)
             throw new InvalidOperationException("Cannot generate path for an invalid movie.");
@@ -114,6 +100,7 @@ public class Movie : IMediaFile
         }
 
         return result;
+
     }
 
     public override string ToString()

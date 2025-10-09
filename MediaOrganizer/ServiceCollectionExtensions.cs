@@ -26,14 +26,12 @@ public static class ServiceCollectionExtensions
             .AddSingleton<IConsoleIO, ConsoleIO>()
             .AddTransient<IFileSystem, FileSystem>()
             .AddTransient<FileSystemValidator>()
-            .AddTransient<TvShowEpisodeParser>()
             .AddTransient<IDirectoryCleaner, DirectoryCleaner>()
             .AddTransient(provider =>
                 new MediaFileOrganizerFactory(
                     resolveFileSystem: () => provider.GetRequiredService<IFileSystem>(),
                     resolveLogger: () => provider.GetRequiredService<ILogger<MediaFileOrganizer>>(),
-                    resolveSettings: () => provider.GetRequiredService<IOptions<MediaOrganizerSettings>>(),
-                    resolveDirectoryCleaner: () => provider.GetRequiredService<IDirectoryCleaner>()))
+                    resolveSettings: () => provider.GetRequiredService<IOptions<MediaOrganizerSettings>>()))
             .AddTransient<MediaOrganizerConsoleApp>();
     }
 }

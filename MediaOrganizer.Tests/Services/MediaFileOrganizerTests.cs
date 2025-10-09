@@ -51,7 +51,6 @@ public class MediaFileOrganizerTests
             NullLogger<MediaFileOrganizer>.Instance,
             new TvShowEpisodeParser(),
             Options.Create(_settings),
-            _mockDirectoryCleaner.Object,
             fileInfos);
     }
 
@@ -150,55 +149,5 @@ public class MediaFileOrganizerTests
         var allFiles = _mockFileSystem.Directory.GetFiles(TvShowDestinationDirectory, "*", SearchOption.AllDirectories);
         Assert.Single(allFiles);
         Assert.Equal(correctDestinationPath, allFiles[0]);
-    }
-
-    [Fact]
-    public void OrganizeFile_WithCleanupEnabled_CallsDirectoryCleaner()
-    {
-        // Arrange
-        var sourceFilePath = Path.Combine(TvShowSourceDirectory, "The.Office.S01E01.Pilot.mkv");
-        _settings.AutoCleanupEmptyDirectories = true;
-
-        var organizer = CreateOrganizerWithFiles(sourceFilePath);
-
-        // Act
-        organizer.OrganizeFile();
-
-        // Assert
-        _mockDirectoryCleaner.Verify(x => x.CleanEmptyDirectories(), Times.Once);
-    }
-
-    [Fact]
-    public void OrganizeFile_WithCleanupDisabled_DoesNotCallDirectoryCleaner()
-    {
-        // Arrange
-        var sourceFilePath = Path.Combine(TvShowSourceDirectory, "The.Office.S01E01.Pilot.mkv");
-
-        _settings.AutoCleanupEmptyDirectories = false;
-
-        var organizer = CreateOrganizerWithFiles(sourceFilePath);
-
-        // Act
-        organizer.OrganizeFile();
-
-        // Assert
-        _mockDirectoryCleaner.Verify(x => x.CleanEmptyDirectories(), Times.Never);
-    }
-
-    [Fact]
-    public void OrganizeFile_WithCleanupEnabled_CallsDirectoryCleanerRegardlessOfDirectoryState()
-    {
-        // Arrange
-        var sourceFilePath = Path.Combine(TvShowSourceDirectory, "The.Office.S01E01.Pilot.mkv");
-
-        _settings.AutoCleanupEmptyDirectories = true;
-
-        var organizer = CreateOrganizerWithFiles(sourceFilePath);
-
-        // Act
-        organizer.OrganizeFile();
-
-        // Assert
-        _mockDirectoryCleaner.Verify(x => x.CleanEmptyDirectories(), Times.Once);
     }
 }

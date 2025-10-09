@@ -15,18 +15,15 @@ public class MediaFileOrganizerFactory
     private readonly Func<IFileSystem> _resolveFileSystem;
     private readonly Func<ILogger<MediaFileOrganizer>> _resolveLogger;
     private readonly Func<IOptions<MediaOrganizerSettings>> _resolveSettings;
-    private readonly Func<IDirectoryCleaner> _resolveDirectoryCleaner;
 
     public MediaFileOrganizerFactory(
         Func<IFileSystem> resolveFileSystem,
         Func<ILogger<MediaFileOrganizer>> resolveLogger,
-        Func<IOptions<MediaOrganizerSettings>> resolveSettings,
-        Func<IDirectoryCleaner> resolveDirectoryCleaner)
+        Func<IOptions<MediaOrganizerSettings>> resolveSettings)
     {
         _resolveFileSystem = resolveFileSystem;
         _resolveLogger = resolveLogger;
         _resolveSettings = resolveSettings;
-        _resolveDirectoryCleaner = resolveDirectoryCleaner;
     }
 
     public MediaFileOrganizer CreateTvShowOrganizer()
@@ -42,7 +39,6 @@ public class MediaFileOrganizerFactory
             _resolveLogger(),
             new TvShowEpisodeParser(),
             settings,
-            _resolveDirectoryCleaner(),
             tvShowFiles);
     }
 
@@ -59,7 +55,6 @@ public class MediaFileOrganizerFactory
             _resolveLogger(),
             new MovieParser(),
             settings,
-            _resolveDirectoryCleaner(),
             movieFiles
         );
     }

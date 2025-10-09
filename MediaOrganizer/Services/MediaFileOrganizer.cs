@@ -6,11 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Services;
 
-// decoupling one class from another class is a virtue if can keep the logic as simple
-// for that reason the MediaFileOrganizer might not have to use a file provider at all
-// if I also create the organizers on my own, i might not need the subclasses
-// say I have a factory, that can generate all the dependencies of an organizer
-
 public class OrganizationResult
 {
     public int ProcessedCount { get; set; }
@@ -26,7 +21,6 @@ public class MediaFileOrganizer
     private readonly IFileSystem _fileSystem;
     private readonly IMediaFileParser _parser;
     private readonly MediaOrganizerSettings _settings;
-    private readonly IDirectoryCleaner _directoryCleaner;
     private readonly OrganizationResult _result = new();
     private readonly Stack<IFileInfo> _files;
     private readonly IReadOnlyList<IFileInfo> _allFiles;
@@ -43,14 +37,12 @@ public class MediaFileOrganizer
         ILogger<MediaFileOrganizer> logger,
         IMediaFileParser parser,
         IOptions<MediaOrganizerSettings> settings,
-        IDirectoryCleaner directoryCleaner,
         IEnumerable<IFileInfo> mediaFiles)
     {
         _fileSystem = fileSystem;
         _logger = logger;
         _parser = parser;
         _settings = settings.Value;
-        _directoryCleaner = directoryCleaner;
         
         // TODO: performance, later avoid doing toList if possible, although important part is probably when making changes later
         var mediaFilesList = mediaFiles.ToList();
@@ -155,13 +147,6 @@ public class MediaFileOrganizer
                 _result.FailedCount++;
                 return null;
             }
-        }
-
-        // todo: no need to couple this feature with this class, it is fine to do after completely separately
-        // and that way remove a side effect
-        if (_settings.AutoCleanupEmptyDirectories)
-        {
-            _directoryCleaner.CleanEmptyDirectories();
         }
 
         _logger.LogInformation("{Prefix} {FileName} -> {FileDestinationPath}",

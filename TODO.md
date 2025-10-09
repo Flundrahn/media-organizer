@@ -30,9 +30,11 @@
     - rename parser interface to make generic
     - update config of file provider
     - inject configured file provider into organizer in factory method: ended up not doing. Nice and decoupled to inject FileInfos into ctor of organizer.
+- [x] Movie feature
 
 ## Doing
-- [x] Movie feature
+- [x] Extract cleanup module from MediaFileOrganizer, it should be independend module.
+- [x] Complete cleanup directory console UI to able manually cleanup either tv show or movie directories.
 
 ## TODO: Movie Feature Plan 🎬
 
@@ -95,7 +97,6 @@ The\.Movie\.Title\.(\d{4})\.(\d{4}p)\..*
 - [ ] Add smooth build and publish setup, maybe checkout GitHub actions and release.
 - [ ] Possibly refactor MediaOrganizerService into Program.cs, just extract parts that build app and so on, make clear which parts are logic and which parts are UI.
 - [ ] Cleanup double validation TvShow and movie model
-- [ ] Extract cleanup module from MediaFileOrganizer, it should be independend module.
 - [ ] Use microsoft package for console options that can display usage and so on.
 - [ ] Settings validate one property at a time in own method
 - [ ] Add quality to TvShowEpisode and parser

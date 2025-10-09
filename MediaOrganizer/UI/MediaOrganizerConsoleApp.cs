@@ -249,8 +249,9 @@ public class MediaOrganizerConsoleApp
         _console.WriteLine($"  Destination: {destinationDirectory}");
         _console.WriteLine("");
         
-        // TODO: Implement media specific directory cleaning
-        _console.WriteInformation($"{mediaType} directory cleaning not yet implemented");
+        _directoryCleaner.CleanEmptyDirectories(sourceDirectory, destinationDirectory);
+        
+        _console.WriteSuccess($"{mediaType} directory cleanup completed");
     }
 
     private void ProcessFilesInteractively(MediaFileOrganizer organizer)
@@ -294,9 +295,8 @@ public class MediaOrganizerConsoleApp
                     break;
                 case ConsoleKey.A:
                     _console.WriteLine("Organizing all remaining files...");
-                    var finalResult = organizer.OrganizeAllFiles();
-                    _console.WriteSuccess($"Batch complete: {finalResult.OrganizedCount} organized, {finalResult.SkippedCount} skipped, {finalResult.FailedCount} failed");
-                    return;
+                    _ = organizer.OrganizeAllFiles();
+                    break;
                 case ConsoleKey.S:
                     organizer.SkipFile();
                     _console.WriteInformation("Skipped file");
@@ -315,6 +315,11 @@ public class MediaOrganizerConsoleApp
         
         var stats = organizer.Result;
         _console.WriteSuccess($"Organization complete: {stats.OrganizedCount} organized, {stats.SkippedCount} skipped, {stats.FailedCount} failed out of {stats.ProcessedCount} total files");
+
+        if (_settings.AutoCleanupEmptyDirectories)
+        {
+            CleanEmptyDirectories();
+        }
     }
 
     private void CleanEmptyDirectories()

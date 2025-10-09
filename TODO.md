@@ -67,7 +67,7 @@ Add support for organizing movie files alongside TV shows by creating a common m
 - [x] Add movie-specific unit tests
 - [x] Add movie integration tests using `TempMediaTestEnvironment`
 - [x] Update configuration validation for readability
-- [ ] Update file provider to ignore specific folders such as "Featurettes", "Extras", "Behind the Scenes"
+- [x] Update file provider to ignore specific folders such as "Featurettes", "Extras", "Behind the Scenes"
 
 #### Phase 5: Polish 💎
 - [x] Update console UI to show media type in file listings

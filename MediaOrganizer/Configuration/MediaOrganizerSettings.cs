@@ -120,6 +120,14 @@ public class MediaOrganizerSettings
     /// </summary>
     public bool AutoCleanupEmptyDirectories { get; set; } = false;
 
+    /// <summary>
+    /// List of folder names to ignore when scanning for media files.
+    /// These folders will be completely skipped during file discovery.
+    /// Case-insensitive matching is used.
+    /// Common examples: "Featurettes", "Extras", "Behind the Scenes", "Deleted Scenes"
+    /// </summary>
+    public List<string> IgnoredFolders { get; set; } = new List<string>();
+
     public ICollection<string> GetValidationErrors() => _validationErrors;
 
     // Set manually since options need empty ctor
@@ -152,6 +160,7 @@ public class MediaOrganizerSettings
         isValid &= ValidateTvShowPathTemplate();
         isValid &= ValidateMoviePathTemplate();
         isValid &= ValidateVideoFileExtensions();
+        isValid &= ValidateIgnoredFolders();
 
         return isValid;
     }
@@ -299,6 +308,39 @@ public class MediaOrganizerSettings
             if (_validator != null && !_validator.IsValidPathSegment(extension))
             {
                 _validationErrors.Add($"VideoFileExtensions contains invalid characters: '{extension}'");
+                isValid = false;
+            }
+        }
+
+        return isValid;
+    }
+
+    private bool ValidateIgnoredFolders()
+    {
+        bool isValid = true;
+
+        foreach (var folder in IgnoredFolders)
+        {
+            if (string.IsNullOrWhiteSpace(folder))
+            {
+                _validationErrors.Add($"{nameof(IgnoredFolders)} cannot contain empty or whitespace folder names");
+                isValid = false;
+                continue;
+            }
+
+            // Check for invalid path characters
+            var invalidChars = Path.GetInvalidFileNameChars();
+            if (folder.IndexOfAny(invalidChars) != -1)
+            {
+                _validationErrors.Add($"{nameof(IgnoredFolders)} contains invalid characters in folder name: '{folder}'");
+                isValid = false;
+            }
+
+            // Check for reserved Windows names (CON, PRN, etc.)
+            var reservedNames = new[] { "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
+            if (reservedNames.Contains(folder.ToUpperInvariant()))
+            {
+                _validationErrors.Add($"{nameof(IgnoredFolders)} contains reserved folder name: '{folder}'");
                 isValid = false;
             }
         }

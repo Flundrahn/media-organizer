@@ -566,34 +566,34 @@ public class MediaOrganizerSettingsTests
     }
 
     [Theory]
-    [InlineData(null, false, "VideoFileExtensions must contain at least one extension")] // Null list
-    [InlineData(new string[0], false, "VideoFileExtensions must contain at least one extension")] // Empty list
-    [InlineData(new string[] { "" }, false, "VideoFileExtensions cannot contain empty or whitespace extensions")] // Empty string extension
-    [InlineData(new string[] { "   " }, false, "VideoFileExtensions cannot contain empty or whitespace extensions")] // Whitespace extension
-    [InlineData(new string[] { "mp4" }, false, "VideoFileExtensions must start with a dot: 'mp4'")] // Extension without dot
-    [InlineData(new string[] { "avi" }, false, "VideoFileExtensions must start with a dot: 'avi'")] // Extension without dot
-    [InlineData(new string[] { "." }, false, "VideoFileExtensions must have at least one character after the dot: '.'")] // Dot only extension
-    [InlineData(new string[] { ".mp*" }, false, "VideoFileExtensions contains invalid characters: '.mp*'")] // Extension with asterisk
-    [InlineData(new string[] { ".avi?" }, false, "VideoFileExtensions contains invalid characters: '.avi?'")] // Extension with question mark
-    [InlineData(new string[] { ".mkv<" }, false, "VideoFileExtensions contains invalid characters: '.mkv<'")] // Extension with less than
-    [InlineData(new string[] { ".mp4>" }, false, "VideoFileExtensions contains invalid characters: '.mp4>'")] // Extension with greater than
-    [InlineData(new string[] { ".avi|" }, false, "VideoFileExtensions contains invalid characters: '.avi|'")] // Extension with pipe
-    [InlineData(new string[] { ".mkv:" }, false, "VideoFileExtensions contains invalid characters: '.mkv:'")] // Extension with colon
-    [InlineData(new string[] { ".mp4\"" }, false, "VideoFileExtensions contains invalid characters: '.mp4\"'")] // Extension with quote
-    [InlineData(new string[] { ".avi\\" }, false, "VideoFileExtensions contains invalid characters: '.avi\\'")] // Extension with backslash
-    [InlineData(new string[] { ".mkv/" }, false, "VideoFileExtensions contains invalid characters: '.mkv/'")] // Extension with forward slash
-    [InlineData(new string[] { ".mp4" }, true, null)] // Valid mp4 extension
-    [InlineData(new string[] { ".avi" }, true, null)] // Valid avi extension
-    [InlineData(new string[] { ".mkv" }, true, null)] // Valid mkv extension
-    [InlineData(new string[] { ".mov" }, true, null)] // Valid mov extension
-    [InlineData(new string[] { ".wmv" }, true, null)] // Valid wmv extension
-    [InlineData(new string[] { ".flv" }, true, null)] // Valid flv extension
-    [InlineData(new string[] { ".webm" }, true, null)] // Valid webm extension
-    [InlineData(new string[] { ".m4v" }, true, null)] // Valid m4v extension
-    [InlineData(new string[] { ".3gp" }, true, null)] // Valid 3gp extension
-    [InlineData(new string[] { ".MP4" }, true, null)] // Valid uppercase extension
-    [InlineData(new string[] { ".mp4v" }, true, null)] // Valid multi-character extension
-    [InlineData(new string[] { ".mp4", ".avi", ".mkv", ".mov", ".wmv" }, true, null)] // Multiple valid extensions
+    [InlineData(null, false, "VideoFileExtensions must contain at least one extension")] 
+    [InlineData(new string[0], false, "VideoFileExtensions must contain at least one extension")] 
+    [InlineData(new string[] { "" }, false, "VideoFileExtensions cannot contain empty or whitespace extensions")] 
+    [InlineData(new string[] { "   " }, false, "VideoFileExtensions cannot contain empty or whitespace extensions")] 
+    [InlineData(new string[] { "mp4" }, false, "VideoFileExtensions must start with a dot: 'mp4'")] 
+    [InlineData(new string[] { "avi" }, false, "VideoFileExtensions must start with a dot: 'avi'")] 
+    [InlineData(new string[] { "." }, false, "VideoFileExtensions must have at least one character after the dot: '.'")] 
+    [InlineData(new string[] { ".mp*" }, false, "VideoFileExtensions contains invalid characters: '.mp*'")] 
+    [InlineData(new string[] { ".avi?" }, false, "VideoFileExtensions contains invalid characters: '.avi?'")] 
+    [InlineData(new string[] { ".mkv<" }, false, "VideoFileExtensions contains invalid characters: '.mkv<'")] 
+    [InlineData(new string[] { ".mp4>" }, false, "VideoFileExtensions contains invalid characters: '.mp4>'")] 
+    [InlineData(new string[] { ".avi|" }, false, "VideoFileExtensions contains invalid characters: '.avi|'")] 
+    [InlineData(new string[] { ".mkv:" }, false, "VideoFileExtensions contains invalid characters: '.mkv:'")] 
+    [InlineData(new string[] { ".mp4\"" }, false, "VideoFileExtensions contains invalid characters: '.mp4\"'")] 
+    [InlineData(new string[] { ".avi\\" }, false, "VideoFileExtensions contains invalid characters: '.avi\\'")] 
+    [InlineData(new string[] { ".mkv/" }, false, "VideoFileExtensions contains invalid characters: '.mkv/'")] 
+    [InlineData(new string[] { ".mp4" }, true, null)] 
+    [InlineData(new string[] { ".avi" }, true, null)] 
+    [InlineData(new string[] { ".mkv" }, true, null)] 
+    [InlineData(new string[] { ".mov" }, true, null)] 
+    [InlineData(new string[] { ".wmv" }, true, null)] 
+    [InlineData(new string[] { ".flv" }, true, null)] 
+    [InlineData(new string[] { ".webm" }, true, null)] 
+    [InlineData(new string[] { ".m4v" }, true, null)] 
+    [InlineData(new string[] { ".3gp" }, true, null)] 
+    [InlineData(new string[] { ".MP4" }, true, null)] 
+    [InlineData(new string[] { ".mp4v" }, true, null)] 
+    [InlineData(new string[] { ".mp4", ".avi", ".mkv", ".mov", ".wmv" }, true, null)] 
     public void IsValid_VideoFileExtensionsValidation(string[]? extensions, bool expectedValid, string? expectedErrorSubstring)
     {
         // Arrange
@@ -754,5 +754,73 @@ public class MediaOrganizerSettingsTests
         {
             Assert.True(Path.IsPathRooted(_sut.TvShowDestinationDirectory));
         }
+    }
+
+    [Fact]
+    public void IsValid_WithValidIgnoredFolders_IsValid()
+    {
+        // Arrange
+        SetupValidConfiguration();
+        _sut.IgnoredFolders = new List<string> { "Featurettes", "Extras", "Behind the Scenes" };
+
+        // Act
+        var result = _sut.IsValid();
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(_sut.GetValidationErrors());
+    }
+
+    [Theory]
+    [InlineData(new string[0], true)]
+    [InlineData(new[] { "Featurettes", "Extras" }, true)]
+    [InlineData(new[] { "Featurettes", "", "Extras" }, false)]
+    [InlineData(new[] { "Featurettes", "   ", "Extras" }, false)]
+    [InlineData(new[] { "Ext<>ras" }, false)]
+    [InlineData(new[] { "Behind|the|Scenes" }, false)]
+    [InlineData(new[] { "CON" }, false)]
+    [InlineData(new[] { "PRN" }, false)]
+    [InlineData(new[] { "con" }, false)]
+    public void IsValid_IgnoredFoldersValidation_ReturnsExpectedResult(string[] ignoredFolders, bool expectedValid)
+    {
+        // Arrange
+        SetupValidConfiguration();
+        _sut.IgnoredFolders = ignoredFolders.ToList();
+
+        // Act
+        var result = _sut.IsValid();
+
+        // Assert
+        Assert.Equal(expectedValid, result);
+        if (!expectedValid)
+        {
+            Assert.NotEmpty(_sut.GetValidationErrors());
+            Assert.Contains(_sut.GetValidationErrors(), error => error.Contains("IgnoredFolders"));
+        }
+        else
+        {
+            Assert.Empty(_sut.GetValidationErrors());
+        }
+    }
+
+    private void SetupValidConfiguration()
+    {
+        var tvSourceDir = @"C:\TvSource";
+        var tvDestDir = @"C:\TvDestination";
+        var movieSourceDir = @"C:\MovieSource";
+        var movieDestDir = @"C:\MovieDestination";
+        
+        _mockFileSystem.AddDirectory(tvSourceDir);
+        _mockFileSystem.AddDirectory(tvDestDir);
+        _mockFileSystem.AddDirectory(movieSourceDir);
+        _mockFileSystem.AddDirectory(movieDestDir);
+        
+        _sut.TvShowSourceDirectory = tvSourceDir;
+        _sut.TvShowDestinationDirectory = tvDestDir;
+        _sut.MovieSourceDirectory = movieSourceDir;
+        _sut.MovieDestinationDirectory = movieDestDir;
+        _sut.TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName}";
+        _sut.MoviePathTemplate = "{Title} ({Year})";
+        _sut.VideoFileExtensions = new List<string> { ".mp4", ".avi", ".mkv" };
     }
 }

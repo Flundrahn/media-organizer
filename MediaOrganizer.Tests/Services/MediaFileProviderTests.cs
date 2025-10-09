@@ -133,4 +133,117 @@ public class MediaFileProviderTests
         // Assert
         Assert.Equal(2, result.Count);
     }
+
+    [Fact]
+    public void GetMediaFiles_WithIgnoredFolders_ExcludesFilesInIgnoredFolders()
+    {
+        // Arrange
+        const string normalFile = @"C:\TvShows\episode.mp4";
+        const string featurettesFile = @"C:\TvShows\Featurettes\making_of.mp4";
+        const string extrasFile = @"C:\TvShows\Extras\deleted_scene.mkv";
+        const string behindScenesFile = @"C:\TvShows\Behind the Scenes\interview.avi";
+
+        _mockFileSystem.AddFile(normalFile, new MockFileData(""));
+        _mockFileSystem.AddFile(featurettesFile, new MockFileData(""));
+        _mockFileSystem.AddFile(extrasFile, new MockFileData(""));
+        _mockFileSystem.AddFile(behindScenesFile, new MockFileData(""));
+        
+        _settings.IncludeSubdirectories = true;
+        _settings.IgnoredFolders = new List<string> { "Featurettes", "Extras", "Behind the Scenes" };
+
+        var sut = new MediaFileProvider(_mockFileSystem,
+                                        Options.Create(_settings),
+                                        MediaType.TvShow);
+
+        // Act
+        var result = sut.GetMediaFiles().ToList();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Contains(result, f => f.FullName == normalFile);
+        Assert.DoesNotContain(result, f => f.FullName == featurettesFile);
+        Assert.DoesNotContain(result, f => f.FullName == extrasFile);
+        Assert.DoesNotContain(result, f => f.FullName == behindScenesFile);
+    }
+
+    [Fact]
+    public void GetMediaFiles_WithIgnoredFoldersCaseInsensitive_ExcludesFiles()
+    {
+        // Arrange
+        const string normalFile = @"C:\TvShows\episode.mp4";
+        const string extrasFileUpperCase = @"C:\TvShows\EXTRAS\deleted_scene.mkv";
+        const string featurettesFileLowerCase = @"C:\TvShows\featurettes\making_of.mp4";
+
+        _mockFileSystem.AddFile(normalFile, new MockFileData(""));
+        _mockFileSystem.AddFile(extrasFileUpperCase, new MockFileData(""));
+        _mockFileSystem.AddFile(featurettesFileLowerCase, new MockFileData(""));
+        
+        _settings.IncludeSubdirectories = true;
+        _settings.IgnoredFolders = new List<string> { "Extras", "Featurettes" };
+
+        var sut = new MediaFileProvider(_mockFileSystem,
+                                        Options.Create(_settings),
+                                        MediaType.TvShow);
+
+        // Act
+        var result = sut.GetMediaFiles().ToList();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Contains(result, f => f.FullName == normalFile);
+        Assert.DoesNotContain(result, f => f.FullName == extrasFileUpperCase);
+        Assert.DoesNotContain(result, f => f.FullName == featurettesFileLowerCase);
+    }
+
+    [Fact]
+    public void GetMediaFiles_WithNestedIgnoredFolders_ExcludesDeepNesting()
+    {
+        // Arrange
+        const string normalFile = @"C:\TvShows\Season 1\episode.mp4";
+        const string nestedIgnoredFile = @"C:\TvShows\Season 1\Extras\Deleted Scenes\scene.mkv";
+
+        _mockFileSystem.AddFile(normalFile, new MockFileData(""));
+        _mockFileSystem.AddFile(nestedIgnoredFile, new MockFileData(""));
+        
+        _settings.IncludeSubdirectories = true;
+        _settings.IgnoredFolders = new List<string> { "Extras" };
+
+        var sut = new MediaFileProvider(_mockFileSystem,
+                                        Options.Create(_settings),
+                                        MediaType.TvShow);
+
+        // Act
+        var result = sut.GetMediaFiles().ToList();
+
+        // Assert
+        Assert.Single(result);
+        Assert.Contains(result, f => f.FullName == normalFile);
+        Assert.DoesNotContain(result, f => f.FullName == nestedIgnoredFile);
+    }
+
+    [Fact]
+    public void GetMediaFiles_WithEmptyIgnoredFolders_DoesNotExcludeAnyFiles()
+    {
+        // Arrange
+        const string normalFile = @"C:\TvShows\episode.mp4";
+        const string extrasFile = @"C:\TvShows\Extras\extra.mkv";
+
+        _mockFileSystem.AddFile(normalFile, new MockFileData(""));
+        _mockFileSystem.AddFile(extrasFile, new MockFileData(""));
+        
+        _settings.IncludeSubdirectories = true;
+        _settings.IgnoredFolders = new List<string>();
+
+        var sut = new MediaFileProvider(_mockFileSystem,
+                                        Options.Create(_settings),
+                                        MediaType.TvShow);
+
+        // Act
+        var result = sut.GetMediaFiles().ToList();
+
+        // Assert
+        Assert.Equal(2, result.Count);
+        Assert.Contains(result, f => f.FullName == normalFile);
+        Assert.Contains(result, f => f.FullName == extrasFile);
+    }
 }

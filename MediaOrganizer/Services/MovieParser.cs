@@ -6,42 +6,32 @@ namespace MediaOrganizer.Services;
 
 public class MovieParser : IMediaFileParser
 {
-    // Pattern for movies with title, year, and quality info (most common)
-    // Examples: "Grandmas Boy 2006 UNRATED 1080p BluRay HEVC x265 5.1 BONE.mkv"
-    //           "Superman 2025 1080p WEB-DL HEVC x265 5.1 BONE.mkv"
+    // Example: "Grandmas Boy 2006 UNRATED 1080p BluRay HEVC x265 5.1 BONE.mkv"
     private static readonly Regex MovieWithYearAndQualityPattern = new(
-        @"^(?<title>.+?)\s+(?<year>\d{4})\s+(?:UNRATED\s+)?(?<quality>\d{3,4}p|4K|UHD)(?:\s+.+?)?(?:\s+(?:BONE|YIFY|YTS|RARBG))?$",
+        @"^(?<title>.+?)\s+(?<year>\d{4})\s+(?:UNRATED\s+)?(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:\s+.+?)?$",
         RegexOptions.IgnoreCase);
 
-    // Pattern for movies with title and year in parentheses
-    // Examples: "A Brilliant Young Mind (2014) (1080p BluRay x265 10bit Tigole).mkv"
-    //           "Jobs (2013) (1080p BluRay x265 10bit Tigole).mkv"
+    // Example: "A Brilliant Young Mind (2014) (1080p BluRay x265 10bit Tigole).mkv"
     private static readonly Regex MovieWithYearInParenthesesPattern = new(
-        @"^(?<title>.+?)\s+\((?<year>\d{4})\)\s+\((?<quality>\d{3,4}p|4K|UHD)(?:\s+[^)]*)?",
+        @"^(?<title>.+?)\s+\((?<year>\d{4})\)\s+\((?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:\s+[^)]*)?",
         RegexOptions.IgnoreCase);
 
-    // Pattern for movies with dots as separators
-    // Examples: "Clash.Of.The.Titans.1981.1080p.BluRay.x264-[YTS.AM].mp4"
-    //           "Run.Fatboy.Run.2007.1080p.BluRay.x264.AAC5.1-[YTS.MX].mp4"
-    //           "Interstellar.2014.1080p.BluRay.x264.YIFY.mp4"
+    // Example: "Clash.Of.The.Titans.1981.1080p.BluRay.x264-[YTS.AM].mp4"
     private static readonly Regex MovieWithDotsPattern = new(
-        @"^(?<title>(?:[A-Za-z0-9]+\.)*[A-Za-z0-9]+)\.(?<year>\d{4})\.(?<quality>\d{3,4}p|4K|UHD)(?:\..*)?$",
+        @"^(?<title>(?:[A-Za-z0-9]+\.)*[A-Za-z0-9]+)\.(?<year>\d{4})\.(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:\..*)?$",
         RegexOptions.IgnoreCase);
 
-    // Pattern for movies with simple title and quality only
-    // Examples: "Interstellar 1080p.mkv", "Fast and Furious 1080p.mp4"
+    // Example: "Interstellar 1080p.mkv"
     private static readonly Regex MovieSimpleWithQualityPattern = new(
-        @"^(?<title>.+?)\s+(?<quality>\d{3,4}p|4K|UHD|HDR)(?:\.|$)",
+        @"^(?<title>.+?)\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:\.|$)",
         RegexOptions.IgnoreCase);
 
-    // Pattern for movies with title and year, no explicit quality
-    // Examples: "Superman 2025", "Meeting Gorbachev" (we'll need to handle year detection)
+    // Example: "Superman 2025"
     private static readonly Regex MovieWithYearPattern = new(
         @"^(?<title>.+?)\s+(?<year>\d{4})(?:\s|$)",
         RegexOptions.IgnoreCase);
 
-    // Pattern for simple movie titles without year or quality
-    // Examples: "Samsara 1080p.mkv" -> "Samsara", "Heavy Metal 1080p.mkv" -> "Heavy Metal"
+    // Example: "Samsara 1080p.mkv"
     private static readonly Regex MovieSimpleTitlePattern = new(
         @"^(?<title>[A-Za-z][A-Za-z\s]+[A-Za-z])(?:\s+\d{3,4}p|\s+4K|\s+UHD|\s+HDR|$)",
         RegexOptions.IgnoreCase);

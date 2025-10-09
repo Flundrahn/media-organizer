@@ -14,7 +14,7 @@ public class TvShowEpisode : IMediaFile
     /// </summary>
     public static readonly HashSet<string> ValidPlaceholders = new()
     {
-        "TvShowName", "Season", "Episode", "Title", "Year"
+        "TvShowName", "Season", "Episode", "Title", "Year", "Quality"
     };
 
     public string TvShowName { get; internal set; } = string.Empty;
@@ -30,6 +30,8 @@ public class TvShowEpisode : IMediaFile
     public int Episode { get; internal set; }
 
     public string Title { get; internal set; } = string.Empty;
+
+    public string Quality { get; internal set; } = string.Empty;
 
     public int? Year { get; internal set; }
 
@@ -113,7 +115,8 @@ public class TvShowEpisode : IMediaFile
             { "{Episode}", Episode.ToString() },
             { "{Episode:D2}", Episode.ToString("D2") },
             { "{Title}", Title ?? string.Empty },
-            { "{Year}", Year?.ToString() ?? string.Empty }
+            { "{Year}", Year?.ToString() ?? string.Empty },
+            { "{Quality}", Quality ?? string.Empty }
         };
 
         var result = template;

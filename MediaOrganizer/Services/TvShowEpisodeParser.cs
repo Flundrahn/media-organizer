@@ -7,14 +7,12 @@ namespace MediaOrganizer.Services;
 
 public class TvShowEpisodeParser : IMediaFileParser
 {
-    // TODO: look at these patterns and possibly dry or at least ensure they are equal in sets of e.g. qualty strings they accept and so on.
-    // possibly can use const strings to dry
     private static readonly Regex StandardSxxExxPattern = new(
-        @"^(?<showName>.+?)(?:\.(?<year>\d{4}))?\.S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?\.(?:\d{4}p|1080p|720p|480p|REPACK|WEB|BluRay|ATVP|WEB-DL|DD|H\.?264|x264|h264|ETHEL|EZTVx|mkv|mp4|avi|playWEB|\[.*?\]|Atmos|5\.1|successfulcrab)", 
+        @"^(?<showName>.+?)(?:\.(?<year>\d{4}))?\.S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?=\.|$))?", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex YearBeforeSxxExxPattern = new(
-        @"^(?<showName>.+?)\s+(?<year>\d{4})\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])\s+(?:\d{4}p|1080p|720p|480p|REPACK|WEB|BluRay|ATVP|WEB-DL|DD|H\.?264|x264|h264|ETHEL|EZTVx|mkv|mp4|avi|playWEB|\[.*?\]|Atmos|5\.1)", 
+        @"^(?<showName>.+?)\s+(?<year>\d{4})\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD|.*?))?(?:\.|$)", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex YearInParenthesesPattern = new(
@@ -26,7 +24,7 @@ public class TvShowEpisodeParser : IMediaFileParser
         RegexOptions.IgnoreCase);
     
     private static readonly Regex SpacedSxxExxWithTitlePattern = new(
-        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])\s+(?:\d{4}p|1080p|720p|480p|REPACK|WEB|BluRay|ATVP|WEB-DL|DD|H\.?264|x264|h264|AMZN|DDP\d|FLUX|\[.*?\]|Atmos)", 
+        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD|.*?))?(?:\.|$)", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex DashedSxxExxWithTitlePattern = new(
@@ -34,7 +32,7 @@ public class TvShowEpisodeParser : IMediaFileParser
         RegexOptions.IgnoreCase);
     
     private static readonly Regex SpacedSxxExxWithQualityPattern = new(
-        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?:\d{4}p|1080p|720p|480p|4K|UHD|HDR|WEB|BluRay|HDTV|BDRip|DVDRip)(?:\.[^.]+)?$", 
+        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:\.[^.]+)?$", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex DashedSxxExxPattern = new(
@@ -82,6 +80,9 @@ public class TvShowEpisodeParser : IMediaFileParser
                 int? year = match.Groups["year"].Success
                     ? int.Parse(match.Groups["year"].Value) 
                     : null;
+                string quality = match.Groups["quality"].Success 
+                    ? match.Groups["quality"].Value 
+                    : string.Empty;
 
                 var tvShowEpisode = new TvShowEpisode(fileInfo);
                 tvShowEpisode.TvShowName = showName;
@@ -89,6 +90,7 @@ public class TvShowEpisodeParser : IMediaFileParser
                 tvShowEpisode.Episode = episode;
                 tvShowEpisode.Title = episodeTitle;
                 tvShowEpisode.Year = year;
+                tvShowEpisode.Quality = quality;
 
                 return tvShowEpisode;
             }
@@ -131,7 +133,7 @@ public class TvShowEpisodeParser : IMediaFileParser
             cleaned.Length <= 2 || 
             Regex.IsMatch(cleaned, @"^\d+$") ||  // Just numbers
             Regex.IsMatch(cleaned, @"^[A-Z]$") || // Single letter
-            Regex.IsMatch(cleaned, @"^\d{4}p$|^(1080p|720p|480p|REPACK|WEB|BluRay|ATVP|WEB-DL|DD|H\.?264|x264|h264)$", RegexOptions.IgnoreCase))
+            Regex.IsMatch(cleaned, @"^(480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD|REPACK)$", RegexOptions.IgnoreCase))
             return "";
 
         return cleaned;

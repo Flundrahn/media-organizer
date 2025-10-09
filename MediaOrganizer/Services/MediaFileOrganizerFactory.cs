@@ -35,7 +35,7 @@ public class MediaFileOrganizerFactory
         var settings = _resolveSettings();
 
         var mediaFileProvider = new MediaFileProvider(fileSystem, settings, MediaType.TvShow);
-        var mediaFiles = mediaFileProvider.GetMediaFiles();
+        var tvShowFiles = mediaFileProvider.GetMediaFiles();
 
         return new MediaFileOrganizer(
             fileSystem,
@@ -43,7 +43,7 @@ public class MediaFileOrganizerFactory
             new TvShowEpisodeParser(),
             settings,
             _resolveDirectoryCleaner(),
-            mediaFiles);
+            tvShowFiles);
     }
 
     public MediaFileOrganizer CreateMovieOrganizer()
@@ -51,10 +51,16 @@ public class MediaFileOrganizerFactory
         var fileSystem = _resolveFileSystem();
         var settings = _resolveSettings();
         
-        // Configuration logic for movie organizer (to be implemented)
-        // var parser = new MovieParser(); // Future implementation
-        // var mediaFileProvider = new MediaFileProvider(fileSystem, settings, MediaType.Movie);
+        var mediaFileProvider = new MediaFileProvider(fileSystem, settings, MediaType.Movie);
+        var movieFiles = mediaFileProvider.GetMediaFiles();
 
-        throw new NotImplementedException("Movie organizer will be implemented in the future");
+        return new MediaFileOrganizer(
+            fileSystem,
+            _resolveLogger(),
+            new MovieParser(),
+            settings,
+            _resolveDirectoryCleaner(),
+            movieFiles
+        );
     }
 }

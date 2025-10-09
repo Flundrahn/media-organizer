@@ -59,22 +59,18 @@ Add support for organizing movie files alongside TV shows by creating a common m
   - Example: `"Movies/{Title} ({Year})"` → `"Movies/The Matrix (1999).mkv"`
 
 #### Phase 3: Directory Context 📁
-- [ ] Add media type detection based on source directory or user selection
-- [ ] Update console UI to allow user to choose between TV shows and movies
-- [ ] MediaFileOrganizer receives media type as parameter, not composite parsing
-- [ ] Add separate menu options: "Organize TV Shows" and "Organize Movies"
+- [x] Update console UI to allow user to choose between TV shows and movies
+- [x] MediaFileOrganizer receives media files and parser as parameters, making it configurable for different media types
 
 #### Phase 4: Integration & Testing 🧪
-- [ ] Update DI registration for new parsers
-- [ ] Add movie-specific unit tests
+- [x] Update DI registration for new parsers
+- [x] Add movie-specific unit tests
 - [ ] Add movie integration tests using `TempMediaTestEnvironment`
 - [ ] Update configuration validation for movie path templates
-- [ ] Add logging for media type detection
 
 #### Phase 5: Polish 💎
-- [ ] Update console UI to show media type in file listings
-- [ ] Add validation for movie path template placeholders
-- [ ] Improve error handling for unknown media types
+- [x] Update console UI to show media type in file listings
+- [x] Add validation for movie path template placeholders
 - [ ] Update documentation and examples
 
 ### Example Movie Patterns

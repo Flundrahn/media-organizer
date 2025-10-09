@@ -8,6 +8,7 @@ namespace MediaOrganizer.Services;
 /// </summary>
 public interface IMediaFileParser
 {
+    // TODO: possibly replace the CanParse with a TryParse pattern
     /// <summary>
     /// Determines if the given filename can be parsed as a TV show episode
     /// </summary>
@@ -20,5 +21,5 @@ public interface IMediaFileParser
     /// </summary>
     /// <param name="fileInfo">The file to parse</param>
     /// <returns>Episode information, or invalid TvShowEpisode if parsing fails</returns>
-    TvShowEpisode Parse(IFileInfo fileInfo);
+    IMediaFile Parse(IFileInfo fileInfo);
 }

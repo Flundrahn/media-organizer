@@ -51,7 +51,7 @@ Add support for organizing movie files alongside TV shows by creating a common m
 - [x] Create `Movie` class implementing `IMediaFile`
   - Properties: `Title`, `Year`, `Quality` (1080p, 4K, etc.)
   - Support placeholders: `{Title}`, `{Year}`, `{Quality}`
-- [ ] Create `MovieParser` class implementing `IMediaFileParser`
+- [x] Create `MovieParser` class implementing `IMediaFileParser`
   - Parse patterns like: `Movie.Title.2023.1080p.BluRay.x264.mkv`
   - Parse patterns like: `The Matrix (1999) [1080p].mp4`
 - [x] Add `MoviePathTemplate` to `MediaOrganizerSettings`
@@ -101,6 +101,7 @@ The\.Movie\.Title\.(\d{4})\.(\d{4}p)\..*
 - [ ] Extract cleanup module from MediaFileOrganizer, it should be independend module.
 - [ ] Use microsoft package for console options that can display usage and so on.
 - [ ] Settings validate one property at a time in own method
+- [ ] Add quality to TvShowEpisode and parser
 
 ## Nice to Have 🌟
 

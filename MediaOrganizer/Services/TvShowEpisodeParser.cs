@@ -7,6 +7,8 @@ namespace MediaOrganizer.Services;
 
 public class TvShowEpisodeParser : IMediaFileParser
 {
+    // TODO: look at these patterns and possibly dry or at least ensure they are equal in sets of e.g. qualty strings they accept and so on.
+    // possibly can use const strings to dry
     private static readonly Regex StandardSxxExxPattern = new(
         @"^(?<showName>.+?)(?:\.(?<year>\d{4}))?\.S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?\.(?:\d{4}p|1080p|720p|480p|REPACK|WEB|BluRay|ATVP|WEB-DL|DD|H\.?264|x264|h264|ETHEL|EZTVx|mkv|mp4|avi|playWEB|\[.*?\]|Atmos|5\.1|successfulcrab)", 
         RegexOptions.IgnoreCase);
@@ -58,10 +60,11 @@ public class TvShowEpisodeParser : IMediaFileParser
         return AllPatterns.Any(pattern => pattern.IsMatch(filename));
     }
 
-    public TvShowEpisode Parse(IFileInfo fileInfo)
+    public IMediaFile Parse(IFileInfo fileInfo)
     {
         string filename = fileInfo.Name;
         
+        // TODO: possibly remove this call or do other way to avoid duplicate matching attempts
         if (!CanParse(filename))
         {
             return new TvShowEpisode(fileInfo);

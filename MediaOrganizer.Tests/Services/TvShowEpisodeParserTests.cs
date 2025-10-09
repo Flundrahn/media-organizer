@@ -1,3 +1,4 @@
+using MediaOrganizer.Models;
 using MediaOrganizer.Services;
 using System.IO.Abstractions.TestingHelpers;
 
@@ -22,10 +23,11 @@ public class TvShowEpisodeParserTests
 
         // Assert
         Assert.True(result.IsValid);
-        Assert.Equal(expectedShow, result.TvShowName);
-        Assert.Equal(expectedSeason, result.Season);
-        Assert.Equal(expectedEpisode, result.Episode);
-        Assert.Equal(expectedTitle, result.Title);
+        var tvShow = Assert.IsType<TvShowEpisode>(result);
+        Assert.Equal(expectedShow, tvShow.TvShowName);
+        Assert.Equal(expectedSeason, tvShow.Season);
+        Assert.Equal(expectedEpisode, tvShow.Episode);
+        Assert.Equal(expectedTitle, tvShow.Title);
     }
 
     [Theory]
@@ -38,14 +40,17 @@ public class TvShowEpisodeParserTests
         var parser = new TvShowEpisodeParser();
 
         // Act
-        var mockFileSystem = new MockFileSystem(); var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); var result = parser.Parse(fileInfo);
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); 
+        var result = parser.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
-        Assert.Equal(expectedShow, result.TvShowName);
-        Assert.Equal(expectedSeason, result.Season);
-        Assert.Equal(expectedEpisode, result.Episode);
-        Assert.Equal(expectedTitle, result.Title);
+        var tvShow = Assert.IsType<TvShowEpisode>(result);
+        Assert.Equal(expectedShow, tvShow.TvShowName);
+        Assert.Equal(expectedSeason, tvShow.Season);
+        Assert.Equal(expectedEpisode, tvShow.Episode);
+        Assert.Equal(expectedTitle, tvShow.Title);
     }
 
     [Theory]
@@ -59,14 +64,17 @@ public class TvShowEpisodeParserTests
         var parser = new TvShowEpisodeParser();
 
         // Act
-        var mockFileSystem = new MockFileSystem(); var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); var result = parser.Parse(fileInfo);
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); 
+        var result = parser.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
-        Assert.Equal(expectedShow, result.TvShowName);
-        Assert.Equal(expectedSeason, result.Season);
-        Assert.Equal(expectedEpisode, result.Episode);
-        Assert.Equal("", result.Title);
+        var tvShow = Assert.IsType<TvShowEpisode>(result);
+        Assert.Equal(expectedShow, tvShow.TvShowName);
+        Assert.Equal(expectedSeason, tvShow.Season);
+        Assert.Equal(expectedEpisode, tvShow.Episode);
+        Assert.Equal("", tvShow.Title);
     }
 
     [Theory]
@@ -78,14 +86,17 @@ public class TvShowEpisodeParserTests
         var parser = new TvShowEpisodeParser();
 
         // Act
-        var mockFileSystem = new MockFileSystem(); var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); var result = parser.Parse(fileInfo);
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); 
+        var result = parser.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
-        Assert.Equal(expectedShow, result.TvShowName);
-        Assert.Equal(expectedSeason, result.Season);
-        Assert.Equal(expectedEpisode, result.Episode);
-        Assert.Equal(expectedYear, result.Year);
+        var tvShow = Assert.IsType<TvShowEpisode>(result);
+        Assert.Equal(expectedShow, tvShow.TvShowName);
+        Assert.Equal(expectedSeason, tvShow.Season);
+        Assert.Equal(expectedEpisode, tvShow.Episode);
+        Assert.Equal(expectedYear, tvShow.Year);
     }
 
     [Theory]
@@ -99,7 +110,9 @@ public class TvShowEpisodeParserTests
         var parser = new TvShowEpisodeParser();
 
         // Act
-        var mockFileSystem = new MockFileSystem(); var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); var result = parser.Parse(fileInfo);
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); 
+        var result = parser.Parse(fileInfo);
 
         // Assert
         Assert.False(result.IsValid);
@@ -154,24 +167,25 @@ public class TvShowEpisodeParserTests
         var canParse = parser.CanParse(filename);
         
         // Output debug information
+        var tvShow = Assert.IsType<TvShowEpisode>(result);
         if (!result.IsValid)
         {
             Assert.Fail(
                 $"Parser failed to parse: {filename}\n" +
                 $"CanParse: {canParse}\n" +
                 $"IsValid: {result.IsValid}\n" +
-                $"TvShowName: '{result.TvShowName}'\n" +
-                $"Season: {result.Season}\n" +
-                $"Episode: {result.Episode}\n" +
-                $"Title: '{result.Title}'");
+                $"TvShowName: '{tvShow.TvShowName}'\n" +
+                $"Season: {tvShow.Season}\n" +
+                $"Episode: {tvShow.Episode}\n" +
+                $"Title: '{tvShow.Title}'");
         }
 
         // Assert - Using the SpacedSxxExxWithTitlePattern
         Assert.True(result.IsValid, "Should be able to parse episode with SpacedSxxExxWithTitlePattern");
-        Assert.Equal("Its Always Sunny In Philadelphia", result.TvShowName);
-        Assert.Equal(17, result.Season);
-        Assert.Equal(8, result.Episode);
-        Assert.Equal("The Golden Bachelor Live", result.Title);
+        Assert.Equal("Its Always Sunny In Philadelphia", tvShow.TvShowName);
+        Assert.Equal(17, tvShow.Season);
+        Assert.Equal(8, tvShow.Episode);
+        Assert.Equal("The Golden Bachelor Live", tvShow.Title);
     }
 
     [Fact]
@@ -201,10 +215,11 @@ public class TvShowEpisodeParserTests
 
         // Assert
         Assert.True(result.IsValid, "Should be able to parse dashed SxxExx format with title");
-        Assert.Equal("The Mandalorian", result.TvShowName);
-        Assert.Equal(2, result.Season);
-        Assert.Equal(2, result.Episode);
-        Assert.Equal("Chapter 10 The Passenger", result.Title);
+        var tvShow = Assert.IsType<TvShowEpisode>(result);
+        Assert.Equal("The Mandalorian", tvShow.TvShowName);
+        Assert.Equal(2, tvShow.Season);
+        Assert.Equal(2, tvShow.Episode);
+        Assert.Equal("Chapter 10 The Passenger", tvShow.Title);
     }
 
     [Fact]
@@ -238,24 +253,25 @@ public class TvShowEpisodeParserTests
         var canParse = parser.CanParse(filename);
         
         // Output debug information
+        var tvShow = Assert.IsType<TvShowEpisode>(result);
         if (!result.IsValid)
         {
             Assert.Fail(
                 $"Parser failed to parse: {filename}\n" +
                 $"CanParse: {canParse}\n" +
                 $"IsValid: {result.IsValid}\n" +
-                $"TvShowName: '{result.TvShowName}'\n" +
-                $"Season: {result.Season}\n" +
-                $"Episode: {result.Episode}\n" +
-                $"Title: '{result.Title}'");
+                $"TvShowName: '{tvShow.TvShowName}'\n" +
+                $"Season: {tvShow.Season}\n" +
+                $"Episode: {tvShow.Episode}\n" +
+                $"Title: '{tvShow.Title}'");
         }
 
         // Assert - Expected values for SpacedSxxExxWithQualityPattern
         Assert.True(result.IsValid, "Should be able to parse SpacedSxxExxWithQualityPattern");
-        Assert.Equal("The Sandman", result.TvShowName);
-        Assert.Equal(2, result.Season);
-        Assert.Equal(7, result.Episode);
-        Assert.Equal("", result.Title); // No episode title in this format
+        Assert.Equal("The Sandman", tvShow.TvShowName);
+        Assert.Equal(2, tvShow.Season);
+        Assert.Equal(7, tvShow.Episode);
+        Assert.Equal("", tvShow.Title); // No episode title in this format
     }
 
     [Fact]
@@ -299,10 +315,11 @@ public class TvShowEpisodeParserTests
 
         // Assert
         Assert.True(result.IsValid, "Should be able to parse DashedSxxExxPattern");
-        Assert.Equal("Breaking Bad", result.TvShowName);
-        Assert.Equal(1, result.Season);
-        Assert.Equal(1, result.Episode);
-        Assert.Equal("", result.Title); // No episode title in this format
+        var tvShow = Assert.IsType<TvShowEpisode>(result);
+        Assert.Equal("Breaking Bad", tvShow.TvShowName);
+        Assert.Equal(1, tvShow.Season);
+        Assert.Equal(1, tvShow.Episode);
+        Assert.Equal("", tvShow.Title); // No episode title in this format
     }
 
     [Fact]
@@ -318,10 +335,11 @@ public class TvShowEpisodeParserTests
 
         // Assert
         Assert.True(result.IsValid, "Should be able to parse repeated SxxExx pattern");
-        Assert.Equal("The Lord Of The Rings The Rings Of Power", result.TvShowName);
-        Assert.Equal(1, result.Season);
-        Assert.Equal(1, result.Episode);
-        Assert.Equal("A Shadow of the Past", result.Title);
+        var tvShow = Assert.IsType<TvShowEpisode>(result);
+        Assert.Equal("The Lord Of The Rings The Rings Of Power", tvShow.TvShowName);
+        Assert.Equal(1, tvShow.Season);
+        Assert.Equal(1, tvShow.Episode);
+        Assert.Equal("A Shadow of the Past", tvShow.Title);
     }
 
     [Fact]

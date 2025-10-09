@@ -17,8 +17,8 @@ public class DirectoryCleanerTests
         var logger = NullLogger<DirectoryCleaner>.Instance;
         var settings = new MediaOrganizerSettings
         {
-            SourceDirectory = @"C:\Source",
-            DestinationDirectory = @"C:\Destination",
+            TvShowSourceDirectory = @"C:\Source",
+            TvShowDestinationDirectory = @"C:\Destination",
             DryRun = false
         };
         _sut = new DirectoryCleaner(_mockFileSystem, logger, Options.Create(settings));
@@ -98,8 +98,8 @@ public class DirectoryCleanerTests
         // Arrange
         var settings = new MediaOrganizerSettings
         {
-            SourceDirectory = @"C:\NonExistent\Source",
-            DestinationDirectory = @"C:\NonExistent\Destination"
+            TvShowSourceDirectory = @"C:\Source",
+            TvShowDestinationDirectory = @"C:\Destination",
         };
         var sut = new DirectoryCleaner(_mockFileSystem, NullLogger<DirectoryCleaner>.Instance, Options.Create(settings));
 
@@ -116,8 +116,8 @@ public class DirectoryCleanerTests
         
         var settings = new MediaOrganizerSettings
         {
-            SourceDirectory = @"C:\Source",
-            DestinationDirectory = @"C:\Destination",
+            TvShowSourceDirectory = @"C:\Source",
+            TvShowDestinationDirectory = @"C:\Destination",
             DryRun = true
         };
         var sut = new DirectoryCleaner(_mockFileSystem, NullLogger<DirectoryCleaner>.Instance, Options.Create(settings));

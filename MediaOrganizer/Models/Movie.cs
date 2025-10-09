@@ -127,7 +127,11 @@ public class Movie : IMediaFile
 
     public override string ToString()
     {
-        var result = $"{Title} ({Year})";
+        var result = Title;
+        if (Year is not null)
+        {
+            result += $" ({Year})";
+        }
         if (!string.IsNullOrWhiteSpace(Quality))
         {
             result += $" [{Quality}]";

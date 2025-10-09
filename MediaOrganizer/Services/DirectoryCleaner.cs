@@ -29,8 +29,6 @@ public class DirectoryCleaner : IDirectoryCleaner
     /// </summary>
     public void CleanEmptyDirectories()
     {
-        CleanEmptyDirectoriesInPath(_settings.SourceDirectory);
-        CleanEmptyDirectoriesInPath(_settings.DestinationDirectory);
         CleanEmptyDirectoriesInPath(_settings.TvShowSourceDirectory);
         CleanEmptyDirectoriesInPath(_settings.TvShowDestinationDirectory);
         CleanEmptyDirectoriesInPath(_settings.MovieSourceDirectory);

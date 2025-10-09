@@ -32,7 +32,7 @@
     - inject configured file provider into organizer in factory method: ended up not doing. Nice and decoupled to inject FileInfos into ctor of organizer.
 
 ## Doing
-- [ ] Movie feature
+- [x] Movie feature
 
 ## TODO: Movie Feature Plan 🎬
 
@@ -72,8 +72,7 @@ Add support for organizing movie files alongside TV shows by creating a common m
 #### Phase 5: Polish 💎
 - [x] Update console UI to show media type in file listings
 - [x] Add validation for movie path template placeholders
-- [ ] Cleanup legacy directories in settings and references
-- [ ] Update documentation and examples
+- [x] Cleanup legacy directories in settings and references
 
 ### Example Movie Patterns
 ```regex

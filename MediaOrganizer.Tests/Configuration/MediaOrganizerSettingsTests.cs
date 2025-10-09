@@ -345,8 +345,6 @@ public class MediaOrganizerSettingsTests
         _mockFileSystem.AddDirectory(sourceDir);
         _mockFileSystem.AddDirectory(destDir);
         
-        _sut.SourceDirectory = sourceDir;
-        _sut.DestinationDirectory = destDir;
         _sut.TvShowPathTemplate = invalidTemplate;
 
         // Act
@@ -453,116 +451,6 @@ public class MediaOrganizerSettingsTests
         Assert.Contains("MoviePathTemplate is required", errors);
         Assert.Contains("VideoFileExtensions must contain at least one extension", errors);
         Assert.Equal(7, errors.Count);
-    }
-
-    [Fact]
-    public void SourceDirectory_WithRelativePath_ConvertsToAbsolutePath()
-    {
-        // Arrange
-        var settings = new MediaOrganizerSettings();
-        var relativePath = "Source";
-
-        // Act
-        settings.SourceDirectory = relativePath;
-
-        // Assert
-        Assert.True(Path.IsPathFullyQualified(settings.SourceDirectory), "SourceDirectory should be converted to absolute path");
-        Assert.EndsWith("Source", settings.SourceDirectory);
-        Assert.NotEqual(relativePath, settings.SourceDirectory);
-    }
-
-    [Fact]
-    public void DestinationDirectory_WithRelativePath_ConvertsToAbsolutePath()
-    {
-        // Arrange
-        var settings = new MediaOrganizerSettings();
-        var relativePath = "Destination";
-
-        // Act
-        settings.DestinationDirectory = relativePath;
-
-        // Assert
-        Assert.True(Path.IsPathFullyQualified(settings.DestinationDirectory), "DestinationDirectory should be converted to absolute path");
-        Assert.EndsWith("Destination", settings.DestinationDirectory);
-        Assert.NotEqual(relativePath, settings.DestinationDirectory);
-    }
-
-    [Fact]
-    public void SourceDirectory_WithAbsolutePath_RemainsUnchanged()
-    {
-        // Arrange
-        var settings = new MediaOrganizerSettings();
-        var absolutePath = @"C:\Source";
-
-        // Act
-        settings.SourceDirectory = absolutePath;
-
-        // Assert
-        Assert.Equal(absolutePath, settings.SourceDirectory);
-        Assert.True(Path.IsPathFullyQualified(settings.SourceDirectory));
-    }
-
-    [Fact]
-    public void DestinationDirectory_WithAbsolutePath_RemainsUnchanged()
-    {
-        // Arrange
-        var settings = new MediaOrganizerSettings();
-        var absolutePath = @"C:\Destination";
-
-        // Act
-        settings.DestinationDirectory = absolutePath;
-
-        // Assert
-        Assert.Equal(absolutePath, settings.DestinationDirectory);
-        Assert.True(Path.IsPathFullyQualified(settings.DestinationDirectory));
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    [InlineData(null)]
-    public void SourceDirectory_WithNullOrWhiteSpace_RemainsEmpty(string? value)
-    {
-        // Arrange
-        var settings = new MediaOrganizerSettings();
-
-        // Act
-        settings.SourceDirectory = value!;
-
-        // Assert
-        Assert.Equal(string.Empty, settings.SourceDirectory);
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("   ")]
-    [InlineData(null)]
-    public void DestinationDirectory_WithNullOrWhiteSpace_RemainsEmpty(string? value)
-    {
-        // Arrange
-        var settings = new MediaOrganizerSettings();
-
-        // Act
-        settings.DestinationDirectory = value!;
-
-        // Assert
-        Assert.Equal(string.Empty, settings.DestinationDirectory);
-    }
-
-    [Fact]
-    public void Directories_WithCurrentDirectoryReference_ExpandsCorrectly()
-    {
-        // Arrange
-        var settings = new MediaOrganizerSettings();
-        var currentDir = Environment.CurrentDirectory;
-
-        // Act
-        settings.SourceDirectory = ".";
-        settings.DestinationDirectory = ".";
-
-        // Assert
-        Assert.Equal(currentDir, settings.SourceDirectory);
-        Assert.Equal(currentDir, settings.DestinationDirectory);
     }
 
     [Theory]

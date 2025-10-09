@@ -427,7 +427,7 @@ public class MovieTests
 
         var settings = new MediaOrganizerSettings
         {
-            DestinationDirectory = @"C:\destination",
+            MovieDestinationDirectory = @"C:\destination",
             MoviePathTemplate = "Movies/{Title} ({Year})"
         };
 

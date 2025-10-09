@@ -11,36 +11,12 @@ public class MediaOrganizerSettings
 {
     private List<string> _validationErrors = [];
     private FileSystemValidator? _validator;
-    private string _sourceDirectory = string.Empty;
-    private string _destinationDirectory = string.Empty;
     private string _tvShowSourceDirectory = string.Empty;
     private string _tvShowDestinationDirectory = string.Empty;
     private string _movieSourceDirectory = string.Empty;
     private string _movieDestinationDirectory = string.Empty;
 
     public const string SectionName = "MediaOrganizer";
-
-    // TODO: clean up "legacy" directories
-
-    /// <summary>
-    /// The source directory to scan for media files
-    /// Automatically converts relative paths to absolute paths
-    /// </summary>
-    public string SourceDirectory
-    {
-        get => _sourceDirectory;
-        set => _sourceDirectory = string.IsNullOrWhiteSpace(value) ? string.Empty : Path.GetFullPath(value);
-    }
-
-    /// <summary>
-    /// The destination directory where organized files will be placed
-    /// Automatically converts relative paths to absolute paths
-    /// </summary>
-    public string DestinationDirectory 
-    { 
-        get => _destinationDirectory;
-        set => _destinationDirectory = string.IsNullOrWhiteSpace(value) ? string.Empty : Path.GetFullPath(value);
-    }
 
     /// <summary>
     /// The source directory to scan for TV show files

@@ -264,7 +264,8 @@ public class MediaOrganizerConsoleApp
             if (currentFile != null && currentFile.IsValid)
             {
                 _console.WriteLine($"Next file: {currentFile.OriginalFile.Name}");
-                _console.WriteLine($"Will organize as: {currentFile}");
+                // TODO: Fix performance so feel free to generate the relative path many times like this
+                _console.WriteLine($"Will organize as: {currentFile.GenerateRelativePath(_settings)}");
             }
             else
             {

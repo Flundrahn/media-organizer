@@ -237,24 +237,7 @@ public class MediaOrganizerConsoleApp
         
         ProcessFilesInteractively(organizer);
     }
-
-    private void OrganizeAllFiles(MediaFileOrganizer organizer)
-    {
-        _console.WriteLine("");
-        _console.WriteLine("Organizing All Files");
-        _console.WriteLine("===================");
-        
-        if (organizer.RemainingCount == 0)
-        {
-            _console.WriteLine("No files to organize.");
-            return;
-        }
-        
-        _console.WriteLine($"Organizing {organizer.RemainingCount} files...");
-        var result = organizer.OrganizeAllFiles();
-        _console.WriteSuccess($"Batch complete: {result.OrganizedCount} organized, {result.SkippedCount} skipped, {result.FailedCount} failed");
-    }
-
+    
     private void CleanMediaDirectories(string mediaType, string sourceDirectory, string destinationDirectory)
     {
         _console.WriteLine("");

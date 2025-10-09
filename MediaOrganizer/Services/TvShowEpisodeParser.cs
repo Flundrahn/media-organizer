@@ -8,35 +8,35 @@ namespace MediaOrganizer.Services;
 public class TvShowEpisodeParser : IMediaFileParser
 {
     private static readonly Regex StandardSxxExxPattern = new(
-        @"^(?<showName>.+?)(?:\.(?<year>\d{4}))?\.S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?=\.|$))?", 
+        @"^(?<showName>.+?)(?:\.(?<year>\d{4}))?\.S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex YearBeforeSxxExxPattern = new(
-        @"^(?<showName>.+?)\s+(?<year>\d{4})\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD|.*?))?(?:\.|$)", 
+        @"^(?<showName>.+?)\s+(?<year>\d{4})\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD))?", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex YearInParenthesesPattern = new(
-        @"^(?<showName>.+?)\s+\((?<year>\d{4})\)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?(?:\.|$)", 
+        @"^(?<showName>.+?)\s+\((?<year>\d{4})\)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex SeasonXEpisodePattern = new(
-        @"^(?<showName>.+?)\s+(?<season>\d{1,2})x(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\.|$)", 
+        @"^(?<showName>.+?)\s+(?<season>\d{1,2})x(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex SpacedSxxExxWithTitlePattern = new(
-        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD|.*?))?(?:\.|$)", 
+        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD))?", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex DashedSxxExxWithTitlePattern = new(
-        @"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+S(?<season>\d{1,2})E(?<episode>\d{1,2}))?\s+-\s+(?<episodeTitle>.+?)(?:\.[^.]+)?$", 
+        @"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+S(?<season>\d{1,2})E(?<episode>\d{1,2}))?\s+-\s+(?<episodeTitle>.+)", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex SpacedSxxExxWithQualityPattern = new(
-        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:\.[^.]+)?$", 
+        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", 
         RegexOptions.IgnoreCase);
     
     private static readonly Regex DashedSxxExxPattern = new(
-        @"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.[^.]+)?$", 
+        @"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})", 
         RegexOptions.IgnoreCase);
 
     private static readonly Regex[] AllPatterns = [
@@ -55,7 +55,8 @@ public class TvShowEpisodeParser : IMediaFileParser
         if (string.IsNullOrWhiteSpace(filename))
             return false;
 
-        return AllPatterns.Any(pattern => pattern.IsMatch(filename));
+        var nameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
+        return AllPatterns.Any(pattern => pattern.IsMatch(nameWithoutExtension));
     }
 
     public IMediaFile Parse(IFileInfo fileInfo)
@@ -68,9 +69,11 @@ public class TvShowEpisodeParser : IMediaFileParser
             return new TvShowEpisode(fileInfo);
         }
 
+        var nameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
+
         foreach (var pattern in AllPatterns)
         {
-            var match = pattern.Match(filename);
+            var match = pattern.Match(nameWithoutExtension);
             if (match.Success)
             {
                 string showName = CleanShowName(match.Groups["showName"].Value);

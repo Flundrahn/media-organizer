@@ -6,20 +6,24 @@ namespace MediaOrganizer.Tests.Services;
 
 public class MovieParserTests
 {
+    private readonly MovieParser _sut = new();
+
     [Theory]
     [InlineData("The Matrix 1999 1080p BluRay.mkv", true)]
     [InlineData("Inception (2010) (1080p BluRay).mkv", true)]
     [InlineData("Interstellar.2014.1080p.BluRay.x264.YIFY.mp4", true)]
+    [InlineData("Tolkien 1080p.mp4", true)]
+    [InlineData("Thor Ragnarok 1080p.mkv", true)]
+    [InlineData("Solo A Star Wars Story 2160p.mkv", true)]
+    [InlineData("Bram.Stokers.Dracula.1992.RM4k.1080p.BluRay.x265.hevc.10bit.AAC.7.1.commentary-HeVK.mkv", true)]
+    [InlineData("Thunderbolts.2025.Proper.1080p.WEB-DL.DDP5.1.x265-NeoNoir.mkv", true)]
     [InlineData("Breaking Bad S01E01.mkv", false)] // TV show format should not be parsed as movie
     [InlineData("Game.of.Thrones.S08E06.mkv", false)] // TV show format should not be parsed as movie
     [InlineData("Sample.mkv", false)]
     public void CanParse_ShouldReturnExpectedResult(string filename, bool expected)
     {
-        // Arrange
-        var parser = new MovieParser();
-
         // Act
-        var result = parser.CanParse(filename);
+        var result = _sut.CanParse(filename);
 
         // Assert
         Assert.Equal(expected, result);
@@ -35,12 +39,11 @@ public class MovieParserTests
     public void Parse_WithYearAndQuality_ShouldReturnCorrectMovie(string filename, string expectedTitle, int expectedYear, string expectedQuality)
     {
         // Arrange
-        var parser = new MovieParser();
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
 
         // Act
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
@@ -60,12 +63,11 @@ public class MovieParserTests
     public void Parse_WithParenthesesFormat_ShouldReturnCorrectMovie(string filename, string expectedTitle, int expectedYear, string expectedQuality)
     {
         // Arrange
-        var parser = new MovieParser();
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
 
         // Act
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
@@ -83,12 +85,11 @@ public class MovieParserTests
     public void Parse_WithDotsFormat_ShouldReturnCorrectMovie(string filename, string expectedTitle, int expectedYear, string expectedQuality)
     {
         // Arrange
-        var parser = new MovieParser();
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
 
         // Act
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
@@ -98,41 +99,132 @@ public class MovieParserTests
         Assert.Contains(expectedQuality, movie.Quality);
     }
 
+
+    [Theory]
+    [InlineData("Tolkien 1080p.mp4", "Tolkien", "1080p")]
+    [InlineData("Thor Ragnarok 1080p.mkv", "Thor Ragnarok", "1080p")]
+    [InlineData("The Princess Bride 1080p.mp4", "The Princess Bride", "1080p")]
+    [InlineData("The Batman 1080p.mkv", "The Batman", "1080p")]
+    [InlineData("Interstellar 1080p.mkv", "Interstellar", "1080p")]
+    [InlineData("Soul 1080p.mkv", "Soul", "1080p")]
+    [InlineData("Free Guy 1080p.mp4", "Free Guy", "1080p")]
+    [InlineData("Moneyball 1080p.mkv", "Moneyball", "1080p")]
+    public void Parse_SimpleMovieWithQuality_ShouldReturnCorrectMovie(string filename, string expectedTitle, string expectedQuality)
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
+
+        // Act
+        var result = _sut.Parse(fileInfo);
+
+        // Assert
+        Assert.True(result.IsValid);
+        var movie = Assert.IsType<Movie>(result);
+        Assert.Equal(expectedTitle, movie.Title);
+        Assert.Contains(expectedQuality, movie.Quality);
+        Assert.Null(movie.Year);
+    }
+
+    [Theory]
+    [InlineData("Solo A Star Wars Story 2160p.mkv", "Solo A Star Wars Story", "2160p")]
+    [InlineData("Shang Chi And The Legend Of The Ten Rings 1080p.mp4", "Shang Chi and the Legend of the Ten Rings", "1080p")]
+    [InlineData("Dungeons and Dragons Honor Among Thieves 2160p.mkv", "Dungeons and Dragons Honor Among Thieves", "2160p")]
+    [InlineData("Sorry To Bother You 1080p.mp4", "Sorry to Bother You", "1080p")]
+    [InlineData("This Is Where I Leave You 1080p.mp4", "This Is Where I Leave You", "1080p")]
+    public void Parse_LongTitleMovieWithQuality_ShouldReturnCorrectMovie(string filename, string expectedTitle, string expectedQuality)
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
+
+        // Act
+        var result = _sut.Parse(fileInfo);
+
+        // Assert
+        Assert.True(result.IsValid);
+        var movie = Assert.IsType<Movie>(result);
+        Assert.Equal(expectedTitle, movie.Title);
+        Assert.Contains(expectedQuality, movie.Quality);
+        Assert.Null(movie.Year);
+    }
+
+    [Theory]
+    // [InlineData("Bram.Stokers.Dracula.1992.RM4k.1080p.BluRay.x265.hevc.10bit.AAC.7.1.commentary-HeVK.mkv", "Bram Stokers Dracula", 1992, "1080p")]
+    [InlineData("Thunderbolts.2025.Proper.1080p.WEB-DL.DDP5.1.x265-NeoNoir.mkv", "Thunderbolts", 2025, "1080p")]
+    public void Parse_ComplexDotsReleaseFormat_ShouldReturnCorrectMovie(string filename, string expectedTitle, int expectedYear, string expectedQuality)
+    {
+        // Arrange
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
+
+        // Act
+        var result = _sut.Parse(fileInfo);
+
+        // Assert
+        Assert.True(result.IsValid);
+        var movie = Assert.IsType<Movie>(result);
+        Assert.Equal(expectedTitle, movie.Title);
+        Assert.Equal(expectedYear, movie.Year);
+        Assert.Equal(expectedQuality, movie.Quality);
+    }
+
+    // todo: probably just remove this, they can be "parsed" as movies, or possibly we automatically ignore certain folder's instead.
     [Theory]
     [InlineData("Sample.mkv")]
     [InlineData("Making-of-documentary.mp4")]
     [InlineData("Behind-the-scenes-featurette.mkv")]
     [InlineData("Director-commentary-track.mp4")]
-    public void Parse_WithExcludedContent_ShouldReturnInvalidResult(string filename)
+    [InlineData("The Return to Hand Drawn Animation.mkv")]
+    [InlineData("The Princess and the Animator.mkv")]
+    [InlineData("The Disney Legacy.mkv")]
+    [InlineData("Ne-Yo - Never Knew I Needed.mkv")]
+    [InlineData("Magic in the Bayou - The Making of a Princess.mkv")]
+    [InlineData("Drawing Naveen.mkv")]
+    [InlineData("Disney's Newest Princess.mkv")]
+    [InlineData("Deleted Scenes.mkv")]
+    [InlineData("Conjuring the Villain.mkv")]
+    [InlineData("Bringing Life to Animation.mkv")]
+    [InlineData("A Return to the Animated Musical.mkv")]
+    [InlineData("Q&A with Michael Shannon and Shea Whigham.mkv")]
+    [InlineData("Deleted Scene 2.mkv")]
+    [InlineData("Deleted Scene 1.mkv")]
+    [InlineData("Behind the Scenes of Taking Shelter.mkv")]
+    [InlineData("The Production.mkv")]
+    [InlineData("The Musical Journey.mkv")]
+    [InlineData("The Filmmakers.mkv")]
+    [InlineData("The Editing.mkv")]
+    [InlineData("The Concept.mkv")]
+    [InlineData("Internet Teaser.mkv")]
+    [InlineData("The Legacy of Steve Jobs.mkv")]
+    [InlineData("Behind the Score.mkv")]
+    [InlineData("Ashton Kutcher is Steve Jobs.mkv")]
+    public void CanParse_WithExcludedContent_ShouldReturnFalse(string filename)
     {
-        // Arrange
-        var parser = new MovieParser();
-        var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
-
         // Act
-        var result = parser.Parse(fileInfo);
+        var result = _sut.CanParse(filename);
 
         // Assert
-        Assert.False(result.IsValid);
+        Assert.False(result);
     }
 
     [Fact]
     public void Parse_WithUnparseableFilename_ShouldReturnInvalidMovie()
     {
         // Arrange
-        var parser = new MovieParser();
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\movies\unparseable-filename.mkv");
 
         // Act
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.False(result.IsValid);
         var movie = Assert.IsType<Movie>(result);
-        Assert.Equal("unparseable-filename.mkv", movie.Title);
+        Assert.Equal(string.Empty, movie.Title);
         Assert.Null(movie.Year);
         Assert.Equal(string.Empty, movie.Quality);
+        Assert.Equal(fileInfo, movie.CurrentFile);
+        Assert.Equal(fileInfo, movie.OriginalFile);
     }
 }

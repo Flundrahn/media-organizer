@@ -62,7 +62,7 @@ public class MovieTests
     }
 
     [Fact]
-    public void IsValid_WithNullYear_ReturnsFalse()
+    public void IsValid_WithNullYear_ReturnsTrue()
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\test.mkv");
@@ -71,7 +71,7 @@ public class MovieTests
         movie.Year = null;
 
         // Act & Assert
-        Assert.False(movie.IsValid);
+        Assert.True(movie.IsValid);
     }
 
     [Fact]

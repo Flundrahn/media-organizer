@@ -39,7 +39,7 @@ public class Movie : IMediaFile
         CurrentFile = fileInfo;
     }
 
-    public bool IsValid => !string.IsNullOrWhiteSpace(Title) && Year.HasValue && Year > 0;
+    public bool IsValid => !string.IsNullOrWhiteSpace(Title);
 
     public bool IsOrganized(MediaOrganizerSettings settings)
     {
@@ -105,6 +105,9 @@ public class Movie : IMediaFile
         // Clean up any double path separators that might have been created
         var doublePathSep = $"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}";
         result = result.Replace(doublePathSep, Path.DirectorySeparatorChar.ToString());
+        
+        // Clean up patterns where Year was empty - remove empty parentheses
+        result = Regex.Replace(result, @"\s*\(\s*\)", "");
         
         // Clean up patterns where Quality was empty - remove empty brackets
         result = Regex.Replace(result, @"\s*\[\s*\]", "");

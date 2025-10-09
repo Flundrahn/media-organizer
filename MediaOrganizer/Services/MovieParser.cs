@@ -1,9 +1,11 @@
+using System.Globalization;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 using MediaOrganizer.Models;
 
 namespace MediaOrganizer.Services;
 
+// TODO possibly just remove the wild card matching of the last group.
 public class MovieParser : IMediaFileParser
 {
     // Example: "Grandmas Boy 2006 UNRATED 1080p BluRay HEVC x265 5.1 BONE.mkv"
@@ -21,31 +23,47 @@ public class MovieParser : IMediaFileParser
         @"^(?<title>(?:[A-Za-z0-9]+\.)*[A-Za-z0-9]+)\.(?<year>\d{4})\.(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:\..*)?$",
         RegexOptions.IgnoreCase);
 
-    // Example: "Interstellar 1080p.mkv"
+    // Example: "Interstellar 1080p.mkv", "Thor Ragnarok 1080p.mkv" 
     private static readonly Regex MovieSimpleWithQualityPattern = new(
-        @"^(?<title>.+?)\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:\.|$)",
+        @"^(?<title>.+?)\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:\s|$)",
         RegexOptions.IgnoreCase);
 
-    // Example: "Superman 2025"
+    // Example: "Superman 2025", "Wonder Woman 1984"
     private static readonly Regex MovieWithYearPattern = new(
         @"^(?<title>.+?)\s+(?<year>\d{4})(?:\s|$)",
         RegexOptions.IgnoreCase);
 
-    // Example: "Samsara 1080p.mkv"
+    // Example: "Thunderbolts.2025.Proper.1080p.WEB-DL.DDP5.1.x265-NeoNoir"
+    private static readonly Regex MovieComplexDotsPattern = new(
+        @"^(?<title>(?:[A-Za-z0-9]+\.)*[A-Za-z0-9]+)\.(?<year>\d{4})\.(?:[A-Za-z0-9\-\.]+\.)*(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:.*)?$",
+        RegexOptions.IgnoreCase);
+
+    // Example: "Solo A Star Wars Story 2160p.mkv" - title with spaces followed by quality
+    private static readonly Regex MovieLongTitleWithQualityPattern = new(
+        @"^(?<title>(?:[A-Za-z]+\s+){2,}[A-Za-z]+)\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)(?:\s|$)",
+        RegexOptions.IgnoreCase);
+
+    // Example: "Samsara 1080p.mkv", "Tolkien 1080p.mp4" - simple title with quality
     private static readonly Regex MovieSimpleTitlePattern = new(
-        @"^(?<title>[A-Za-z][A-Za-z\s]+[A-Za-z])(?:\s+\d{3,4}p|\s+4K|\s+UHD|\s+HDR|$)",
+        @"^(?<title>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+\d{3,4}p|\s+4K|\s+UHD|\s+HDR|$)",
         RegexOptions.IgnoreCase);
 
     // Patterns to exclude files that are clearly not movies (bonus content, etc.)
     private static readonly Regex[] ExclusionPatterns = [
         new Regex(@"^(?:deleted|bonus|behind|making|trailer|teaser|concept|editing|legacy|internet|sample)", RegexOptions.IgnoreCase),
-        new Regex(@"\b(?:deleted\s+scenes|behind\s+the\s+score|bonus\s+features|making\s+of)\b", RegexOptions.IgnoreCase)
+        new Regex(@"\b(?:deleted\s+scenes|behind\s+the\s+score|bonus\s+features|making\s+of|return\s+to\s+hand\s+drawn|princess\s+and\s+the\s+animator)\b", RegexOptions.IgnoreCase),
+        new Regex(@"^(?:the\s+)?(?:production|musical\s+journey|filmmakers|editing|concept|legacy|drawing|conjuring|bringing\s+life)(?:\s|$)", RegexOptions.IgnoreCase),
+        new Regex(@"^(?:disney|ne-yo|magic\s+in\s+the\s+bayou|q&a\s+with|ashton\s+kutcher\s+is)", RegexOptions.IgnoreCase),
+        new Regex(@"^(?:the\s+)?disney\s+legacy", RegexOptions.IgnoreCase),
+        new Regex(@"^a\s+return\s+to\s+the\s+animated\s+musical", RegexOptions.IgnoreCase)
     ];
 
     private static readonly Regex[] AllPatterns = [
         MovieWithYearAndQualityPattern,
         MovieWithYearInParenthesesPattern,
         MovieWithDotsPattern,
+        MovieComplexDotsPattern,
+        MovieLongTitleWithQualityPattern,
         MovieSimpleWithQualityPattern,
         MovieWithYearPattern,
         MovieSimpleTitlePattern
@@ -81,7 +99,6 @@ public class MovieParser : IMediaFileParser
         // Remove file extension for parsing
         var nameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
 
-        bool matched = false;
         foreach (var pattern in AllPatterns)
         {
             var match = pattern.Match(nameWithoutExtension);
@@ -105,24 +122,14 @@ public class MovieParser : IMediaFileParser
                 {
                     movie.Quality = match.Groups["quality"].Value;
                 }
-
-                matched = true;
                 break; // Use the first successful match
             }
-        }
-        // NOTE: is this the type of behavior we want?a or better to throw considering we have canparse?
-        //  just need to return anything with invalid media file tbh
-
-        // Fallback for unparseable files
-        if (!matched)
-        {
-            movie.Title = filename; // Use full filename including extension
         }
 
         return movie;
     }
 
-    private static string ExtractAndCleanTitle(string rawTitle)
+   private static string ExtractAndCleanTitle(string rawTitle)
     {
         if (string.IsNullOrWhiteSpace(rawTitle))
             return string.Empty;
@@ -135,6 +142,7 @@ public class MovieParser : IMediaFileParser
         
         // Capitalize properly (basic title case)
         return ToTitleCase(title);
+        // return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(title);
     }
 
     private static string ToTitleCase(string input)

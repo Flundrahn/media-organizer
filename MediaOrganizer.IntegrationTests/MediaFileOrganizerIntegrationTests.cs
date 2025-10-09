@@ -51,5 +51,48 @@ namespace MediaOrganizer.IntegrationTests
             Assert.True(File.Exists(expectedOrganizedFilePath), $"Expected organized file to exist at: {expectedOrganizedFilePath}");
             Assert.False(Directory.Exists(nestedSourceDirectoryFullPath), $"Source nested directory should be cleaned up after moving files: {nestedSourceDirectoryFullPath}");
         }
+
+        [Fact]
+        public void Organize_Movie_File_IsMoved_And_EmptyDirectories_Cleaned_WhenEnabled()
+        {
+            using var environment = new TempMediaTestEnvironment();
+
+            string relativeSourceFilePath = Path.Combine("Movies", "The.Matrix.1999.1080p.BluRay.mkv");
+            string sourceFileFullPath = environment.CreateFile(relativeSourceFilePath);
+            string nestedSourceDirectoryFullPath = Path.Combine(environment.MediaSourceDirectory, "Movies");
+            // See used MoviePathTemplate below
+            string expectedOrganizedFilePath = Path.Combine(environment.MediaDestinationDirectory, "Movies", "The Matrix (1999).mkv");
+
+            var settings = new MediaOrganizerSettings
+            {
+                AutoCleanupEmptyDirectories = true,
+                TvShowSourceDirectory = environment.MediaSourceDirectory,
+                TvShowDestinationDirectory = environment.MediaDestinationDirectory,
+                MovieSourceDirectory = environment.MediaSourceDirectory,
+                MovieDestinationDirectory = environment.MediaDestinationDirectory,
+                DryRun = false,
+                IncludeSubdirectories = true,
+                MoviePathTemplate = "Movies/{Title} ({Year})",
+                VideoFileExtensions = [".mkv"]
+            };
+
+            var services = new ServiceCollection();
+            var provider = services
+                // Passing in empty configuration, then overriding actual settings object by injecting singleton
+                .AddMediaOrganizerServices(new ConfigurationBuilder().Build())
+                .AddSingleton(Options.Create(settings))
+                .BuildServiceProvider();
+
+            var organizerFactory = provider.GetRequiredService<MediaFileOrganizerFactory>();
+            var organizer = organizerFactory.CreateMovieOrganizer();
+
+            // Act
+            var result = organizer.OrganizeAllFiles();
+
+            // Assert
+            Assert.False(File.Exists(sourceFileFullPath), $"Expected organized file to be moved away from: {sourceFileFullPath}");
+            Assert.True(File.Exists(expectedOrganizedFilePath), $"Expected organized file to exist at: {expectedOrganizedFilePath}");
+            Assert.False(Directory.Exists(nestedSourceDirectoryFullPath), $"Source nested directory should be cleaned up after moving files: {nestedSourceDirectoryFullPath}");
+        }
     }
 }

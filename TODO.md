@@ -65,7 +65,7 @@ Add support for organizing movie files alongside TV shows by creating a common m
 #### Phase 4: Integration & Testing 🧪
 - [x] Update DI registration for new parsers
 - [x] Add movie-specific unit tests
-- [ ] Add movie integration tests using `TempMediaTestEnvironment`
+- [x] Add movie integration tests using `TempMediaTestEnvironment`
 - [ ] Update configuration validation for movie path templates
 - [ ] Update file provider to ignore specific folders such as "Featurettes", "Extras", "Behind the Scenes"
 

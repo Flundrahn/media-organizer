@@ -48,16 +48,6 @@ public class MovieParser : IMediaFileParser
         @"^(?<title>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+\d{3,4}p|\s+4K|\s+UHD|\s+HDR|$)",
         RegexOptions.IgnoreCase);
 
-    // Patterns to exclude files that are clearly not movies (bonus content, etc.)
-    private static readonly Regex[] ExclusionPatterns = [
-        new Regex(@"^(?:deleted|bonus|behind|making|trailer|teaser|concept|editing|legacy|internet|sample)", RegexOptions.IgnoreCase),
-        new Regex(@"\b(?:deleted\s+scenes|behind\s+the\s+score|bonus\s+features|making\s+of|return\s+to\s+hand\s+drawn|princess\s+and\s+the\s+animator)\b", RegexOptions.IgnoreCase),
-        new Regex(@"^(?:the\s+)?(?:production|musical\s+journey|filmmakers|editing|concept|legacy|drawing|conjuring|bringing\s+life)(?:\s|$)", RegexOptions.IgnoreCase),
-        new Regex(@"^(?:disney|ne-yo|magic\s+in\s+the\s+bayou|q&a\s+with|ashton\s+kutcher\s+is)", RegexOptions.IgnoreCase),
-        new Regex(@"^(?:the\s+)?disney\s+legacy", RegexOptions.IgnoreCase),
-        new Regex(@"^a\s+return\s+to\s+the\s+animated\s+musical", RegexOptions.IgnoreCase)
-    ];
-
     private static readonly Regex[] AllPatterns = [
         MovieWithYearAndQualityPattern,
         MovieWithYearInParenthesesPattern,
@@ -75,12 +65,6 @@ public class MovieParser : IMediaFileParser
             return false;
 
         var nameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
-
-        foreach (var exclusionPattern in ExclusionPatterns)
-        {
-            if (exclusionPattern.IsMatch(nameWithoutExtension))
-                return false;
-        }
 
         foreach (var pattern in AllPatterns)
         {

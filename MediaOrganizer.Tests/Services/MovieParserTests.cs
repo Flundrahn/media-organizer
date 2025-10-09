@@ -19,7 +19,6 @@ public class MovieParserTests
     [InlineData("Thunderbolts.2025.Proper.1080p.WEB-DL.DDP5.1.x265-NeoNoir.mkv", true)]
     [InlineData("Breaking Bad S01E01.mkv", false)] // TV show format should not be parsed as movie
     [InlineData("Game.of.Thrones.S08E06.mkv", false)] // TV show format should not be parsed as movie
-    [InlineData("Sample.mkv", false)]
     public void CanParse_ShouldReturnExpectedResult(string filename, bool expected)
     {
         // Act
@@ -167,45 +166,6 @@ public class MovieParserTests
         Assert.Equal(expectedTitle, movie.Title);
         Assert.Equal(expectedYear, movie.Year);
         Assert.Equal(expectedQuality, movie.Quality);
-    }
-
-    // todo: probably just remove this, they can be "parsed" as movies, or possibly we automatically ignore certain folder's instead.
-    [Theory]
-    [InlineData("Sample.mkv")]
-    [InlineData("Making-of-documentary.mp4")]
-    [InlineData("Behind-the-scenes-featurette.mkv")]
-    [InlineData("Director-commentary-track.mp4")]
-    [InlineData("The Return to Hand Drawn Animation.mkv")]
-    [InlineData("The Princess and the Animator.mkv")]
-    [InlineData("The Disney Legacy.mkv")]
-    [InlineData("Ne-Yo - Never Knew I Needed.mkv")]
-    [InlineData("Magic in the Bayou - The Making of a Princess.mkv")]
-    [InlineData("Drawing Naveen.mkv")]
-    [InlineData("Disney's Newest Princess.mkv")]
-    [InlineData("Deleted Scenes.mkv")]
-    [InlineData("Conjuring the Villain.mkv")]
-    [InlineData("Bringing Life to Animation.mkv")]
-    [InlineData("A Return to the Animated Musical.mkv")]
-    [InlineData("Q&A with Michael Shannon and Shea Whigham.mkv")]
-    [InlineData("Deleted Scene 2.mkv")]
-    [InlineData("Deleted Scene 1.mkv")]
-    [InlineData("Behind the Scenes of Taking Shelter.mkv")]
-    [InlineData("The Production.mkv")]
-    [InlineData("The Musical Journey.mkv")]
-    [InlineData("The Filmmakers.mkv")]
-    [InlineData("The Editing.mkv")]
-    [InlineData("The Concept.mkv")]
-    [InlineData("Internet Teaser.mkv")]
-    [InlineData("The Legacy of Steve Jobs.mkv")]
-    [InlineData("Behind the Score.mkv")]
-    [InlineData("Ashton Kutcher is Steve Jobs.mkv")]
-    public void CanParse_WithExcludedContent_ShouldReturnFalse(string filename)
-    {
-        // Act
-        var result = _sut.CanParse(filename);
-
-        // Assert
-        Assert.False(result);
     }
 
     [Fact]

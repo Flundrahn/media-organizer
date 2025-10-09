@@ -65,12 +65,13 @@ public class Movie : IMediaFile
 
     public string GenerateFullPath(MediaOrganizerSettings settings)
     {
-        // TODO: possibly use Path.GetFullPath if make a difference, note already use it in settings dir setters
-        return Path.Combine(settings.MovieDestinationDirectory, GenerateRelativePath(settings));
+        return Path.GetFullPath(Path.Combine(settings.MovieDestinationDirectory, GenerateRelativePath(settings)));
     }
 
     public string GenerateRelativePath(MediaOrganizerSettings settings)
     {
+        // TODO: probably cleanup this duplicate validation. it is a public method, but then again this is already validated in settings.
+        // should never ever be null or whitespace
         if (string.IsNullOrWhiteSpace(settings.MoviePathTemplate))
             throw new ArgumentException("MoviePathTemplate cannot be empty or whitespace.", nameof(settings));
             

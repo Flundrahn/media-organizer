@@ -79,8 +79,7 @@ public class TvShowEpisode : IMediaFile
 
     public string GenerateFullPath(MediaOrganizerSettings settings)
     {
-        // TODO: possibly use Path.GetFullPath if make a difference, note already use it in settings dir setters
-        return Path.Combine(settings.TvShowDestinationDirectory, GenerateRelativePath(settings));
+        return Path.GetFullPath(Path.Combine(settings.TvShowDestinationDirectory, GenerateRelativePath(settings)));
     }
 
     // TODO: possibly change this to just generate the full path immediately, since have settings here anyway

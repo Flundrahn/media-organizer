@@ -26,8 +26,6 @@ public class MediaFileOrganizer
     private readonly IReadOnlyList<IFileInfo> _allFiles;
 
     public int RemainingCount => _files.Count;
-    public int TotalCount => _allFiles.Count;
-    // todo: decide how do about this
     public IReadOnlyList<IFileInfo> AllFiles => _allFiles;
     public OrganizationResult Result => _result;
 

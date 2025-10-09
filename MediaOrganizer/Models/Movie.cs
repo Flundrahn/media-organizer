@@ -17,11 +17,31 @@ public class Movie : IMediaFile
         "Title", "Year", "Quality"
     };
 
-    public string Title { get; internal set; } = string.Empty;
+    private string _title = string.Empty;
+    public string Title
+    {
+        get => _title;
+        internal set
+        {
+            _title = string.IsNullOrWhiteSpace(value)
+                ? string.Empty
+                : value;
+        }
+    }
 
     public int? Year { get; internal set; }
 
-    public string Quality { get; internal set; } = string.Empty;
+    private string _quality = string.Empty;
+    public string Quality
+    {
+        get => _quality;
+        internal set
+        {
+            _quality = string.IsNullOrWhiteSpace(value)
+                ? string.Empty
+                : value;
+        }
+    }
 
     public IFileInfo OriginalFile { get; init; }
 

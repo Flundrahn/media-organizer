@@ -17,7 +17,14 @@ public class TvShowEpisode : IMediaFile
         "TvShowName", "Season", "Episode", "Title", "Year", "Quality"
     };
 
-    public string TvShowName { get; internal set; } = string.Empty;
+    private string _tvShowName = string.Empty;
+    public string TvShowName
+    {
+        get => _tvShowName;
+        internal set => _tvShowName = string.IsNullOrWhiteSpace(value) 
+            ? string.Empty 
+            : value;
+    }
 
     /// <summary>
     /// The season number (1-based)
@@ -29,9 +36,23 @@ public class TvShowEpisode : IMediaFile
     /// </summary>
     public int Episode { get; internal set; }
 
-    public string Title { get; internal set; } = string.Empty;
+    private string _title = string.Empty;
+    public string Title
+    {
+        get => _title;
+        internal set => _title = string.IsNullOrWhiteSpace(value) 
+            ? string.Empty 
+            : value;
+    }
 
-    public string Quality { get; internal set; } = string.Empty;
+    private string _quality = string.Empty;
+    public string Quality
+    {
+        get => _quality;
+        internal set => _quality = string.IsNullOrWhiteSpace(value) 
+            ? string.Empty 
+            : value;
+    }
 
     public int? Year { get; internal set; }
 

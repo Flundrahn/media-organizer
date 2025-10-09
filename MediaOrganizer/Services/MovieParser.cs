@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 using MediaOrganizer.Models;
@@ -76,53 +75,46 @@ public class MovieParser : IMediaFileParser
 
     public IMediaFile Parse(IFileInfo fileInfo)
     {
-        var movie = new Movie(fileInfo);
-        var filename = fileInfo.Name;
-        
-        // Remove file extension for parsing
-        var nameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
+        var nameWithoutExtension = Path.GetFileNameWithoutExtension(fileInfo.Name);
 
         foreach (var pattern in AllPatterns)
         {
             var match = pattern.Match(nameWithoutExtension);
-            if (match.Success)
+            if (!match.Success)
             {
-                // Extract title and clean it up
-                var title = ExtractAndCleanTitle(match.Groups["title"].Value);
-                if (!string.IsNullOrWhiteSpace(title))
-                {
-                    movie.Title = title;
-                }
-
-                // Extract year if present
-                if (match.Groups["year"].Success && int.TryParse(match.Groups["year"].Value, out int year))
-                {
-                    movie.Year = year;
-                }
-
-                // Extract quality if present
-                if (match.Groups["quality"].Success)
-                {
-                    movie.Quality = match.Groups["quality"].Value;
-                }
-                break; // Use the first successful match
+                continue;
             }
+
+            string title = ExtractAndCleanTitle(match.Groups["title"].Value);
+            int? year = match.Groups["year"].Success
+                ? int.Parse(match.Groups["year"].Value)
+                : null;
+            string quality = match.Groups["quality"].Success
+                ? match.Groups["quality"].Value
+                : null;
+
+            return new Movie(fileInfo)
+            {
+                Title = title,
+                Year = year,
+                Quality = quality
+            };
         }
 
-        return movie;
+        return new Movie(fileInfo);
     }
 
-   private static string ExtractAndCleanTitle(string rawTitle)
+    private static string ExtractAndCleanTitle(string rawTitle)
     {
         if (string.IsNullOrWhiteSpace(rawTitle))
             return string.Empty;
 
         // Replace dots with spaces for dotted titles
         var title = rawTitle.Replace('.', ' ');
-        
+
         // Clean up extra whitespace
         title = Regex.Replace(title, @"\s+", " ").Trim();
-        
+
         // Capitalize properly (basic title case)
         return ToTitleCase(title);
         // return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(title);
@@ -171,7 +163,7 @@ public class MovieParser : IMediaFileParser
     {
         if (string.IsNullOrEmpty(word))
             return word;
-        
+
         return char.ToUpper(word[0]) + word.Substring(1);
     }
 }

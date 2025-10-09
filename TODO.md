@@ -46,6 +46,11 @@
 - [ ] Use microsoft package for console options that can display usage and so on.
 - [ ] Settings validate one property at a time in own method
 - [ ] Add quality to TvShowEpisode and parser
+- [ ] Problem: does not use the full path when organizing media, if put year in folder cannot put it back in file.
+- [ ] Problem: does not move auxiliary files along with main video for movie or tv show.
+- [ ] Problem: does not rename subtitle files along with corresponding video file
+- [ ] Bug: consumes character when pressing esc to go back
+- [ ] Feature: cleanup jpg and nfo (and txt?)
 
 ## Nice to Have 🌟
 

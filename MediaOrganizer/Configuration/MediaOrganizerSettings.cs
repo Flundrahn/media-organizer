@@ -116,8 +116,6 @@ public class MediaOrganizerSettings
     /// Validates the configuration settings
     /// </summary>
     /// <returns>True if configuration is valid</returns>
-    
-    // NOTE: Possibly extract validation to own class
     public bool IsValid()
     {
         if (_validator is null)

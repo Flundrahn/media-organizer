@@ -142,154 +142,164 @@ public class MediaOrganizerSettings
         }
 
         _validationErrors.Clear();
-        var isValid = true;
+        bool isValid = true;
 
-        if (string.IsNullOrWhiteSpace(TvShowSourceDirectory))
-        {
-            _validationErrors.Add("TvShowSourceDirectory is required");
-            isValid = false;
-        }
-        else if (!_validator.DirectoryExists(TvShowSourceDirectory))
-        {
-            _validationErrors.Add($"TvShowSourceDirectory does not exist: {TvShowSourceDirectory}");
-            isValid = false;
-        }
+        // bitwise AND operation, once false stays false
+        isValid &= ValidateTvShowSourceDirectory();
+        isValid &= ValidateTvShowDestinationDirectory();
+        isValid &= ValidateMovieSourceDirectory();
+        isValid &= ValidateMovieDestinationDirectory();
+        isValid &= ValidateTvShowPathTemplate();
+        isValid &= ValidateMoviePathTemplate();
+        isValid &= ValidateVideoFileExtensions();
 
+        return isValid;
+    }
+
+    private bool ValidateTvShowSourceDirectory()
+    {
+        return ValidateSourceDirectory(TvShowSourceDirectory, nameof(TvShowSourceDirectory));
+    }
+
+    private bool ValidateTvShowDestinationDirectory()
+    {
         if (string.IsNullOrWhiteSpace(TvShowDestinationDirectory))
         {
-            _validationErrors.Add("TvShowDestinationDirectory is required");
-            isValid = false;
+            _validationErrors.Add($"{nameof(TvShowDestinationDirectory)} is required");
+            return false;
         }
-        else if (!_validator.DirectoryIsWriteable(TvShowDestinationDirectory))
+        
+        if (!_validator!.DirectoryIsWriteable(TvShowDestinationDirectory))
         {
-            _validationErrors.Add("TvShowDestinationDirectory is not writable or cannot be created");
-            isValid = false;
+            _validationErrors.Add($"{nameof(TvShowDestinationDirectory)} is not writable or cannot be created");
+            return false;
         }
 
-        if (string.IsNullOrWhiteSpace(MovieSourceDirectory))
+        return true;
+    }
+
+    private bool ValidateMovieSourceDirectory()
+    {
+        return ValidateSourceDirectory(MovieSourceDirectory, nameof(MovieSourceDirectory));
+    }
+
+    private bool ValidateSourceDirectory(string directory, string directoryName)
+    {
+        if (string.IsNullOrWhiteSpace(directory))
         {
-            _validationErrors.Add("MovieSourceDirectory is required");
-            isValid = false;
+            _validationErrors.Add($"{directoryName} is required");
+            return false;
         }
-        else if (!_validator.DirectoryExists(MovieSourceDirectory))
+        
+        if (!_validator!.DirectoryExists(directory))
         {
-            _validationErrors.Add($"MovieSourceDirectory does not exist: {MovieSourceDirectory}");
-            isValid = false;
+            _validationErrors.Add($"{directoryName} does not exist: {directory}");
+            return false;
         }
 
+        return true;
+    }
+
+    private bool ValidateMovieDestinationDirectory()
+    {
         if (string.IsNullOrWhiteSpace(MovieDestinationDirectory))
         {
-            _validationErrors.Add("MovieDestinationDirectory is required");
-            isValid = false;
+            _validationErrors.Add($"{nameof(MovieDestinationDirectory)} is required");
+            return false;
         }
-        else if (!_validator.DirectoryIsWriteable(MovieDestinationDirectory))
+        
+        if (!_validator!.DirectoryIsWriteable(MovieDestinationDirectory))
         {
-            _validationErrors.Add("MovieDestinationDirectory is not writable or cannot be created");
-            isValid = false;
+            _validationErrors.Add($"{nameof(MovieDestinationDirectory)} is not writable or cannot be created");
+            return false;
         }
 
-        if (string.IsNullOrWhiteSpace(TvShowPathTemplate))
-        {
-            _validationErrors.Add("TvShowPathTemplate is required");
-            isValid = false;
-        }
-        else
-        {
-            // Validate placeholders in the template using the valid placeholders from TvShowEpisode
-            var placeholderMatches = Regex.Matches(TvShowPathTemplate, @"\{([^}:]*)[^}]*\}");
+        return true;
+    }
 
-            foreach (Match match in placeholderMatches)
+    private bool ValidateTvShowPathTemplate()
+    {
+        return ValidateMediaPathTemplate(TvShowPathTemplate, nameof(TvShowPathTemplate), TvShowEpisode.ValidPlaceholders);
+    }
+
+    private bool ValidateMoviePathTemplate()
+    {
+        return ValidateMediaPathTemplate(MoviePathTemplate, nameof(MoviePathTemplate), Movie.ValidPlaceholders);
+    }
+
+    private bool ValidateMediaPathTemplate(string template, string templateName, HashSet<string> validPlaceholders)
+    {
+        if (string.IsNullOrWhiteSpace(template))
+        {
+            _validationErrors.Add($"{templateName} is required");
+            return false;
+        }
+
+        var isValid = true;
+
+        // Validate placeholders in the template using the valid placeholders
+        var placeholderMatches = Regex.Matches(template, @"\{([^}:]*)[^}]*\}");
+        foreach (Match match in placeholderMatches)
+        {
+            var placeholderName = match.Groups[1].Value;
+            if (!validPlaceholders.Contains(placeholderName))
             {
-                var placeholderName = match.Groups[1].Value;
-                if (!TvShowEpisode.ValidPlaceholders.Contains(placeholderName))
-                {
-                    _validationErrors.Add($"TvShowPathTemplate contains invalid placeholder: {{{placeholderName}}}");
-                    isValid = false;
-                }
-            }
-
-            // Validate path characters by removing placeholders and checking segments
-            var templateWithoutPlaceholders = Regex.Replace(
-                TvShowPathTemplate,
-                @"\{[^}]*\}",
-                "X"); // Replace placeholders with a safe character
-
-            var pathParts = templateWithoutPlaceholders.Split('/', '\\');
-            if (_validator != null && !_validator.AreValidPathSegments(pathParts))
-            {
-                _validationErrors.Add("TvShowPathTemplate contains invalid path characters");
+                _validationErrors.Add($"{templateName} contains invalid placeholder: {{{placeholderName}}}");
                 isValid = false;
             }
         }
 
-        if (string.IsNullOrWhiteSpace(MoviePathTemplate))
+        // Validate path characters by removing placeholders and checking segments
+        var templateWithoutPlaceholders = Regex.Replace(
+            template,
+            @"\{[^}]*\}",
+            "X"); // Replace placeholders with a safe character
+
+        var pathParts = templateWithoutPlaceholders.Split('/', '\\');
+        if (_validator != null && !_validator.AreValidPathSegments(pathParts))
         {
-            _validationErrors.Add("MoviePathTemplate is required");
+            _validationErrors.Add($"{templateName} contains invalid path characters");
             isValid = false;
         }
-        else
-        {
-            // Validate placeholders in the template using the valid placeholders from Movie
-            var placeholderMatches = Regex.Matches(MoviePathTemplate, @"\{([^}:]*)[^}]*\}");
 
-            foreach (Match match in placeholderMatches)
-            {
-                var placeholderName = match.Groups[1].Value;
-                if (!Movie.ValidPlaceholders.Contains(placeholderName))
-                {
-                    _validationErrors.Add($"MoviePathTemplate contains invalid placeholder: {{{placeholderName}}}");
-                    isValid = false;
-                }
-            }
+        return isValid;
+    }
 
-            // Validate path characters by removing placeholders and checking segments
-            var movieTemplateWithoutPlaceholders = Regex.Replace(
-                MoviePathTemplate,
-                @"\{[^}]*\}",
-                "X"); // Replace placeholders with a safe character
-
-            var moviePathParts = movieTemplateWithoutPlaceholders.Split('/', '\\');
-            if (_validator != null && !_validator.AreValidPathSegments(moviePathParts))
-            {
-                _validationErrors.Add("MoviePathTemplate contains invalid path characters");
-                isValid = false;
-            }
-        }
-
+    private bool ValidateVideoFileExtensions()
+    {
         // Validate video file extensions
         if (VideoFileExtensions == null || VideoFileExtensions.Count == 0)
         {
             _validationErrors.Add("VideoFileExtensions must contain at least one extension");
-            isValid = false;
+            return false;
         }
-        else
+
+        var isValid = true;
+        foreach (var extension in VideoFileExtensions)
         {
-            foreach (var extension in VideoFileExtensions)
+            if (string.IsNullOrWhiteSpace(extension))
             {
-                if (string.IsNullOrWhiteSpace(extension))
-                {
-                    _validationErrors.Add("VideoFileExtensions cannot contain empty or whitespace extensions");
-                    isValid = false;
-                    break;
-                }
+                _validationErrors.Add("VideoFileExtensions cannot contain empty or whitespace extensions");
+                isValid = false;
+                break;
+            }
 
-                if (!extension.StartsWith('.'))
-                {
-                    _validationErrors.Add($"VideoFileExtensions must start with a dot: '{extension}'");
-                    isValid = false;
-                }
+            if (!extension.StartsWith('.'))
+            {
+                _validationErrors.Add($"VideoFileExtensions must start with a dot: '{extension}'");
+                isValid = false;
+            }
 
-                if (extension.Length < 2)
-                {
-                    _validationErrors.Add($"VideoFileExtensions must have at least one character after the dot: '{extension}'");
-                    isValid = false;
-                }
+            if (extension.Length < 2)
+            {
+                _validationErrors.Add($"VideoFileExtensions must have at least one character after the dot: '{extension}'");
+                isValid = false;
+            }
 
-                if (_validator != null && !_validator.IsValidPathSegment(extension))
-                {
-                    _validationErrors.Add($"VideoFileExtensions contains invalid characters: '{extension}'");
-                    isValid = false;
-                }
+            if (_validator != null && !_validator.IsValidPathSegment(extension))
+            {
+                _validationErrors.Add($"VideoFileExtensions contains invalid characters: '{extension}'");
+                isValid = false;
             }
         }
 

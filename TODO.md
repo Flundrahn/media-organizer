@@ -66,12 +66,13 @@ Add support for organizing movie files alongside TV shows by creating a common m
 - [x] Update DI registration for new parsers
 - [x] Add movie-specific unit tests
 - [x] Add movie integration tests using `TempMediaTestEnvironment`
-- [ ] Update configuration validation for movie path templates
+- [x] Update configuration validation for readability
 - [ ] Update file provider to ignore specific folders such as "Featurettes", "Extras", "Behind the Scenes"
 
 #### Phase 5: Polish 💎
 - [x] Update console UI to show media type in file listings
 - [x] Add validation for movie path template placeholders
+- [ ] Cleanup legacy directories in settings and references
 - [ ] Update documentation and examples
 
 ### Example Movie Patterns
@@ -141,12 +142,10 @@ The\.Movie\.Title\.(\d{4})\.(\d{4}p)\..*
 - [ ] No graceful handling of locked files
 
 ## Development Notes 📝
-- Keep backward compatibility with existing configuration files
 - Maintain comprehensive test coverage for new features
 - Follow .NET best practices and patterns
 - Consider performance impact of new features
 - Prioritize core functionality over nice-to-have features
-
 
 ## Won't Do
 - [ ] Support for additional media formats (images, audio)

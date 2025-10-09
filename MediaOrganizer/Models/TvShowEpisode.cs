@@ -64,19 +64,10 @@ public class TvShowEpisode : IMediaFile
             || string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))
             return false;
 
-        // TODO: probably remove this try catch, seems better let error propagate with full info
-        // else will just say it is not organzied, when in reality something else may be wrong
-        try
-        {
-            var organizedFullPath = GenerateFullPath(settings);
-            var currentFullPath = Path.GetFullPath(CurrentFile.FullName); // Helps normalize for path comparison
+        var organizedFullPath = GenerateFullPath(settings);
+        var currentFullPath = Path.GetFullPath(CurrentFile.FullName); // Helps normalize for path comparison
 
-            return string.Equals(currentFullPath, organizedFullPath, StringComparison.OrdinalIgnoreCase);
-        }
-        catch
-        {
-            return false;
-        }
+        return string.Equals(currentFullPath, organizedFullPath, StringComparison.OrdinalIgnoreCase);
     }
 
     public string GenerateFullPath(MediaOrganizerSettings settings)
@@ -92,7 +83,7 @@ public class TvShowEpisode : IMediaFile
     {
         if (string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))
             throw new ArgumentException("TvShowPathTemplate cannot be empty or whitespace.", nameof(settings));
-            
+
         return GenerateRelativePathInternal(settings.TvShowPathTemplate);
     }
 
@@ -100,10 +91,10 @@ public class TvShowEpisode : IMediaFile
     {
         if (template is null)
             throw new ArgumentNullException(nameof(template));
-            
+
         if (string.IsNullOrWhiteSpace(template))
             throw new ArgumentException("Template cannot be empty or whitespace.", nameof(template));
-            
+
         if (!IsValid)
             throw new InvalidOperationException("Cannot generate path for an invalid TV show episode.");
 
@@ -128,10 +119,10 @@ public class TvShowEpisode : IMediaFile
         // Clean up any double path separators that might have been created
         var doublePathSep = $"{Path.DirectorySeparatorChar}{Path.DirectorySeparatorChar}";
         result = result.Replace(doublePathSep, Path.DirectorySeparatorChar.ToString());
-        
+
         // Clean up patterns where Year was empty - remove empty parentheses
         result = Regex.Replace(result, @"\s*\(\s*\)", "");
-        
+
         // Clean up extra spaces
         result = Regex.Replace(result, @"\s+", " ").Trim();
 

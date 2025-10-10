@@ -11,3 +11,4 @@ obj/
 .ionide
 appsettings.Development.json
 README.md
+/.vs

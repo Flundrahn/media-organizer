@@ -1,56 +1,26 @@
 # Media Organizer - TODO
 
-## Done ✅
-- [x] Configuration loading from appsettings.json
-- [x] File system validation with proper error reporting
-- [x] Interactive main menu with file count display
-- [x] Video file discovery with extension filtering (.mp4, .avi, .mkv, .mov, .wmv)
-- [x] Subdirectory inclusion/exclusion support
-- [x] File listing with sizes and full paths
-- [x] Options pattern for dependency injection
-- [x] Comprehensive test coverage (23/23 tests passing)
-- [x] IFileInfo integration for enhanced file metadata
-- [x] File size formatting (B, KB, MB, GB, TB)
-- [x] Clean architecture with proper service separation
-- [x] Console output abstraction for testability
-- [x] Tv show file parser.
-- [x] File organization/moving functionality
-- [x] Basic logging system
-- [x] Different file renaming patterns
-- [x] Fix bug with unparse-able file spaced with spaces instead of dots
-- [x] Use env dependent path separation character
-- [x] Fix bugs with certain unparse-able files
-- [x] Support using full paths for organizing tv show files to search within existing show and episode directories
-- [x] Interactive file organization with options to organize one file at a time, skip files, or organize all remaining files
-- [x] Add support to configure allowed video file extensions
-- [x] Add support to clean up empty directories after moving files
-- [x] Add some integration tests
-- [x] Refactor before continuing movie feature
-    - factory methods to create specific organizer
-    - rename parser interface to make generic
-    - update config of file provider
-    - inject configured file provider into organizer in factory method: ended up not doing. Nice and decoupled to inject FileInfos into ctor of organizer.
-- [x] Movie feature
-- [x] Extract cleanup module from MediaFileOrganizer, it should be independend module.
-- [x] Complete cleanup directory console UI to able manually cleanup either tv show or movie directories.
+## 🔥 Currently Working On
 
-## Doing
+## 🚨 Critical Issues (Fix First)
+- [ ] **Problem: does not move auxiliary files along with main video for movie or tv show** - Core functionality gap
+- [ ] **Problem: does not rename subtitle files along with corresponding video file** - Related to above
+- [ ] **Problem: does not use the full path when organizing media, if put year in folder cannot put it back in file** - Core functionality issue
 
-## TODO - Core Features
+## 🔧 High Priority - Core Improvements
+- [ ] **File organization/moving: Strategy pattern for different organization methods** - Architecture improvement
+- [ ] **Cleanup double validation TvShow and movie model** - Code quality
+- [ ] **Settings validate one property at a time in own method** - Code quality
+- [ ] **Feature: cleanup jpg and nfo (and txt?) files** - Extends existing cleanup feature
 
-- [ ] File organization/moving: Strategy pattern for different organization methods
-- [ ] Add readme
-- [ ] Add smooth build and publish setup, maybe checkout GitHub actions and release.
-- [ ] Possibly refactor MediaOrganizerService into Program.cs, just extract parts that build app and so on, make clear which parts are logic and which parts are UI.
-- [ ] Cleanup double validation TvShow and movie model
-- [ ] Use microsoft package for console options that can display usage and so on.
-- [ ] Settings validate one property at a time in own method
-- [ ] Add quality to TvShowEpisode and parser
-- [ ] Problem: does not use the full path when organizing media, if put year in folder cannot put it back in file.
-- [ ] Problem: does not move auxiliary files along with main video for movie or tv show.
-- [ ] Problem: does not rename subtitle files along with corresponding video file
-- [ ] Bug: consumes character when pressing esc to go back
-- [ ] Feature: cleanup jpg and nfo (and txt?)
+## 📚 Documentation & DevEx
+- [ ] **Add readme** - Essential for project usability
+- [ ] **Add smooth build and publish setup, maybe checkout GitHub actions and release** - DevEx
+- [ ] **Use microsoft package for console options that can display usage and so on** - Better CLI UX
+
+## 🏗️ Refactoring & Architecture
+- [ ] **Possibly refactor MediaOrganizerService into Program.cs** - Separate UI from logic
+- [ ] **Add quality to TvShowEpisode and parser** - Feature enhancement
 
 ## Nice to Have 🌟
 
@@ -66,7 +36,7 @@
 - [ ] File preview/details view with metadata
 - [ ] Filtering options (by size, date, extension)
 - [ ] Recent operations history
-- [ ] Default to destination folders same as source - unless specified.
+- [ ] Default to destination folders same as source - unless specified
 
 ### Advanced Features
 - [ ] Metadata extraction (resolution, duration, codec info)
@@ -92,11 +62,35 @@
 - [ ] Large directory scanning may be slow
 - [ ] No graceful handling of locked files
 
-## Development Notes 📝
-- Maintain comprehensive test coverage for new features
-- Follow .NET best practices and patterns
-- Consider performance impact of new features
-- Prioritize core functionality over nice-to-have features
-
 ## Won't Do
 - [ ] Support for additional media formats (images, audio)
+
+## Done 
+- [x] Configuration loading from appsettings.json
+- [x] File system validation with proper error reporting
+- [x] Interactive main menu with file count display
+- [x] Video file discovery with extension filtering (.mp4, .avi, .mkv, .mov, .wmv)
+- [x] Subdirectory inclusion/exclusion support
+- [x] File listing with sizes and full paths
+- [x] Options pattern for dependency injection
+- [x] Comprehensive test coverage (23/23 tests passing)
+- [x] IFileInfo integration for enhanced file metadata
+- [x] File size formatting (B, KB, MB, GB, TB)
+- [x] Clean architecture with proper service separation
+- [x] Console output abstraction for testability
+- [x] Tv show file parser
+- [x] File organization/moving functionality
+- [x] Basic logging system
+- [x] Different file renaming patterns
+- [x] Fix bug with unparse-able file spaced with spaces instead of dots
+- [x] Use env dependent path separation character
+- [x] Fix bugs with certain unparse-able files
+- [x] Support using full paths for organizing tv show files to search within existing show and episode directories
+- [x] Interactive file organization with options to organize one file at a time, skip files, or organize all remaining files
+- [x] Add support to configure allowed video file extensions
+- [x] Add support to clean up empty directories after moving files
+- [x] Add some integration tests
+- [x] Refactor before continuing movie feature
+- [x] Movie feature
+- [x] Extract cleanup module from MediaFileOrganizer, it should be independent module
+- [x] Complete cleanup directory console UI to able manually cleanup either tv show or movie directories

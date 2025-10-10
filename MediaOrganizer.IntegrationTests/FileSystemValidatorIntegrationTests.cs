@@ -2,7 +2,7 @@ using System.IO.Abstractions;
 using MediaOrganizer.IntegrationTests.TestHelpers;
 using MediaOrganizer.Validations;
 
-namespace MediaOrganizer.IntegrationTests.Validations;
+namespace MediaOrganizer.IntegrationTests;
 
 /// <summary>
 /// Integration tests for FileSystemValidations using real file system I/O

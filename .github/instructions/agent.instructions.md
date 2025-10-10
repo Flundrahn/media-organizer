@@ -24,3 +24,9 @@ Use for manual commands: builds, git, app runs, PowerShell
 ### Workflow
 1. Start `test-watch` task in background
 2. Make changes, check test output, manual operations in secondary terminal
+
+## Development Notes
+- Maintain comprehensive test coverage for new features
+- Follow .NET best practices and patterns
+- Consider performance impact of new features
+- Prioritize core functionality over nice-to-have features

@@ -1,6 +1,7 @@
 # Media Organizer - TODO
 
 ## 🔥 Currently Working On
+<!-- Move items here when actively working on them -->
 
 ## 🚨 Critical Issues (Fix First)
 - [ ] **Problem: does not move auxiliary files along with main video for movie or tv show** - Core functionality gap
@@ -25,7 +26,6 @@
 ## Nice to Have 🌟
 
 ### Core Features
-- [ ] Generate regex in compile time for performance
 - [ ] Batch operations with progress tracking
 - [ ] Better error handling and user feedback
 - [ ] Undo operations for file moves
@@ -43,6 +43,7 @@
 - [ ] Performance optimizations for large directories
 - [ ] Async operations for better responsiveness
 - [ ] Plugin/extension system for custom processors
+- [ ] Add DB to keep state of media directories. Can 
 
 ### Configuration & Automation
 - [ ] Export/import settings profiles
@@ -73,7 +74,7 @@
 - [x] Subdirectory inclusion/exclusion support
 - [x] File listing with sizes and full paths
 - [x] Options pattern for dependency injection
-- [x] Comprehensive test coverage (23/23 tests passing)
+- [x] Comprehensive test coverage (268/268 tests passing)
 - [x] IFileInfo integration for enhanced file metadata
 - [x] File size formatting (B, KB, MB, GB, TB)
 - [x] Clean architecture with proper service separation
@@ -94,3 +95,4 @@
 - [x] Movie feature
 - [x] Extract cleanup module from MediaFileOrganizer, it should be independent module
 - [x] Complete cleanup directory console UI to able manually cleanup either tv show or movie directories
+- [x] **Generate regex in compile time for performance** - Implemented RegexOptions.Compiled for better performance

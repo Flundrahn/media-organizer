@@ -1,60 +1,45 @@
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 using MediaOrganizer.Models;
+using MediaOrganizer.Utils;
 
 namespace MediaOrganizer.Services;
 
-public class MovieParser : IMediaFileParser
+public partial class MovieParser : IMediaFileParser
 {
-    // Example: "Grandmas Boy 2006 UNRATED 1080p BluRay HEVC x265 5.1 BONE.mkv"
-    private static readonly Regex MovieWithYearAndQualityPattern = new(
-        @"^(?<title>.+?)\s+(?<year>\d{4})\s+(?:UNRATED\s+)?(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<title>.+?)\s+(?<year>\d{4})\s+(?:UNRATED\s+)?(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
+    private static partial Regex MovieWithYearAndQualityPattern();
 
-    // Example: "A Brilliant Young Mind (2014) (1080p BluRay x265 10bit Tigole).mkv"
-    private static readonly Regex MovieWithYearInParenthesesPattern = new(
-        @"^(?<title>.+?)\s+\((?<year>\d{4})\)\s+\((?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<title>.+?)\s+\((?<year>\d{4})\)\s+\((?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
+    private static partial Regex MovieWithYearInParenthesesPattern();
 
-    // Example: "Clash.Of.The.Titans.1981.1080p.BluRay.x264-[YTS.AM].mp4"
-    private static readonly Regex MovieWithDotsPattern = new(
-        @"^(?<title>(?:[A-Za-z0-9]+\.)*[A-Za-z0-9]+)\.(?<year>\d{4})\.(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<title>(?:[A-Za-z0-9]+\.)*[A-Za-z0-9]+)\.(?<year>\d{4})\.(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
+    private static partial Regex MovieWithDotsPattern();
 
-    // Example: "Interstellar 1080p.mkv", "Thor Ragnarok 1080p.mkv" 
-    private static readonly Regex MovieSimpleWithQualityPattern = new(
-        @"^(?<title>.+?)\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<title>.+?)\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
+    private static partial Regex MovieSimpleWithQualityPattern();
 
-    // Example: "Superman 2025", "Wonder Woman 1984"
-    private static readonly Regex MovieWithYearPattern = new(
-        @"^(?<title>.+?)\s+(?<year>\d{4})",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<title>.+?)\s+(?<year>\d{4})", RegexOptions.IgnoreCase)]
+    private static partial Regex MovieWithYearPattern();
 
-    // Example: "Thunderbolts.2025.Proper.1080p.WEB-DL.DDP5.1.x265-NeoNoir"
-    private static readonly Regex MovieComplexDotsPattern = new(
-        @"^(?<title>(?:[A-Za-z0-9]+\.)*[A-Za-z0-9]+)\.(?<year>\d{4})\.(?:[A-Za-z0-9\-\.]+\.)*(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<title>(?:[A-Za-z0-9]+\.)*[A-Za-z0-9]+)\.(?<year>\d{4})\.(?:[A-Za-z0-9\-\.]+\.)*(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
+    private static partial Regex MovieComplexDotsPattern();
 
-    // Example: "Solo A Star Wars Story 2160p.mkv" - title with spaces followed by quality
-    private static readonly Regex MovieLongTitleWithQualityPattern = new(
-        @"^(?<title>(?:[A-Za-z]+\s+){2,}[A-Za-z]+)\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<title>(?:[A-Za-z]+\s+){2,}[A-Za-z]+)\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
+    private static partial Regex MovieLongTitleWithQualityPattern();
 
-    // Example: "Samsara 1080p.mkv", "Tolkien 1080p.mp4" - simple title with quality
-    private static readonly Regex MovieSimpleTitlePattern = new(
-        @"^(?<title>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+\d{3,4}p|\s+4K|\s+UHD|\s+HDR|$)",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<title>[A-Za-z][A-ZaZ\s]*[A-ZaZe])(?:\s+\d{3,4}p|\s+4K|\s+UHD|\s+HDR|$)", RegexOptions.IgnoreCase)]
+    private static partial Regex MovieSimpleTitlePattern();
 
     private static readonly Regex[] AllPatterns = [
-        MovieWithYearAndQualityPattern,
-        MovieWithYearInParenthesesPattern,
-        MovieWithDotsPattern,
-        MovieComplexDotsPattern,
-        MovieLongTitleWithQualityPattern,
-        MovieSimpleWithQualityPattern,
-        MovieWithYearPattern,
-        MovieSimpleTitlePattern
+        MovieWithYearAndQualityPattern(),
+        MovieWithYearInParenthesesPattern(),
+        MovieWithDotsPattern(),
+        MovieComplexDotsPattern(),
+        MovieLongTitleWithQualityPattern(),
+        MovieSimpleWithQualityPattern(),
+        MovieWithYearPattern(),
+        MovieSimpleTitlePattern()
     ];
 
     public bool CanParse(string filename)
@@ -91,7 +76,7 @@ public class MovieParser : IMediaFileParser
                 : null;
             string quality = match.Groups["quality"].Success
                 ? match.Groups["quality"].Value
-                : null;
+                : string.Empty;
 
             return new Movie(fileInfo)
             {
@@ -112,12 +97,11 @@ public class MovieParser : IMediaFileParser
         // Replace dots with spaces for dotted titles
         var title = rawTitle.Replace('.', ' ');
 
-        // Clean up extra whitespace
-        title = Regex.Replace(title, @"\s+", " ").Trim();
+        // Clean up extra whitespace using source-generated regex
+        title = RegexUtils.WhitespacePattern().Replace(title, " ").Trim();
 
         // Capitalize properly (basic title case)
         return ToTitleCase(title);
-        // return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(title);
     }
 
     private static string ToTitleCase(string input)
@@ -144,7 +128,6 @@ public class MovieParser : IMediaFileParser
             }
         }
 
-        // Always capitalize the first word
         if (titleCaseWords.Count > 0)
         {
             titleCaseWords[0] = CapitalizeFirstWord(titleCaseWords[0]);

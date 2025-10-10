@@ -2,52 +2,45 @@ using System.Text.RegularExpressions;
 using System.IO.Abstractions;
 using MediaOrganizer.Models;
 using System.Globalization;
+using MediaOrganizer.Utils;
 
 namespace MediaOrganizer.Services;
 
-public class TvShowEpisodeParser : IMediaFileParser
+public partial class TvShowEpisodeParser : IMediaFileParser
 {
-    private static readonly Regex StandardSxxExxPattern = new(
-        @"^(?<showName>.+?)(?:\.(?<year>\d{4}))?\.S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<showName>.+?)(?:\.(?<year>\d{4}))?\.S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?", RegexOptions.IgnoreCase)]
+    private static partial Regex StandardSxxExxPattern();
 
-    private static readonly Regex YearBeforeSxxExxPattern = new(
-        @"^(?<showName>.+?)\s+(?<year>\d{4})\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD))?",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<showName>.+?)\s+(?<year>\d{4})\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD))?", RegexOptions.IgnoreCase)]
+    private static partial Regex YearBeforeSxxExxPattern();
 
-    private static readonly Regex YearInParenthesesPattern = new(
-        @"^(?<showName>.+?)\s+\((?<year>\d{4})\)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<showName>.+?)\s+\((?<year>\d{4})\)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?", RegexOptions.IgnoreCase)]
+    private static partial Regex YearInParenthesesPattern();
 
-    private static readonly Regex SeasonXEpisodePattern = new(
-        @"^(?<showName>.+?)\s+(?<season>\d{1,2})x(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<showName>.+?)\s+(?<season>\d{1,2})x(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])", RegexOptions.IgnoreCase)]
+    private static partial Regex SeasonXEpisodePattern();
 
-    private static readonly Regex SpacedSxxExxWithTitlePattern = new(
-        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD))?",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD))?", RegexOptions.IgnoreCase)]
+    private static partial Regex SpacedSxxExxWithTitlePattern();
 
-    private static readonly Regex DashedSxxExxWithTitlePattern = new(
-        @"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+S(?<season>\d{1,2})E(?<episode>\d{1,2}))?\s+-\s+(?<episodeTitle>.+)",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+S(?<season>\d{1,2})E(?<episode>\d{1,2}))?\s+-\s+(?<episodeTitle>.+)", RegexOptions.IgnoreCase)]
+    private static partial Regex DashedSxxExxWithTitlePattern();
 
-    private static readonly Regex SpacedSxxExxWithQualityPattern = new(
-        @"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
+    private static partial Regex SpacedSxxExxWithQualityPattern();
 
-    private static readonly Regex DashedSxxExxPattern = new(
-        @"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})",
-        RegexOptions.IgnoreCase);
+    [GeneratedRegex(@"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})", RegexOptions.IgnoreCase)]
+    private static partial Regex DashedSxxExxPattern();
 
     private static readonly Regex[] AllPatterns = [
-        StandardSxxExxPattern,
-        YearBeforeSxxExxPattern,
-        YearInParenthesesPattern,
-        SeasonXEpisodePattern,
-        SpacedSxxExxWithTitlePattern,
-        DashedSxxExxWithTitlePattern,
-        SpacedSxxExxWithQualityPattern,
-        DashedSxxExxPattern
+        StandardSxxExxPattern(),
+        YearBeforeSxxExxPattern(),
+        YearInParenthesesPattern(),
+        SeasonXEpisodePattern(),
+        SpacedSxxExxWithTitlePattern(),
+        DashedSxxExxWithTitlePattern(),
+        SpacedSxxExxWithQualityPattern(),
+        DashedSxxExxPattern()
     ];
 
     public bool CanParse(string filename)
@@ -106,9 +99,10 @@ public class TvShowEpisodeParser : IMediaFileParser
                               .Replace("_", " ")
                               .Trim();
 
-        // Remove extra spaces
-        cleaned = Regex.Replace(cleaned, @"\s+", " ");
+        // Remove extra spaces using source-generated regex
+        cleaned = RegexUtils.WhitespacePattern().Replace(cleaned, " ");
 
+        // TODO: use own title case method, put in stringUtils class
         return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cleaned);
     }
 
@@ -122,15 +116,15 @@ public class TvShowEpisodeParser : IMediaFileParser
                                  .Replace("_", " ")
                                  .Trim();
 
-        // Remove extra spaces
-        cleaned = Regex.Replace(cleaned, @"\s+", " ");
+        // Remove extra spaces using source-generated regex
+        cleaned = RegexUtils.WhitespacePattern().Replace(cleaned, " ");
 
-        // Return empty string if it looks like quality info or metadata (single letters, numbers, or quality terms)
+        // Return empty string if it looks like quality info or metadata
         if (string.IsNullOrWhiteSpace(cleaned) ||
             cleaned.Length <= 2 ||
-            Regex.IsMatch(cleaned, @"^\d+$") ||  // Just numbers
-            Regex.IsMatch(cleaned, @"^[A-Z]$") || // Single letter
-            Regex.IsMatch(cleaned, @"^(480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD|REPACK)$", RegexOptions.IgnoreCase))
+            RegexUtils.NumbersOnlyPattern().IsMatch(cleaned) ||
+            RegexUtils.SingleLetterPattern().IsMatch(cleaned) || 
+            RegexUtils.QualityTermsPattern().IsMatch(cleaned))  
             return "";
 
         return cleaned;

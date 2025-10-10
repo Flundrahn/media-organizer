@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediaOrganizer.Tests", "Med
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaOrganizer.IntegrationTests", "MediaOrganizer.IntegrationTests\MediaOrganizer.IntegrationTests.csproj", "{A3C238EA-AC7F-4225-BDD8-DA7D4AEC83E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaOrganizer.Benchmarks", "MediaOrganizer.Benchmarks\MediaOrganizer.Benchmarks.csproj", "{504BF465-8762-4142-A221-71C703E001C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{A3C238EA-AC7F-4225-BDD8-DA7D4AEC83E0}.Release|x64.Build.0 = Release|Any CPU
 		{A3C238EA-AC7F-4225-BDD8-DA7D4AEC83E0}.Release|x86.ActiveCfg = Release|Any CPU
 		{A3C238EA-AC7F-4225-BDD8-DA7D4AEC83E0}.Release|x86.Build.0 = Release|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Debug|x64.Build.0 = Debug|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Debug|x86.Build.0 = Debug|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Release|x64.ActiveCfg = Release|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Release|x64.Build.0 = Release|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Release|x86.ActiveCfg = Release|Any CPU
+		{504BF465-8762-4142-A221-71C703E001C8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

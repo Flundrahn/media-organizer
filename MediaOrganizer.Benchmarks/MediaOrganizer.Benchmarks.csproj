@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.15.4" />
     <PackageReference Include="FFMpegCore" Version="5.2.0" />
-    <PackageReference Include="MediaInfoDotNet" Version="0.7.79.40925" />
+    <PackageReference Include="MediaInfoDotNet" Version="0.7.79.40925" NoWarn="NU1701" />
   </ItemGroup>
 
   <ItemGroup>

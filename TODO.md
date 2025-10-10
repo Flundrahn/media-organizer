@@ -4,8 +4,8 @@
 <!-- Move items here when actively working on them -->
 
 ## 🚨 Critical Issues (Fix First)
-- [ ] **Problem: does not move auxiliary files along with main video for movie or tv show** - Core functionality gap
-- [ ] **Problem: does not rename subtitle files along with corresponding video file** - Related to above
+- [ ] **Problem: does not move auxiliary files along with main video for movie or tv show** - Core functionality gap - Possibly this would be easier if we store actual show and movie metadata in DB or corresponding.
+- [ ] **Problem: does not rename subtitle files along with corresponding video file** - Related to above, possibly wait if will add DB anyway.
 - [ ] **Problem: does not use the full path when organizing media, if put year in folder cannot put it back in file** - Core functionality issue
 
 ## 🔧 High Priority - Core Improvements
@@ -43,7 +43,7 @@
 - [ ] Performance optimizations for large directories
 - [ ] Async operations for better responsiveness
 - [ ] Plugin/extension system for custom processors
-- [ ] Add DB to keep state of media directories. Can 
+- [ ] Add DB to keep state of media directories. Can validate files are where last was. Can have events NewTvShowAdded to decouple handler. Then use API to fetch metadata including episode names, that way can keep all info without storing it in names of shows as now.
 
 ### Configuration & Automation
 - [ ] Export/import settings profiles

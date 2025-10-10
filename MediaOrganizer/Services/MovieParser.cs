@@ -8,38 +8,38 @@ namespace MediaOrganizer.Services;
 public partial class MovieParser : IMediaFileParser
 {
     [GeneratedRegex(@"^(?<title>.+?)\s+(?<year>\d{4})\s+(?:UNRATED\s+)?(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
-    private static partial Regex MovieWithYearAndQualityPattern();
+    private static partial Regex TitleYearQualityWithSpacesPattern();
 
     [GeneratedRegex(@"^(?<title>.+?)\s+\((?<year>\d{4})\)\s+\((?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
-    private static partial Regex MovieWithYearInParenthesesPattern();
+    private static partial Regex TitleParenthesesYearParenthesesQualityWithSpacesPattern();
 
     [GeneratedRegex(@"^(?<title>(?:[A-Za-z0-9]+\.)*[A-Za-z0-9]+)\.(?<year>\d{4})\.(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
-    private static partial Regex MovieWithDotsPattern();
+    private static partial Regex TitleYearQualityWithDotsPattern();
 
     [GeneratedRegex(@"^(?<title>.+?)\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
-    private static partial Regex MovieSimpleWithQualityPattern();
+    private static partial Regex TitleQualityWithSpacesPattern();
 
     [GeneratedRegex(@"^(?<title>.+?)\s+(?<year>\d{4})", RegexOptions.IgnoreCase)]
-    private static partial Regex MovieWithYearPattern();
+    private static partial Regex TitleYearWithSpacesPattern();
 
     [GeneratedRegex(@"^(?<title>(?:[A-Za-z0-9]+\.)*[A-Za-z0-9]+)\.(?<year>\d{4})\.(?:[A-Za-z0-9\-\.]+\.)*(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
-    private static partial Regex MovieComplexDotsPattern();
+    private static partial Regex TitleYearExtrasQualityWithDotsPattern();
 
     [GeneratedRegex(@"^(?<title>(?:[A-Za-z]+\s+){2,}[A-Za-z]+)\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
-    private static partial Regex MovieLongTitleWithQualityPattern();
+    private static partial Regex LongTitleQualityWithSpacesPattern();
 
     [GeneratedRegex(@"^(?<title>[A-Za-z][A-ZaZ\s]*[A-ZaZe])(?:\s+\d{3,4}p|\s+4K|\s+UHD|\s+HDR|$)", RegexOptions.IgnoreCase)]
-    private static partial Regex MovieSimpleTitlePattern();
+    private static partial Regex TitleOnlyPattern();
 
     private static readonly Regex[] AllPatterns = [
-        MovieWithYearAndQualityPattern(),
-        MovieWithYearInParenthesesPattern(),
-        MovieWithDotsPattern(),
-        MovieComplexDotsPattern(),
-        MovieLongTitleWithQualityPattern(),
-        MovieSimpleWithQualityPattern(),
-        MovieWithYearPattern(),
-        MovieSimpleTitlePattern()
+        TitleYearQualityWithSpacesPattern(),
+        TitleParenthesesYearParenthesesQualityWithSpacesPattern(),
+        TitleYearQualityWithDotsPattern(),
+        TitleYearExtrasQualityWithDotsPattern(),
+        LongTitleQualityWithSpacesPattern(),
+        TitleQualityWithSpacesPattern(),
+        TitleYearWithSpacesPattern(),
+        TitleOnlyPattern()
     ];
 
     public bool CanParse(string filename)

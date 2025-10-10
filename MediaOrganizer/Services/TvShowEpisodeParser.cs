@@ -9,38 +9,38 @@ namespace MediaOrganizer.Services;
 public partial class TvShowEpisodeParser : IMediaFileParser
 {
     [GeneratedRegex(@"^(?<showName>.+?)(?:\.(?<year>\d{4}))?\.S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?", RegexOptions.IgnoreCase)]
-    private static partial Regex StandardSxxExxPattern();
+    private static partial Regex ShowYearSeasonEpisodeTitleWithDotsPattern();
 
     [GeneratedRegex(@"^(?<showName>.+?)\s+(?<year>\d{4})\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD))?", RegexOptions.IgnoreCase)]
-    private static partial Regex YearBeforeSxxExxPattern();
+    private static partial Regex ShowYearSeasonEpisodeTitleQualityWithSpacesPattern();
 
     [GeneratedRegex(@"^(?<showName>.+?)\s+\((?<year>\d{4})\)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?", RegexOptions.IgnoreCase)]
-    private static partial Regex YearInParenthesesPattern();
+    private static partial Regex ShowParenthesesYearSeasonEpisodeTitleWithSpacesPattern();
 
     [GeneratedRegex(@"^(?<showName>.+?)\s+(?<season>\d{1,2})x(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])", RegexOptions.IgnoreCase)]
-    private static partial Regex SeasonXEpisodePattern();
+    private static partial Regex ShowSeasonXEpisodeTitleWithSpacesPattern();
 
     [GeneratedRegex(@"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z])(?:\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD))?", RegexOptions.IgnoreCase)]
-    private static partial Regex SpacedSxxExxWithTitlePattern();
+    private static partial Regex ShowSeasonEpisodeTitleQualityWithSpacesPattern();
 
     [GeneratedRegex(@"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\s+S(?<season>\d{1,2})E(?<episode>\d{1,2}))?\s+-\s+(?<episodeTitle>.+)", RegexOptions.IgnoreCase)]
-    private static partial Regex DashedSxxExxWithTitlePattern();
+    private static partial Regex ShowSeasonEpisodeTitleWithSpacedDashesPattern();
 
     [GeneratedRegex(@"^(?<showName>.+?)\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})\s+(?<quality>480p|720p|1080p|1440p|2160p|4320p|4K|8K|UHD)", RegexOptions.IgnoreCase)]
-    private static partial Regex SpacedSxxExxWithQualityPattern();
+    private static partial Regex ShowSeasonEpisodeQualityWithSpacesPattern();
 
     [GeneratedRegex(@"^(?<showName>.+?)\s+-\s+S(?<season>\d{1,2})E(?<episode>\d{1,2})", RegexOptions.IgnoreCase)]
-    private static partial Regex DashedSxxExxPattern();
+    private static partial Regex ShowSpaceDashSpaceSeasonEpisodePattern();
 
     private static readonly Regex[] AllPatterns = [
-        StandardSxxExxPattern(),
-        YearBeforeSxxExxPattern(),
-        YearInParenthesesPattern(),
-        SeasonXEpisodePattern(),
-        SpacedSxxExxWithTitlePattern(),
-        DashedSxxExxWithTitlePattern(),
-        SpacedSxxExxWithQualityPattern(),
-        DashedSxxExxPattern()
+        ShowYearSeasonEpisodeTitleWithDotsPattern(),
+        ShowYearSeasonEpisodeTitleQualityWithSpacesPattern(),
+        ShowParenthesesYearSeasonEpisodeTitleWithSpacesPattern(),
+        ShowSeasonXEpisodeTitleWithSpacesPattern(),
+        ShowSeasonEpisodeTitleQualityWithSpacesPattern(),
+        ShowSeasonEpisodeTitleWithSpacedDashesPattern(),
+        ShowSeasonEpisodeQualityWithSpacesPattern(),
+        ShowSpaceDashSpaceSeasonEpisodePattern()
     ];
 
     public bool CanParse(string filename)

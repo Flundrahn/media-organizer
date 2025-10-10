@@ -12,3 +12,4 @@ obj/
 appsettings.Development.json
 README.md
 /.vs
+MediaOrganizer.Benchmarks/BenchmarkDotNet.Artifacts/*

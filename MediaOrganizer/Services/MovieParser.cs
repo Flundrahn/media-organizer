@@ -101,52 +101,7 @@ public partial class MovieParser : IMediaFileParser
         title = RegexUtils.WhitespacePattern().Replace(title, " ").Trim();
 
         // Capitalize properly (basic title case)
-        return ToTitleCase(title);
-    }
-
-    private static string ToTitleCase(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-            return string.Empty;
-
-        var words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var titleCaseWords = new List<string>();
-
-        foreach (var word in words)
-        {
-            if (word.Length == 1)
-            {
-                titleCaseWords.Add(word.ToUpper());
-            }
-            else if (IsSmallWord(word.ToLower()))
-            {
-                titleCaseWords.Add(word.ToLower());
-            }
-            else
-            {
-                titleCaseWords.Add(char.ToUpper(word[0]) + word.Substring(1).ToLower());
-            }
-        }
-
-        if (titleCaseWords.Count > 0)
-        {
-            titleCaseWords[0] = CapitalizeFirstWord(titleCaseWords[0]);
-        }
-
-        return string.Join(' ', titleCaseWords);
-    }
-
-    private static bool IsSmallWord(string word)
-    {
-        var smallWords = new[] { "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "by" };
-        return smallWords.Contains(word);
-    }
-
-    private static string CapitalizeFirstWord(string word)
-    {
-        if (string.IsNullOrEmpty(word))
-            return word;
-
-        return char.ToUpper(word[0]) + word.Substring(1);
+        // TODO: make this field
+        return new StringUtils().ToTitleCase(title);
     }
 }

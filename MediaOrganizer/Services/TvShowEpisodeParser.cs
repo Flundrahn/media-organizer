@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 using System.IO.Abstractions;
 using MediaOrganizer.Models;
-using System.Globalization;
 using MediaOrganizer.Utils;
 
 namespace MediaOrganizer.Services;
@@ -102,8 +101,9 @@ public partial class TvShowEpisodeParser : IMediaFileParser
         // Remove extra spaces using source-generated regex
         cleaned = RegexUtils.WhitespacePattern().Replace(cleaned, " ");
 
-        // TODO: use own title case method, put in stringUtils class
-        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cleaned);
+        // Use proper title case logic (same as MovieParser)
+        // TODO: make this field probably
+        return new StringUtils().ToTitleCase(cleaned);
     }
 
     private static string CleanEpisodeTitle(string episodeTitle)

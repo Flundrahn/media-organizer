@@ -30,3 +30,4 @@ Use for manual commands: builds, git, app runs, PowerShell
 - Follow .NET best practices and patterns
 - Consider performance impact of new features
 - Prioritize core functionality over nice-to-have features
+- Don't stop and ask about small things such as adding a using statement to  fix a compilation error, work independently

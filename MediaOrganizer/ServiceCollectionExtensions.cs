@@ -4,10 +4,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO.Abstractions;
 using MediaOrganizer.IO;
+using MediaOrganizer.Services;
 using MediaOrganizer.UI;
 using MediaOrganizer.Configuration;
 using MediaOrganizer.Validations;
-using MediaOrganizer.Services;
+using MediaOrganizer.Infrastructure.ApiClients;
+using TMDbLib.Client;
 
 namespace MediaOrganizer;
 
@@ -19,19 +21,44 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddMediaOrganizerServices(this IServiceCollection services, IConfiguration configuration)
     {
-        return services
+        services
             .AddSingleton(configuration)
             .Configure<MediaOrganizerSettings>(configuration.GetSection(MediaOrganizerSettings.SectionName))
+            .Configure<TmdbApiConfig>(configuration.GetSection(TmdbApiConfig.SectionName))
+            .AddHttpClient()
             .AddLogging(builder => builder.AddSimpleConsole())
             .AddSingleton<IConsoleIO, ConsoleIO>()
             .AddTransient<IFileSystem, FileSystem>()
             .AddTransient<FileSystemValidator>()
             .AddTransient<IDirectoryCleaner, DirectoryCleaner>()
-            .AddTransient(provider =>
-                new MediaFileOrganizerFactory(
-                    resolveFileSystem: () => provider.GetRequiredService<IFileSystem>(),
-                    resolveLogger: () => provider.GetRequiredService<ILogger<MediaFileOrganizer>>(),
-                    resolveSettings: () => provider.GetRequiredService<IOptions<MediaOrganizerSettings>>()))
-            .AddTransient<MediaOrganizerConsoleApp>();
+            .AddTransient<MediaOrganizerConsoleApp>()
+            .AddMediaFileOrganizerFactory()
+            .AddTmdbApi();
+
+        return services;
+    }
+
+    private static IServiceCollection AddMediaFileOrganizerFactory(this IServiceCollection services)
+    {
+        services.AddTransient(provider =>
+        {
+            return new MediaFileOrganizerFactory(
+                resolveFileSystem: () => provider.GetRequiredService<IFileSystem>(),
+                resolveLogger: () => provider.GetRequiredService<ILogger<MediaFileOrganizer>>(),
+                resolveSettings: () => provider.GetRequiredService<IOptions<MediaOrganizerSettings>>());
+        });
+
+        return services;
+    }
+
+    private static IServiceCollection AddTmdbApi(this IServiceCollection services)
+    {
+        services.AddTransient(provider =>
+        {
+            var tmdbApiConfig = provider.GetRequiredService<IOptions<TmdbApiConfig>>().Value;
+            return new TMDbClient(tmdbApiConfig.ApiKey);
+        });
+
+        return services;
     }
 }

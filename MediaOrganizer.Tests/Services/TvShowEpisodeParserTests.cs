@@ -55,7 +55,7 @@ public class TvShowEpisodeParserTests
 
     [Theory]
     [InlineData("Peacemaker.2022.S02E05.1080p.WEB.h264-ETHEL[EZTVx.to].mkv", "Peacemaker", 2, 5)]
-    [InlineData("Its.Always.Sunny.In.Philadelphia.S17E07.1080p.WEB.h264-ETHEL[EZTVx.to].mkv", "Its Always Sunny In Philadelphia", 17, 7)]
+    [InlineData("Its.Always.Sunny.In.Philadelphia.S17E07.1080p.WEB.h264-ETHEL[EZTVx.to].mkv", "Its Always Sunny in Philadelphia", 17, 7)]
     [InlineData("Gen.V.S02E02.1080p.WEB.h264-ETHEL[EZTVx.to].mkv", "Gen V", 2, 2)]
     [InlineData("Gen.V.S02E03.1080p.WEB.h264-ETHEL[EZTVx.to].mkv", "Gen V", 2, 3)]
     public void Parse_WithNoEpisodeTitle_ShouldReturnCorrectTvShowEpisode(string filename, string expectedShow, int expectedSeason, int expectedEpisode)
@@ -182,7 +182,7 @@ public class TvShowEpisodeParserTests
 
         // Assert - Using the SpacedSxxExxWithTitlePattern
         Assert.True(result.IsValid, "Should be able to parse episode with SpacedSxxExxWithTitlePattern");
-        Assert.Equal("Its Always Sunny In Philadelphia", tvShow.TvShowName);
+        Assert.Equal("Its Always Sunny in Philadelphia", tvShow.TvShowName);
         Assert.Equal(17, tvShow.Season);
         Assert.Equal(8, tvShow.Episode);
         Assert.Equal("The Golden Bachelor Live", tvShow.Title);
@@ -336,7 +336,7 @@ public class TvShowEpisodeParserTests
         // Assert
         Assert.True(result.IsValid, "Should be able to parse repeated SxxExx pattern");
         var tvShow = Assert.IsType<TvShowEpisode>(result);
-        Assert.Equal("The Lord Of The Rings The Rings Of Power", tvShow.TvShowName);
+        Assert.Equal("The Lord of the Rings the Rings of Power", tvShow.TvShowName);
         Assert.Equal(1, tvShow.Season);
         Assert.Equal(1, tvShow.Episode);
         Assert.Equal("A Shadow of the Past", tvShow.Title);

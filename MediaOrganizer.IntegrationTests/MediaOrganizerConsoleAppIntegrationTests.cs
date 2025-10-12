@@ -10,6 +10,22 @@ namespace MediaOrganizer.IntegrationTests;
 
 public class MediaOrganizerConsoleAppIntegrationTests
 {
+    private static MediaOrganizerSettings CreateSettingsForIntegrationTest(TempMediaTestEnvironment environment)
+    {
+        return new MediaOrganizerSettings
+        {
+            AutoCleanupEmptyDirectories = true,
+            TvShowSourceDirectory = environment.MediaSourceDirectory,
+            TvShowDestinationDirectory = environment.MediaDestinationDirectory,
+            MovieSourceDirectory = environment.MediaSourceDirectory,
+            MovieDestinationDirectory = environment.MediaDestinationDirectory,
+            DryRun = false,
+            TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}",
+            MoviePathTemplate = "{Title} ({Year})",
+            VideoFileExtensions = new List<string> { ".mkv", ".mp4", ".avi" }
+        };
+    }
+
     [Fact]
     public void ConsoleApp_OrganizeTvShow_WithAutoCleanup_MovesFileAndCleansDirectories()
     {
@@ -22,18 +38,7 @@ public class MediaOrganizerConsoleAppIntegrationTests
         string nestedSourceDirectoryFullPath = Path.Combine(environment.MediaSourceDirectory, "The Office (2019)");
         string expectedOrganizedFilePath = Path.Combine(environment.MediaDestinationDirectory, "The Office", "Season 1", "The Office - S01E01.mkv");
 
-        var settings = new MediaOrganizerSettings
-        {
-            AutoCleanupEmptyDirectories = true,
-            TvShowSourceDirectory = environment.MediaSourceDirectory,
-            TvShowDestinationDirectory = environment.MediaDestinationDirectory,
-            MovieSourceDirectory = environment.MediaSourceDirectory,
-            MovieDestinationDirectory = environment.MediaDestinationDirectory,
-            DryRun = false,
-            TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}",
-            MoviePathTemplate = "{Title} ({Year})",
-            VideoFileExtensions = new List<string> { ".mkv", ".mp4", ".avi" }
-        };
+        MediaOrganizerSettings settings = CreateSettingsForIntegrationTest(environment);
 
         var services = new ServiceCollection();
         var provider = services
@@ -49,18 +54,12 @@ public class MediaOrganizerConsoleAppIntegrationTests
         // which would help maintaining backwards compatibility of console app
         // Keep these tests for now.
 
-        // Queue console inputs to:
-        // 1. Select TV Shows (option 1)
-        // 2. Organize files (option 2) 
-        // 3. Organize all files (A)
-        // 4. Back to main menu (B)
-        // 5. Quit (Q)
-        mockConsole.QueueKeyInput(ConsoleKey.D1, '1'); // TV Shows
-        mockConsole.QueueKeyInput(ConsoleKey.D2, '2'); // Organize files
-        mockConsole.QueueKeyInput(ConsoleKey.A, 'A');  // Organize all
+        mockConsole.QueueKeyInput(ConsoleKey.D1, '1'); // 1. Select TV Shows (option 1)
+        mockConsole.QueueKeyInput(ConsoleKey.D2, '2'); // 2. Organize files (option 2) 
+        mockConsole.QueueKeyInput(ConsoleKey.A, 'A');  // 3. Organize all files (A)
         mockConsole.QueueKeyInput(ConsoleKey.Enter);   // Continue prompt
-        mockConsole.QueueKeyInput(ConsoleKey.B, 'B');  // Back to main menu
-        mockConsole.QueueKeyInput(ConsoleKey.Q, 'Q');  // Quit
+        mockConsole.QueueKeyInput(ConsoleKey.B, 'B');  // 4. Back to main menu (B)
+        mockConsole.QueueKeyInput(ConsoleKey.Q, 'Q');  // 5. Quit (Q)
 
         // Act
         var exitCode = consoleApp.Run();
@@ -88,18 +87,7 @@ public class MediaOrganizerConsoleAppIntegrationTests
         string nestedSourceDirectoryFullPath = Path.Combine(environment.MediaSourceDirectory, "Movies");
         string expectedOrganizedFilePath = Path.Combine(environment.MediaDestinationDirectory, "The Matrix (1999).mkv");
 
-        var settings = new MediaOrganizerSettings
-        {
-            AutoCleanupEmptyDirectories = true,
-            TvShowSourceDirectory = environment.MediaSourceDirectory,
-            TvShowDestinationDirectory = environment.MediaDestinationDirectory,
-            MovieSourceDirectory = environment.MediaSourceDirectory,
-            MovieDestinationDirectory = environment.MediaDestinationDirectory,
-            DryRun = false,
-            TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}",
-            MoviePathTemplate = "{Title} ({Year})",
-            VideoFileExtensions = new List<string> { ".mkv", ".mp4", ".avi" }
-        };
+        MediaOrganizerSettings settings = CreateSettingsForIntegrationTest(environment);
 
         var services = new ServiceCollection();
         var provider = services
@@ -110,18 +98,12 @@ public class MediaOrganizerConsoleAppIntegrationTests
 
         var consoleApp = provider.GetRequiredService<MediaOrganizerConsoleApp>();
 
-        // Queue console inputs to:
-        // 1. Select Movies (option 2)
-        // 2. Organize files (option 2)
-        // 3. Organize all files (A)
-        // 4. Back to main menu (B)
-        // 5. Quit (Q)
-        mockConsole.QueueKeyInput(ConsoleKey.D2, '2'); // Movies
-        mockConsole.QueueKeyInput(ConsoleKey.D2, '2'); // Organize files
-        mockConsole.QueueKeyInput(ConsoleKey.A, 'A');  // Organize all
+        mockConsole.QueueKeyInput(ConsoleKey.D2, '2'); // 1. Select Movies (option 2)
+        mockConsole.QueueKeyInput(ConsoleKey.D2, '2'); // 2. Organize files (option 2)
+        mockConsole.QueueKeyInput(ConsoleKey.A, 'A');  // 3. Organize all files (A)
         mockConsole.QueueKeyInput(ConsoleKey.Enter);   // Continue prompt
-        mockConsole.QueueKeyInput(ConsoleKey.B, 'B');  // Back to main menu
-        mockConsole.QueueKeyInput(ConsoleKey.Q, 'Q');  // Quit
+        mockConsole.QueueKeyInput(ConsoleKey.B, 'B');  // 4. Back to main menu (B)
+        mockConsole.QueueKeyInput(ConsoleKey.Q, 'Q');  // 5. Quit (Q)
 
         // Act
         var exitCode = consoleApp.Run();
@@ -150,18 +132,9 @@ public class MediaOrganizerConsoleAppIntegrationTests
         Directory.CreateDirectory(emptyTvDir);
         Directory.CreateDirectory(emptyMovieDir);
 
-        var settings = new MediaOrganizerSettings
-        {
-            AutoCleanupEmptyDirectories = false, // Manual cleanup only
-            TvShowSourceDirectory = environment.MediaSourceDirectory,
-            TvShowDestinationDirectory = environment.MediaDestinationDirectory,
-            MovieSourceDirectory = environment.MediaSourceDirectory,
-            MovieDestinationDirectory = Path.Combine(environment.TempDirectoryRoot, "movies"), // Different destination
-            DryRun = false,
-            TvShowPathTemplate = "{TvShowName}/Season {Season}/{TvShowName} - S{Season:D2}E{Episode:D2}",
-            MoviePathTemplate = "{Title} ({Year})",
-            VideoFileExtensions = new List<string> { ".mkv", ".mp4", ".avi" }
-        };
+        MediaOrganizerSettings settings = CreateSettingsForIntegrationTest(environment);
+        settings.AutoCleanupEmptyDirectories = false; // Manual cleanup only
+        settings.MovieDestinationDirectory = Path.Combine(environment.TempDirectoryRoot, "movies"); // Different destination
 
         // Create movie destination directory and empty dir within it
         Directory.CreateDirectory(settings.MovieDestinationDirectory);
@@ -177,16 +150,11 @@ public class MediaOrganizerConsoleAppIntegrationTests
 
         var consoleApp = provider.GetRequiredService<MediaOrganizerConsoleApp>();
 
-        // Queue console inputs to:
-        // 1. Select TV Shows (option 1)
-        // 2. Clean directories (option 3)
-        // 3. Back to main menu (B)
-        // 4. Quit (Q)
-        mockConsole.QueueKeyInput(ConsoleKey.D1, '1'); // TV Shows
-        mockConsole.QueueKeyInput(ConsoleKey.D3, '3'); // Clean directories
-        mockConsole.QueueKeyInput(ConsoleKey.Enter);   // Continue prompt
-        mockConsole.QueueKeyInput(ConsoleKey.B, 'B');  // Back to main menu
-        mockConsole.QueueKeyInput(ConsoleKey.Q, 'Q');  // Quit
+        mockConsole.QueueKeyInput(ConsoleKey.D1, '1'); // 1. Select TV Shows (option 1)
+        mockConsole.QueueKeyInput(ConsoleKey.D3, '3'); // 2. Clean directories (option 3)
+        mockConsole.QueueKeyInput(ConsoleKey.Enter);   // 3. Continue prompt
+        mockConsole.QueueKeyInput(ConsoleKey.B, 'B');  // 4. Back to main menu (B)
+        mockConsole.QueueKeyInput(ConsoleKey.Q, 'Q');  // 5. Quit (Q)
 
         // Act
         var exitCode = consoleApp.Run();

@@ -1,7 +1,7 @@
+using System.IO.Abstractions;
 using MediaInfoDotNet;
 using MediaInfoDotNet.Models;
-using MediaOrganizer.Models;
-using System.IO.Abstractions;
+using MediaOrganizer.Benchmarks.Models;
 
 namespace MediaOrganizer.Benchmarks.Services;
 

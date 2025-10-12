@@ -1,5 +1,5 @@
 using FFMpegCore;
-using MediaOrganizer.Models;
+using MediaOrganizer.Benchmarks.Models;
 using System.Diagnostics;
 using System.IO.Abstractions;
 

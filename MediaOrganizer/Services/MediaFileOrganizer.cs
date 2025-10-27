@@ -43,6 +43,7 @@ public class MediaFileOrganizer
         _settings = settings.Value;
         
         // TODO: performance, later avoid doing toList if possible, although important part is probably when making changes later
+        // note also that this would mean 'AllFiles' are the initial state of the files, after organize
         var mediaFilesList = mediaFiles.ToList();
         _allFiles = mediaFilesList.AsReadOnly();
         _files = new Stack<IFileInfo>(mediaFilesList);
@@ -61,6 +62,8 @@ public class MediaFileOrganizer
         if (_files.Count == 0) return null;
 
         var fileInfo = _files.Pop();
+
+        // Currently counting as processed as soon as we remove from file stack, no matter result.
         _result.ProcessedCount++;
 
         return OrganizeFileInternal(fileInfo);

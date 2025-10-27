@@ -9,12 +9,15 @@ FEATURE: Enrich with metadata from The Movie Database (TMDB) API and use that in
         - [x] Register TMDbLib client with DI.
         - [x] Add integration test for connectivity.
         - [x] Add validation of API config with tests.
-    - [ ] Create new TvShowEpisodeParser2
-        - [ ] Use regex for minimal extraction (show, season, episode).
-        - [ ] Keep old parser as fallback.
-    - [ ] Design and implement enrichment service
-        - [ ] Define interface for enrichment.
-        - [ ] TDD: Use API client to fetch and enrich TvShowEpisode.
+    - [ ] TvShowEpisodeParser2. Do not make any changes in MediaOrganizerFactory or any user facing implementation, for now we are only adding the new classes and functionality and testing it.
+        - [x] Add wrapper class for TMDB api client
+        - [x] Add domain logic class that uses wrapper, it should use result pattern to elegantly handle any potential http errors, it should provide good logging of respones. Add unit tests for this mocking the response of the wrapper for happy and sad cases.
+        - [x] Add integration test to ensure that TMDB API client works, if we have show name, season and episode number we should be able to get year of show and episode title
+        - [x] Define interface for enrichment.
+        - [x] Add class that uses api client to enrich TvShowEpisode objects with info from TMDB api
+        - [ ] Add class that enriches tv show objects with info from file path. Copy and use same regex from old TvShowEpisodeParser but we will now only show name, season number, episode number.
+        - [ ] Add class TvShowEpisodeParser2, will be able to use multiple enrichers in order to add and improve info of a TvShowEpisode object
+    - [ ] Use TvShowEpisodeParser2 in media organizer classes instead of old parser.
 
 ## Priority Features 
 Do these first since will affect and help how solve the cricital issues below
@@ -26,7 +29,7 @@ Do these first since will affect and help how solve the cricital issues below
 - [ ] Add video file metadata extractor using MediaInfo approach similar to in our benchmark
     - Refactor to use extractor get quality from files
 
-## 🚨 Critical Issues (Fix First)
+## 🚨 Critical Issues
 - [ ] **Problem: does not move auxiliary files along with main video for movie or tv show** - Core functionality gap - Possibly this would be easier if we store actual show and movie metadata in DB or corresponding.
 - [ ] **Problem: does not rename subtitle files along with corresponding video file** - Related to above, possibly wait if will add DB anyway.
 - [ ] **Problem: does not use the full path when organizing media** if do not have say title, season or episode in file name will not find it - Core functionality issue
@@ -53,6 +56,7 @@ Do these first since will affect and help how solve the cricital issues below
 - [ ] Undo operations for file moves
 - [ ] Fetch metedata from online databases (e.g., TheMovieDB, IMDb)
 - [ ] Duplicate file detection and handling
+- [ ] Rate limiting for API calls, TMDB docs `50 requests per second range. This limit could change at any time so be respectful of the service we have built and respect the 429` handling of 429 responses.
 
 ### Enhanced User Experience
 - [ ] File preview/details view with metadata
@@ -66,6 +70,15 @@ Do these first since will affect and help how solve the cricital issues below
 - [ ] Async operations for better responsiveness
 - [ ] Plugin/extension system for custom processors
 - [ ] Add DB to keep state of media directories. Can validate files are where last was. Can have events NewTvShowAdded to decouple handler. Then use API to fetch metadata including episode names, that way can keep all info without storing it in names of shows as now.
+
+### Optimizing C#
+- [ ] Figure out when useful to do ConfigureAwait(false) or not
+- [ ] Possibly remove usage of TMDbLib and create own client
+- [ ] Add caching of Tv Show searches for TMDB API
+    TODO: Possibly want to split up the public methods that will call the API to enable batching
+    when use DB should check if exists in db first, or if use some local cache.
+    Would be cool in that case to put cache in the impl of httpclient
+    let's get functionality working first, then think about changes for batching
 
 ### Configuration & Automation
 - [ ] Export/import settings profiles

@@ -110,9 +110,9 @@ public class TvShowEpisode : IMediaFile
             { "{Season:D2}", Season.ToString("D2") },
             { "{Episode}", Episode.ToString() },
             { "{Episode:D2}", Episode.ToString("D2") },
-            { "{Title}", Title ?? string.Empty },
+            { "{Title}", Title },
             { "{Year}", Year?.ToString() ?? string.Empty },
-            { "{Quality}", Quality ?? string.Empty }
+            { "{Quality}", Quality }
         };
 
         var result = template;

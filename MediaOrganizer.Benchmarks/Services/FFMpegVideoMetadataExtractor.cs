@@ -1,7 +1,7 @@
-using FFMpegCore;
-using MediaOrganizer.Benchmarks.Models;
 using System.Diagnostics;
 using System.IO.Abstractions;
+using FFMpegCore;
+using MediaOrganizer.Benchmarks.Models;
 
 namespace MediaOrganizer.Benchmarks.Services;
 

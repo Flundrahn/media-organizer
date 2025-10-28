@@ -1,14 +1,14 @@
+using System.IO.Abstractions;
+using MediaOrganizer.Configuration;
+using MediaOrganizer.Infrastructure.ApiClients;
+using MediaOrganizer.IO;
+using MediaOrganizer.Services;
+using MediaOrganizer.UI;
+using MediaOrganizer.Validations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.IO.Abstractions;
-using MediaOrganizer.IO;
-using MediaOrganizer.Services;
-using MediaOrganizer.UI;
-using MediaOrganizer.Configuration;
-using MediaOrganizer.Validations;
-using MediaOrganizer.Infrastructure.ApiClients;
 using TMDbLib.Client;
 
 namespace MediaOrganizer;

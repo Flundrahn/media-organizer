@@ -1,5 +1,5 @@
-using MediaOrganizer.Validations;
 using System.IO.Abstractions.TestingHelpers;
+using MediaOrganizer.Validations;
 
 namespace MediaOrganizer.Tests.Validations;
 

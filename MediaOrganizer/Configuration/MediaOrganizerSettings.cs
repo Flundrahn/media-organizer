@@ -202,7 +202,7 @@ public class MediaOrganizerSettings
 
     private bool ValidateTvShowPathTemplate()
     {
-        return ValidateMediaPathTemplate(TvShowPathTemplate, nameof(TvShowPathTemplate), TvShowEpisode.ValidPlaceholders);
+        return ValidateMediaPathTemplate(TvShowPathTemplate, nameof(TvShowPathTemplate), TvEpisode.ValidPlaceholders);
     }
 
     private bool ValidateMoviePathTemplate()

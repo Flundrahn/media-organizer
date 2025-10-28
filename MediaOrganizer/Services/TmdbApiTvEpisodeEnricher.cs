@@ -1,25 +1,24 @@
-using Microsoft.Extensions.Logging;
 using MediaOrganizer.Infrastructure.ApiClients;
+using MediaOrganizer.Utils;
+using Microsoft.Extensions.Logging;
 using TMDbLib.Objects.General;
 using TMDbLib.Objects.Search;
-using TMDbLib.Objects.TvShows;
-using MediaOrganizer.Models;
-using MediaOrganizer.Utils;
+using TmdbTvEpisode = TMDbLib.Objects.TvShows.TvEpisode;
 
 namespace MediaOrganizer.Services;
 
-public class TmdbApiTvShowEpisodeEnricher : IMediaFileEnricher<TvShowEpisode>
+public class TmdbApiTvEpisodeEnricher : IMediaFileEnricher<Models.TvEpisode>
 {
-    private readonly ILogger<TmdbApiTvShowEpisodeEnricher> _logger;
+    private readonly ILogger<TmdbApiTvEpisodeEnricher> _logger;
     private readonly ITmdbApiClient _tmdbApi;
 
-    public TmdbApiTvShowEpisodeEnricher(ILogger<TmdbApiTvShowEpisodeEnricher> logger, ITmdbApiClient tmdbApi)
+    public TmdbApiTvEpisodeEnricher(ILogger<TmdbApiTvEpisodeEnricher> logger, ITmdbApiClient tmdbApi)
     {
         _logger = logger;
         _tmdbApi = tmdbApi;
     }
 
-    public async Task<ResultBase> EnrichAsync(TvShowEpisode mediaFile)
+    public async Task<ResultBase> EnrichAsync(Models.TvEpisode mediaFile)
     {
         // NOTE:
         //1. get tvshow from api
@@ -34,12 +33,12 @@ public class TmdbApiTvShowEpisodeEnricher : IMediaFileEnricher<TvShowEpisode>
         }
         SearchTv tvShow = tvShowSearchResult.Value;
 
-        Result<TvEpisode> tvEpisodeResult = await GetTvEpisodeAsync(mediaFile, tvShow.Id);
+        Result<TmdbTvEpisode> tvEpisodeResult = await GetTvEpisodeAsync(mediaFile, tvShow.Id);
         if (!tvEpisodeResult.IsSuccess)
         {
             return tvEpisodeResult;
         }
-        TvEpisode tvEpisode = tvEpisodeResult.Value;
+        TmdbTvEpisode tvEpisode = tvEpisodeResult.Value;
 
         mediaFile.Title = tvEpisode.Name;
         if (tvEpisode.AirDate.HasValue)
@@ -57,7 +56,7 @@ public class TmdbApiTvShowEpisodeEnricher : IMediaFileEnricher<TvShowEpisode>
         return ResultBase.Success();
     }
 
-    private async Task<Result<SearchTv>> SearchTvShowAsync(TvShowEpisode mediaFile)
+    private async Task<Result<SearchTv>> SearchTvShowAsync(Models.TvEpisode mediaFile)
     {
         SearchContainer<SearchTv> search;
         try
@@ -84,9 +83,9 @@ public class TmdbApiTvShowEpisodeEnricher : IMediaFileEnricher<TvShowEpisode>
         return Result<SearchTv>.Success(search.Results[0]);
     }
 
-    private async Task<Result<TvEpisode>> GetTvEpisodeAsync(TvShowEpisode mediaFile, int tmdbTvShowId)
+    private async Task<Result<TmdbTvEpisode>> GetTvEpisodeAsync(Models.TvEpisode mediaFile, int tmdbTvShowId)
     {
-        TvEpisode? result;
+        TmdbTvEpisode? result;
         try
         {
             result = await _tmdbApi.GetTvEpisodeAsync(tmdbTvShowId, mediaFile.Season, mediaFile.Episode);
@@ -96,18 +95,18 @@ public class TmdbApiTvShowEpisodeEnricher : IMediaFileEnricher<TvShowEpisode>
 
             string message = $"Getting TV episode {mediaFile.TvShowName} S{mediaFile.Season}E{mediaFile.Episode} failed with unexpected error.";
             _logger.LogError(ex, message);
-            return Result<TvEpisode>.Failure(message);
+            return Result<TmdbTvEpisode>.Failure(message);
         }
 
         if (result is null)
         {
-            return Result<TvEpisode>.Failure("Episode not found in TMDB.");
+            return Result<TmdbTvEpisode>.Failure("Episode not found in TMDB.");
         }
 
-        return Result<TvEpisode>.Success(result);
+        return Result<TmdbTvEpisode>.Success(result);
     }
 
-    public Task EnrichAllAsync(IEnumerable<TvShowEpisode> mediaFiles)
+    public Task EnrichAllAsync(IEnumerable<Models.TvEpisode> mediaFiles)
     {
         throw new NotImplementedException();
     }

@@ -4,20 +4,20 @@
 
 Make a commit with a simple message when done with each step
 
-FEATURE: Enrich with metadata from The Movie Database (TMDB) API and use that in new parsers for TvShowEpisodes and Movies, keeping the old ones for now.
+FEATURE: Enrich with metadata from The Movie Database (TMDB) API and use that in new parsers for TvEpisodes and Movies, keeping the old ones for now.
     - [x] Use TMDbLib client directly for TMDB API
         - [x] Register TMDbLib client with DI.
         - [x] Add integration test for connectivity.
         - [x] Add validation of API config with tests.
-    - [ ] TvShowEpisodeParser2. Do not make any changes in MediaOrganizerFactory or any user facing implementation, for now we are only adding the new classes and functionality and testing it.
+    - [ ] TvEpisodeParser2. Do not make any changes in MediaOrganizerFactory or any user facing implementation, for now we are only adding the new classes and functionality and testing it.
         - [x] Add wrapper class for TMDB api client
         - [x] Add domain logic class that uses wrapper, it should use result pattern to elegantly handle any potential http errors, it should provide good logging of respones. Add unit tests for this mocking the response of the wrapper for happy and sad cases.
         - [x] Add integration test to ensure that TMDB API client works, if we have show name, season and episode number we should be able to get year of show and episode title
         - [x] Define interface for enrichment.
-        - [x] Add class that uses api client to enrich TvShowEpisode objects with info from TMDB api
-        - [ ] Add class that enriches tv show objects with info from file path. Copy and use same regex from old TvShowEpisodeParser but we will now only show name, season number, episode number.
-        - [ ] Add class TvShowEpisodeParser2, will be able to use multiple enrichers in order to add and improve info of a TvShowEpisode object
-    - [ ] Use TvShowEpisodeParser2 in media organizer classes instead of old parser.
+        - [x] Add class that uses api client to enrich TvEpisode objects with info from TMDB api
+        - [ ] Add class that enriches tv show objects with info from file path. Copy and use same regex from old TvEpisodeParser but we will now only show name, season number, episode number.
+        - [ ] Add class TvEpisodeParser2, will be able to use multiple enrichers in order to add and improve info of a TvEpisode object
+    - [ ] Use TvEpisodeParser2 in media organizer classes instead of old parser.
 
 ## Priority Features 
 Do these first since will affect and help how solve the cricital issues below
@@ -46,7 +46,7 @@ Do these first since will affect and help how solve the cricital issues below
 
 ## 🏗️ Refactoring & Architecture
 - [ ] **Possibly refactor MediaOrganizerService into Program.cs** - Separate UI from logic
-- [ ] **Add quality to TvShowEpisode and parser** - Feature enhancement
+- [ ] **Add quality to TvEpisode and parser** - Feature enhancement
 
 ## Nice to Have 🌟
 

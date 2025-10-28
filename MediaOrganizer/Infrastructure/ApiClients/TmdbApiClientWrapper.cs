@@ -4,6 +4,7 @@ using TMDbLib.Client;
 using TMDbLib.Objects.General;
 using TMDbLib.Objects.Search;
 using TMDbLib.Objects.TvShows;
+using TmdbTvEpisode = TMDbLib.Objects.TvShows.TvEpisode;
 
 namespace MediaOrganizer.Infrastructure.ApiClients
 {
@@ -14,7 +15,7 @@ namespace MediaOrganizer.Infrastructure.ApiClients
     public interface ITmdbApiClient
     {
         Task<SearchContainer<SearchTv>> SearchTvShowAsync(string query, int page = 1, bool includeAdult = false, int year = 0, CancellationToken cancellationToken = default);
-        Task<TvEpisode?> GetTvEpisodeAsync(int tvShowId, int seasonNumber, int episodeNumber);
+        Task<TmdbTvEpisode?> GetTvEpisodeAsync(int tvShowId, int seasonNumber, int episodeNumber);
     }
 
     public class TmdbApiClientWrapper : ITmdbApiClient

@@ -1,10 +1,10 @@
+using System.IO.Abstractions.TestingHelpers;
 using MediaOrganizer.Configuration;
 using MediaOrganizer.Models;
-using System.IO.Abstractions.TestingHelpers;
 
 namespace MediaOrganizer.Tests.Models;
 
-public class TvShowEpisodeTests
+public class TvEpisodeTests
 {
     [Fact]
     public void Constructor_WithFileInfo_SetsOriginalFileProperty()
@@ -14,7 +14,7 @@ public class TvShowEpisodeTests
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\The.Office.S01E01.mkv");
 
         // Act
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
 
         // Assert
         Assert.Equal(fileInfo, episode.OriginalFile);
@@ -28,7 +28,7 @@ public class TvShowEpisodeTests
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\Breaking.Bad.S02E13.mkv");
 
         // Act
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
 
         // Assert
         Assert.Equal(fileInfo, episode.CurrentFile);
@@ -41,7 +41,7 @@ public class TvShowEpisodeTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\test.mkv");
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         episode.TvShowName = "The Office";
         episode.Season = 1;
         episode.Episode = 1;
@@ -56,7 +56,7 @@ public class TvShowEpisodeTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\test.mkv");
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         episode.TvShowName = "";
         episode.Season = 1;
         episode.Episode = 1;
@@ -71,7 +71,7 @@ public class TvShowEpisodeTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\test.mkv");
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         episode.TvShowName = "The Office";
         episode.Season = 1;
         episode.Episode = 1;
@@ -99,7 +99,7 @@ public class TvShowEpisodeTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\The.Office.S01E01.Pilot.mkv");
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         episode.TvShowName = "The Office";
         episode.Season = 1;
         episode.Episode = 1;
@@ -128,7 +128,7 @@ public class TvShowEpisodeTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\Breaking.Bad.S02E13.mkv");
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         episode.TvShowName = "Breaking Bad";
         episode.Season = 2;
         episode.Episode = 13;
@@ -156,7 +156,7 @@ public class TvShowEpisodeTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\Game.Of.Thrones.S01E01.avi");
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         episode.TvShowName = "Game Of Thrones";
         episode.Season = 1;
         episode.Episode = 1;
@@ -181,7 +181,7 @@ public class TvShowEpisodeTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\invalid.mkv");
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         // Leave properties at default values (invalid state)
 
         var settings = new MediaOrganizerSettings
@@ -200,7 +200,7 @@ public class TvShowEpisodeTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\The.Office.S01E01.mkv");
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         episode.TvShowName = "The Office";
         episode.Season = 1;
         episode.Episode = 1;
@@ -218,7 +218,7 @@ public class TvShowEpisodeTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\The.Office.S01E01.mkv");
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         episode.TvShowName = "The Office";
         episode.Season = 1;
         episode.Episode = 1;
@@ -243,7 +243,7 @@ public class TvShowEpisodeTests
         var correctPath = @"C:\destination\The Office\Season 1\The Office - S01E01.mkv";
         var fileInfo = mockFileSystem.FileInfo.New(correctPath);
         
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         episode.TvShowName = "The Office";
         episode.Season = 1;
         episode.Episode = 1;
@@ -269,7 +269,7 @@ public class TvShowEpisodeTests
         var wrongPath = @"C:\source\The.Office.S01E01.mkv";
         var fileInfo = mockFileSystem.FileInfo.New(wrongPath);
         
-        var episode = new TvShowEpisode(fileInfo);
+        var episode = new TvEpisode(fileInfo);
         episode.TvShowName = "The Office";
         episode.Season = 1;
         episode.Episode = 1;
@@ -293,7 +293,7 @@ public class TvShowEpisodeTests
         // Arrange
         var mockFileSystem = new MockFileSystem();
         var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\invalid.mkv");
-        var episode = new TvShowEpisode(fileInfo); // Invalid episode (no properties set)
+        var episode = new TvEpisode(fileInfo); // Invalid episode (no properties set)
 
         var settings = new MediaOrganizerSettings
         {

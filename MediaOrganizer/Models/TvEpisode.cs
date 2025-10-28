@@ -7,7 +7,7 @@ namespace MediaOrganizer.Models;
 /// <summary>
 /// Contains information about a TV show episode parsed from a filename
 /// </summary>
-public class TvShowEpisode : IMediaFile
+public class TvEpisode : IMediaFile
 {
     /// <summary>
     /// Valid placeholders that can be used in path templates for TV show episodes
@@ -63,10 +63,10 @@ public class TvShowEpisode : IMediaFile
     public MediaType Type => MediaType.TvShow;
 
     /// <summary>
-    /// Initializes a new instance of TvShowEpisode with file information
+    /// Initializes a new instance of TvEpisode with file information
     /// </summary>
     /// <param name="fileInfo">The file information to set as both original and current file</param>
-    public TvShowEpisode(IFileInfo fileInfo)
+    public TvEpisode(IFileInfo fileInfo)
     {
         OriginalFile = fileInfo;
         CurrentFile = fileInfo;

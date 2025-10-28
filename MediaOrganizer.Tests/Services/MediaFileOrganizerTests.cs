@@ -49,7 +49,7 @@ public class MediaFileOrganizerTests
         return new MediaFileOrganizer(
             _mockFileSystem,
             NullLogger<MediaFileOrganizer>.Instance,
-            new TvShowEpisodeParser(),
+            new TvEpisodeParser(),
             Options.Create(_settings),
             fileInfos);
     }

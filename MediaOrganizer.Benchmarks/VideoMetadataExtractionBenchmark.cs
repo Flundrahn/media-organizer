@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
@@ -6,7 +7,6 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Toolchains.InProcess.Emit;
 using MediaOrganizer.Benchmarks.Services;
 using Perfolizer.Horology;
-using System.IO.Abstractions;
 
 namespace MediaOrganizer.Benchmarks;
 

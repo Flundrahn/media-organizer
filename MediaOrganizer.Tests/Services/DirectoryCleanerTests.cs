@@ -1,8 +1,8 @@
-using MediaOrganizer.Services;
+using System.IO.Abstractions.TestingHelpers;
 using MediaOrganizer.Configuration;
+using MediaOrganizer.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using System.IO.Abstractions.TestingHelpers;
 
 namespace MediaOrganizer.Tests.Services;
 

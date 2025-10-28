@@ -37,7 +37,7 @@ public class MediaFileOrganizerFactory
         return new MediaFileOrganizer(
             fileSystem,
             _resolveLogger(),
-            new TvShowEpisodeParser(),
+            new TvEpisodeParser(),
             settings,
             tvShowFiles);
     }

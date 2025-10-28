@@ -1,6 +1,6 @@
+using System.IO.Abstractions.TestingHelpers;
 using MediaOrganizer.Configuration;
 using MediaOrganizer.Validations;
-using System.IO.Abstractions.TestingHelpers;
 
 namespace MediaOrganizer.Tests.Configuration;
 

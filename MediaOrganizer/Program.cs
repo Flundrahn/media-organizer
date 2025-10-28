@@ -1,6 +1,6 @@
-﻿using MediaOrganizer.Configuration;
+﻿using MediaOrganizer;
+using MediaOrganizer.Configuration;
 using MediaOrganizer.UI;
-using MediaOrganizer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

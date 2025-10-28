@@ -1,23 +1,22 @@
+using System.IO.Abstractions;
 using MediaOrganizer.Infrastructure.ApiClients;
-using MediaOrganizer.Models;
 using MediaOrganizer.Services;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using TMDbLib.Objects.General;
 using TMDbLib.Objects.Search;
-using TMDbLib.Objects.TvShows;
-using Microsoft.Extensions.Logging.Abstractions;
-using System.IO.Abstractions;
-using Moq;
+using TmdbTvEpisode = TMDbLib.Objects.TvShows.TvEpisode;
 
 namespace MediaOrganizer.Tests.Services;
 
-public class TmdbApiTvShowEpisodeEnricherTests
+public class TmdbApiTvEpisodeEnricherTests
 {
     private class FakeTmdbClient : ITmdbApiClient
     {
         public bool ThrowOnSearchTvShow { get; set; }
         public bool ThrowOnGetTvEpisode { get; set; }
         public SearchContainer<SearchTv>? SearchResponse { get; set; }
-        public TvEpisode? EpisodeResponse { get; set; }
+        public TmdbTvEpisode? EpisodeResponse { get; set; }
         public int? LastRequestedTvShowId { get; private set; }
 
         public Task<SearchContainer<SearchTv>> SearchTvShowAsync(string query, int page = 1, bool includeAdult = false, int year = 0, CancellationToken cancellationToken = default)
@@ -30,7 +29,7 @@ public class TmdbApiTvShowEpisodeEnricherTests
             return Task.FromResult(SearchResponse ?? new SearchContainer<SearchTv> { Results = [] });
         }
 
-        public Task<TvEpisode?> GetTvEpisodeAsync(int tvShowId, int seasonNumber, int episodeNumber)
+        public Task<TmdbTvEpisode?> GetTvEpisodeAsync(int tvShowId, int seasonNumber, int episodeNumber)
         {
             // To verify client called with expected TMDB show id
             LastRequestedTvShowId = tvShowId;
@@ -45,18 +44,18 @@ public class TmdbApiTvShowEpisodeEnricherTests
     }
 
     private readonly FakeTmdbClient _fakeTmdbClient;
-    private readonly TmdbApiTvShowEpisodeEnricher _sut;
+    private readonly TmdbApiTvEpisodeEnricher _sut;
 
-    public TmdbApiTvShowEpisodeEnricherTests()
+    public TmdbApiTvEpisodeEnricherTests()
     {
         _fakeTmdbClient = new FakeTmdbClient();
-        _sut = new TmdbApiTvShowEpisodeEnricher(NullLogger<TmdbApiTvShowEpisodeEnricher>.Instance, _fakeTmdbClient);
+        _sut = new TmdbApiTvEpisodeEnricher(NullLogger<TmdbApiTvEpisodeEnricher>.Instance, _fakeTmdbClient);
     }
 
-    private static TvShowEpisode CreateTvShowEpisode(string showName = "ShowName", int season = 1, int episode = 1, int year = 0)
+    private static MediaOrganizer.Models.TvEpisode CreateTvEpisode(string showName = "ShowName", int season = 1, int episode = 1, int year = 0)
     {
         var fileInfoMock = new Mock<IFileInfo>();
-        return new TvShowEpisode(fileInfoMock.Object)
+        return new MediaOrganizer.Models.TvEpisode(fileInfoMock.Object)
         {
             TvShowName = showName,
             Season = season,
@@ -71,7 +70,7 @@ public class TmdbApiTvShowEpisodeEnricherTests
     {
         // Arrange
         _fakeTmdbClient.ThrowOnSearchTvShow = true;
-        var episode = CreateTvShowEpisode();
+        var episode = CreateTvEpisode();
 
         // Act
         var result = await _sut.EnrichAsync(episode);
@@ -89,7 +88,7 @@ public class TmdbApiTvShowEpisodeEnricherTests
         {
             Results = []
         };
-        var episode = CreateTvShowEpisode();
+        var episode = CreateTvEpisode();
 
         // Act
         var result = await _sut.EnrichAsync(episode);
@@ -121,14 +120,14 @@ public class TmdbApiTvShowEpisodeEnricherTests
 
         string expectedTitle = "Pilot";
         int expectedYear = 2008;
-        _fakeTmdbClient.EpisodeResponse = new TvEpisode
+        _fakeTmdbClient.EpisodeResponse = new TmdbTvEpisode
         {
             Id = 101,
             Name = expectedTitle,
             AirDate = new DateTime(expectedYear, 1, 20)
         };
 
-        var episode = CreateTvShowEpisode();
+        var episode = CreateTvEpisode();
 
         // Act
         var result = await _sut.EnrichAsync(episode);
@@ -155,7 +154,7 @@ public class TmdbApiTvShowEpisodeEnricherTests
         };
         _fakeTmdbClient.SearchResponse = search;
         _fakeTmdbClient.ThrowOnGetTvEpisode = true;
-        var episode = CreateTvShowEpisode();
+        var episode = CreateTvEpisode();
 
         // Act
         var result = await _sut.EnrichAsync(episode);
@@ -180,7 +179,7 @@ public class TmdbApiTvShowEpisodeEnricherTests
         };
         _fakeTmdbClient.SearchResponse = search;
         _fakeTmdbClient.EpisodeResponse = null;
-        var episode = CreateTvShowEpisode();
+        var episode = CreateTvEpisode();
 
         // Act
         var result = await _sut.EnrichAsync(episode);
@@ -207,14 +206,14 @@ public class TmdbApiTvShowEpisodeEnricherTests
 
         int expectedYear = 2010;
         string expectedTitle = "Pilot";
-        _fakeTmdbClient.EpisodeResponse = new TvEpisode
+        _fakeTmdbClient.EpisodeResponse = new TmdbTvEpisode
         {
             Id = 555,
             Name = expectedTitle,
             AirDate = new DateTime(expectedYear, 2, 3)
         };
 
-        var episode = CreateTvShowEpisode("EpisodeTitleBeforeEnriching", 1, 1);
+        var episode = CreateTvEpisode("EpisodeTitleBeforeEnriching", 1, 1);
 
         // Act
         var result = await _sut.EnrichAsync(episode);
@@ -240,7 +239,7 @@ public class TmdbApiTvShowEpisodeEnricherTests
         };
 
         string expectedTitle = "Pilot";
-        _fakeTmdbClient.EpisodeResponse = new TvEpisode
+        _fakeTmdbClient.EpisodeResponse = new TmdbTvEpisode
         {
             Id = 999,
             Name = expectedTitle,
@@ -248,7 +247,7 @@ public class TmdbApiTvShowEpisodeEnricherTests
         };
 
         int yearBeforeEnriching = 2010;
-        var episode = CreateTvShowEpisode("ShowName", 2, 3, yearBeforeEnriching);
+        var episode = CreateTvEpisode("ShowName", 2, 3, yearBeforeEnriching);
 
         // Act
         var result = await _sut.EnrichAsync(episode);

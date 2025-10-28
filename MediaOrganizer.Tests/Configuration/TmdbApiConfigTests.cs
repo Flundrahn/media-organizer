@@ -1,5 +1,5 @@
-using MediaOrganizer.Infrastructure.ApiClients;
 using System.Reflection;
+using MediaOrganizer.Infrastructure.ApiClients;
 
 namespace MediaOrganizer.Tests.Configuration;
 

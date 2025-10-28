@@ -1,11 +1,11 @@
-using System.Text.RegularExpressions;
 using System.IO.Abstractions;
+using System.Text.RegularExpressions;
 using MediaOrganizer.Models;
 using MediaOrganizer.Utils;
 
 namespace MediaOrganizer.Services;
 
-public partial class TvShowEpisodeParser : IMediaFileParser
+public partial class TvEpisodeParser : IMediaFileParser
 {
     [GeneratedRegex(@"^(?<showName>.+?)(?:\.(?<year>\d{4}))?\.S(?<season>\d{1,2})E(?<episode>\d{1,2})(?:\.(?<episodeTitle>[A-Za-z][A-Za-z\s]*[A-Za-z]))?", RegexOptions.IgnoreCase)]
     private static partial Regex ShowYearSeasonEpisodeTitleWithDotsPattern();
@@ -74,7 +74,7 @@ public partial class TvShowEpisodeParser : IMediaFileParser
                 ? match.Groups["quality"].Value
                 : string.Empty;
 
-            return new TvShowEpisode(fileInfo)
+            return new TvEpisode(fileInfo)
             {
                 TvShowName = showName,
                 Season = season,
@@ -85,7 +85,7 @@ public partial class TvShowEpisodeParser : IMediaFileParser
             };
         }
 
-        return new TvShowEpisode(fileInfo);
+        return new TvEpisode(fileInfo);
     }
 
     private static string CleanShowName(string showName)

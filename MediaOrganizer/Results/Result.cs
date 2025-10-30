@@ -1,4 +1,4 @@
-namespace MediaOrganizer.Utils;
+namespace MediaOrganizer.Results;
 
 public record Result<T> : ResultBase
 {
@@ -26,7 +26,7 @@ public record Result<T> : ResultBase
 public record ResultBase
 {
     public bool IsSuccess { get; init; }
-    public string? Error { get; init; }
+    public string Error { get; init; } = string.Empty;
     public static ResultBase Success() => new ResultBase { IsSuccess = true };
     public static ResultBase Failure(string error) => new ResultBase { IsSuccess = false, Error = error };
 }

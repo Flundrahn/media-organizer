@@ -1,5 +1,6 @@
 using MediaOrganizer.Infrastructure.ApiClients;
-using MediaOrganizer.Utils;
+using MediaOrganizer.Models;
+using MediaOrganizer.Results;
 using Microsoft.Extensions.Logging;
 using TMDbLib.Objects.General;
 using TMDbLib.Objects.Search;
@@ -7,7 +8,7 @@ using TmdbTvEpisode = TMDbLib.Objects.TvShows.TvEpisode;
 
 namespace MediaOrganizer.Services;
 
-public class TmdbApiTvEpisodeEnricher : IMediaFileEnricher<Models.TvEpisode>
+public class TmdbApiTvEpisodeEnricher : IMediaFileEnricher<TvEpisode>
 {
     private readonly ILogger<TmdbApiTvEpisodeEnricher> _logger;
     private readonly ITmdbApiClient _tmdbApi;
@@ -18,45 +19,40 @@ public class TmdbApiTvEpisodeEnricher : IMediaFileEnricher<Models.TvEpisode>
         _tmdbApi = tmdbApi;
     }
 
-    public async Task<ResultBase> EnrichAsync(Models.TvEpisode mediaFile)
+    public async Task<TvEpisodeEnrichmentResult> EnrichAsync(TvEpisode mediaFile)
     {
-        // NOTE:
-        //1. get tvshow from api
-        //2. use tvshow to get episode from api
-        //3. use result to add to entity properties
-        //4. later use separation to allow proper batching
-
         Result<SearchTv> tvShowSearchResult = await SearchTvShowAsync(mediaFile);
         if (!tvShowSearchResult.IsSuccess)
         {
-            return tvShowSearchResult;
+            return new TvEpisodeEnrichmentResult(mediaFile, tvShowSearchResult);
         }
-        SearchTv tvShow = tvShowSearchResult.Value;
 
-        Result<TmdbTvEpisode> tvEpisodeResult = await GetTvEpisodeAsync(mediaFile, tvShow.Id);
+        Result<TmdbTvEpisode> tvEpisodeResult = await GetTvEpisodeAsync(mediaFile, tvShowSearchResult.Value.Id);
         if (!tvEpisodeResult.IsSuccess)
         {
-            return tvEpisodeResult;
+            return new TvEpisodeEnrichmentResult(mediaFile, tvEpisodeResult);
         }
-        TmdbTvEpisode tvEpisode = tvEpisodeResult.Value;
 
-        mediaFile.Title = tvEpisode.Name;
-        if (tvEpisode.AirDate.HasValue)
+        EnrichMediaFile(mediaFile, tvEpisodeResult.Value);
+        return new TvEpisodeEnrichmentResult(mediaFile, ResultBase.Success());
+    }
+
+    private void EnrichMediaFile(TvEpisode mediaFile, TmdbTvEpisode tmdbTvEpisode)
+    {
+        mediaFile.Title = tmdbTvEpisode.Name;
+        if (tmdbTvEpisode.AirDate.HasValue)
         {
-            mediaFile.Year = tvEpisode.AirDate.Value.Year;
+            mediaFile.Year = tmdbTvEpisode.AirDate.Value.Year;
         }
-
         _logger.LogInformation("Enriched {ShowName} S{Season}E{Episode} -> {Year} / {Title}",
                                mediaFile.TvShowName,
                                mediaFile.Season,
                                mediaFile.Episode,
                                mediaFile.Year,
                                mediaFile.Title);
-
-        return ResultBase.Success();
     }
 
-    private async Task<Result<SearchTv>> SearchTvShowAsync(Models.TvEpisode mediaFile)
+    private async Task<Result<SearchTv>> SearchTvShowAsync(TvEpisode mediaFile)
     {
         SearchContainer<SearchTv> search;
         try
@@ -83,7 +79,7 @@ public class TmdbApiTvEpisodeEnricher : IMediaFileEnricher<Models.TvEpisode>
         return Result<SearchTv>.Success(search.Results[0]);
     }
 
-    private async Task<Result<TmdbTvEpisode>> GetTvEpisodeAsync(Models.TvEpisode mediaFile, int tmdbTvShowId)
+    private async Task<Result<TmdbTvEpisode>> GetTvEpisodeAsync(TvEpisode mediaFile, int tmdbTvShowId)
     {
         TmdbTvEpisode? result;
         try
@@ -106,8 +102,74 @@ public class TmdbApiTvEpisodeEnricher : IMediaFileEnricher<Models.TvEpisode>
         return Result<TmdbTvEpisode>.Success(result);
     }
 
-    public Task EnrichAllAsync(IEnumerable<Models.TvEpisode> mediaFiles)
+    public async Task<IEnumerable<TvEpisodeEnrichmentResult>> EnrichAllAsync(IEnumerable<TvEpisode> mediaFiles)
     {
-        throw new NotImplementedException();
+        var searchTvShowTasks = new List<Task<Result<SearchTv>>>();
+        var searchTvShowTaskToFiles = new Dictionary<Task<Result<SearchTv>>, TvEpisode>();
+
+        // start search show tasks for all files
+        foreach (TvEpisode file in mediaFiles)
+        {
+            var task = SearchTvShowAsync(file);
+            searchTvShowTasks.Add(task);
+            searchTvShowTaskToFiles[task] = file;
+        }
+
+        int fileCount = searchTvShowTasks.Count;
+        var getEpisodeTasks = new List<Task<Result<TmdbTvEpisode>>>(fileCount);
+        var getEpisodeTaskToFiles = new Dictionary<Task<Result<TmdbTvEpisode>>, TvEpisode>(fileCount);
+
+        // as searches complete, start get episode fetches 
+        while (searchTvShowTasks.Count > 0)
+        {
+            var finishedSearch = await Task.WhenAny(searchTvShowTasks);
+            var searchTvShowResult = await finishedSearch;
+            // note we don't bother removing from task-2-file mapping dictionary
+            searchTvShowTasks.Remove(finishedSearch);
+
+            TvEpisode file = searchTvShowTaskToFiles[finishedSearch];
+            Task<Result<TmdbTvEpisode>> task;
+
+            if (searchTvShowResult.IsSuccess)
+            {
+                // start get episode 
+                task = GetTvEpisodeAsync(file, searchTvShowResult.Value.Id);
+            }
+            else
+            {
+                task = Task.FromResult(Result<TmdbTvEpisode>.Failure(searchTvShowResult.Error));
+            }
+
+            getEpisodeTasks.Add(task);
+            getEpisodeTaskToFiles[task] = file;
+        }
+
+        var results = new List<TvEpisodeEnrichmentResult>(fileCount);
+
+        // as get episodes complete, enrich media files with metadata
+        while (getEpisodeTasks.Count > 0)
+        {
+            var finishedGet = await Task.WhenAny(getEpisodeTasks);
+            var getTvEpisodeResult = await finishedGet;
+            // note we don't bother removing from task-2-file mapping dictionary
+            getEpisodeTasks.Remove(finishedGet);
+
+            TvEpisode file = getEpisodeTaskToFiles[finishedGet];
+            TvEpisodeEnrichmentResult result;
+
+            if (getTvEpisodeResult.IsSuccess)
+            {
+                EnrichMediaFile(file, getTvEpisodeResult.Value);
+                result = new TvEpisodeEnrichmentResult(file, ResultBase.Success());
+            }
+            else
+            {
+                result = new TvEpisodeEnrichmentResult(file, ResultBase.Failure(getTvEpisodeResult.Error));
+            }
+
+            results.Add(result);
+        }
+
+        return results;
     }
 }

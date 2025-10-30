@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using TMDbLib.Client;
 using TMDbLib.Objects.General;
 using TMDbLib.Objects.Search;
-using TMDbLib.Objects.TvShows;
 using TmdbTvEpisode = TMDbLib.Objects.TvShows.TvEpisode;
 
 namespace MediaOrganizer.Infrastructure.ApiClients
@@ -70,7 +69,7 @@ namespace MediaOrganizer.Infrastructure.ApiClients
         /// <summary>
         /// If TvEpisode is not found null will be returned.
         /// </summary>
-        public async Task<TvEpisode?> GetTvEpisodeAsync(int tvShowId, int seasonNumber, int episodeNumber)
+        public async Task<TmdbTvEpisode?> GetTvEpisodeAsync(int tvShowId, int seasonNumber, int episodeNumber)
         {
             _logger.LogInformation(
                 "Getting TV episode for tvShowId={TvShowId}, season={SeasonNumber}, episode={EpisodeNumber}",
@@ -78,7 +77,7 @@ namespace MediaOrganizer.Infrastructure.ApiClients
                 seasonNumber,
                 episodeNumber);
 
-            TvEpisode? episode = await _client.GetTvEpisodeAsync(
+            TmdbTvEpisode? episode = await _client.GetTvEpisodeAsync(
                 tvShowId,
                 seasonNumber,
                 episodeNumber);

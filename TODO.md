@@ -15,6 +15,7 @@ FEATURE: Enrich with metadata from The Movie Database (TMDB) API and use that in
         - [x] Add integration test to ensure that TMDB API client works, if we have show name, season and episode number we should be able to get year of show and episode title
         - [x] Define interface for enrichment.
         - [x] Add class that uses api client to enrich TvEpisode objects with info from TMDB api
+        - [x] Implement batch processing for TMDB api enricher
         - [ ] Add class that enriches tv show objects with info from file path. Copy and use same regex from old TvEpisodeParser but we will now only show name, season number, episode number.
         - [ ] Add class TvEpisodeParser2, will be able to use multiple enrichers in order to add and improve info of a TvEpisode object
     - [ ] Use TvEpisodeParser2 in media organizer classes instead of old parser.
@@ -36,8 +37,13 @@ Do these first since will affect and help how solve the cricital issues below
 
 ## 🔧 Core Improvements
 - [ ] **File organization/moving: Strategy pattern for different organization methods** - Architecture improvement
-- [ ] **DRY double validation TvShow and movie model** - Code quality
 - [ ] **Feature: cleanup jpg and nfo (and txt?) files** - Extends existing cleanup feature
+- [ ] Kodi NFO file generation and reading. Seems to exist one format for movie and another for tv episode
+    - https://kodi.wiki/view/NFO_files/Episodes#nfo_Tags
+    - [ ] Update internal formats to be more closely compatible with kodi nfo in terms of property naming and structure
+    - [ ] KodiNfoTvEpisodeEnricher => take info and add to internal format
+    - [ ] KodiNfoMovieEnricher => take info and add to internal format
+    - [ ] Feature to enable generating nfo files
 
 ## 📚 Documentation & DevEx
 - [ ] **Add readme** - Essential for project usability
@@ -47,6 +53,7 @@ Do these first since will affect and help how solve the cricital issues below
 ## 🏗️ Refactoring & Architecture
 - [ ] **Possibly refactor MediaOrganizerService into Program.cs** - Separate UI from logic
 - [ ] **Add quality to TvEpisode and parser** - Feature enhancement
+- [ ] **DRY double validation TvShow and movie model** - Code quality. UPDATE don't completely remember what was about. May have already fixed, remove later if fixed or is obsolete TODO.
 
 ## Nice to Have 🌟
 

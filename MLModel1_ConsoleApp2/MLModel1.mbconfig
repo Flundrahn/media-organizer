@@ -1,0 +1,104 @@
+﻿{
+  "Scenario": "NamedEntitiyRecognition",
+  "DataSource": {
+    "Version": 3,
+    "EscapeCharacter": "\"",
+    "ReadMultiLines": false,
+    "KeepDiacritics": false,
+    "KeepPunctuations": false,
+    "AllowQuoting": false,
+    "Type": "TabularFile",
+    "FilePath": "C:\\Users\\fredr\\source\\repos\\media-organizer\\TempConsole\\Data\\refined_training_data_ner.txt",
+    "Delimiter": "\t",
+    "DecimalMarker": ".",
+    "HasHeader": false,
+    "ColumnProperties": [
+      {
+        "ColumnName": "Sentence",
+        "ColumnPurpose": "Sentence",
+        "ColumnDataFormat": "String",
+        "IsCategorical": false,
+        "Type": "Column",
+        "Version": 5
+      },
+      {
+        "ColumnName": "Label",
+        "ColumnPurpose": "Label",
+        "ColumnDataFormat": "StringArray",
+        "IsCategorical": false,
+        "Type": "Column",
+        "Version": 5
+      }
+    ]
+  },
+  "Environment": {
+    "Type": "LocalGPU",
+    "Version": 1
+  },
+  "RunHistory": {
+    "Version": 3,
+    "Type": "Result",
+    "Trials": [
+      {
+        "Version": 1,
+        "Type": "Trial",
+        "TrainerName": "NamedEntityRecognitionMulti",
+        "Score": 0.0,
+        "RuntimeInSeconds": 2793.535,
+        "Parameter": {
+          "_SCHEMA_": "e0 * e1 * e2 * e3",
+          "e0": {
+            "InputColumnName": "Sentence",
+            "OutputColumnName": "Sentence",
+            "CaseMode": "None",
+            "KeepDiacritics": false,
+            "KeepPunctuations": false,
+            "KeepNumbers": true
+          },
+          "e1": {
+            "OutputColumnName": "Label",
+            "InputColumnName": "Label",
+            "AddKeyValueAnnotationsAsText": false
+          },
+          "e2": {
+            "PredictionColumnName": "predicted_label",
+            "LabelColumnName": "Label",
+            "Sentence1ColumnName": "Sentence",
+            "BatchSize": 32,
+            "MaxEpochs": 10,
+            "Architecture": "Roberta"
+          },
+          "e3": {
+            "OutputColumnName": "predicted_label",
+            "InputColumnName": "predicted_label"
+          }
+        }
+      }
+    ],
+    "Estimators": {
+      "e0": "NormalizeText",
+      "e1": "MapValueToKey",
+      "e2": "NamedEntityRecognitionMulti",
+      "e3": "MapKeyToValue"
+    },
+    "Schema": "e0 * e1 * e2 * e3",
+    "MetricName": "Accuracy",
+    "ModelFilePath": "C:\\Users\\fredr\\source\\repos\\media-organizer\\MLModel1_ConsoleApp2\\MLModel1.mlnet"
+  },
+  "Type": "TrainingConfig",
+  "Version": 5,
+  "TrainingOption": {
+    "Version": 0,
+    "Type": "NerTrainingOption",
+    "TrainingTime": 2147483647,
+    "LabelColumn": "Label",
+    "SentenceColumn": "Sentence",
+    "LabelsFilePath": "C:\\Users\\fredr\\source\\repos\\media-organizer\\TempConsole\\Data\\entity_key_map.txt",
+    "Epoch": 10,
+    "ValidationOption": {
+      "Version": 0,
+      "Type": "TrainValidateSplitValidationOption",
+      "SplitRatio": 0.2
+    }
+  }
+}

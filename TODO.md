@@ -1,6 +1,6 @@
 # Media Organizer - TODO
 
-## 🔥 Currently Working On
+## Currently Working On
 
 Make a commit with a simple message when done with each step
 
@@ -20,6 +20,20 @@ FEATURE: Enrich with metadata from The Movie Database (TMDB) API and use that in
         - [ ] Add class TvEpisodeParser2, will be able to use multiple enrichers in order to add and improve info of a TvEpisode object
     - [ ] Use TvEpisodeParser2 in media organizer classes instead of old parser.
 
+### Notes : FilePathTvEpisodeEnricher
+
+Use some type of regex based engine internally to handle extraction of
+- show name, well enough that it is searchable in TMDB
+- season number
+- episode number
+
+This will support some patterns of filepath, but not all
+This will support some patterns of filename, but not all
+
+### Notes : TmdbApiTvEpisodeEnricher
+- add handling, if multiple results for show search, should return some type of result where user can choose which is the correct one
+- meaning a result with show candidates
+
 ## Priority Features 
 Do these first since will affect and help how solve the cricital issues below
 
@@ -30,12 +44,12 @@ Do these first since will affect and help how solve the cricital issues below
 - [ ] Add video file metadata extractor using MediaInfo approach similar to in our benchmark
     - Refactor to use extractor get quality from files
 
-## 🚨 Critical Issues
+## Critical Issues
 - [ ] **Problem: does not move auxiliary files along with main video for movie or tv show** - Core functionality gap - Possibly this would be easier if we store actual show and movie metadata in DB or corresponding.
 - [ ] **Problem: does not rename subtitle files along with corresponding video file** - Related to above, possibly wait if will add DB anyway.
 - [ ] **Problem: does not use the full path when organizing media** if do not have say title, season or episode in file name will not find it - Core functionality issue
 
-## 🔧 Core Improvements
+## Core Improvements
 - [ ] **File organization/moving: Strategy pattern for different organization methods** - Architecture improvement
 - [ ] **Feature: cleanup jpg and nfo (and txt?) files** - Extends existing cleanup feature
 - [ ] Kodi NFO file generation and reading. Seems to exist one format for movie and another for tv episode
@@ -45,24 +59,27 @@ Do these first since will affect and help how solve the cricital issues below
     - [ ] KodiNfoMovieEnricher => take info and add to internal format
     - [ ] Feature to enable generating nfo files
 
-## 📚 Documentation & DevEx
-- [ ] **Add smooth build and publish setup, maybe checkout GitHub actions and release** - DevEx
-- [ ] **Use microsoft package for console options that can display usage and so on** - Better CLI UX
+## Documentation & DevEx
+- [ ] **Add smooth build and publish setup, maybe checkout GitHub actions and release**
 
-## 🏗️ Refactoring & Architecture
+## Refactoring & Architecture
 - [ ] **Possibly refactor MediaOrganizerService into Program.cs** - Separate UI from logic
 - [ ] **Add quality to TvEpisode and parser** - Feature enhancement
 - [ ] **DRY double validation TvShow and movie model** - Code quality. UPDATE don't completely remember what was about. May have already fixed, remove later if fixed or is obsolete TODO.
 
-## Nice to Have 🌟
+## Nice to Have
+
+### UI
+- [ ] **Use microsoft package for console options that can display usage and so on** - Better CLI UX
 
 ### Core Features
 - [ ] Batch operations with progress tracking
-- [ ] Better error handling and user feedback
 - [ ] Undo operations for file moves
-- [ ] Fetch metedata from online databases (e.g., TheMovieDB, IMDb)
 - [ ] Duplicate file detection and handling
 - [ ] Rate limiting for API calls, TMDB docs `50 requests per second range. This limit could change at any time so be respectful of the service we have built and respect the 429` handling of 429 responses.
+- [ ] Return nice error when not possible to move a file due to info used in path template, but not available on the media file
+- [ ] Tmdb API enricher - add handling to skip leading "the" to avoid if something is The Six Million Dollar Man vs Six Million Dollar Man
+- [ ] Feature to submit failed files, along with exception or other info. Could use to put a micro service in cloud, nice practice. Could use to submit new patterns to strengthen the algorithm in FilePathTvEpisodeEnricher.
 
 ### Enhanced User Experience
 - [ ] File preview/details view with metadata
@@ -72,9 +89,7 @@ Do these first since will affect and help how solve the cricital issues below
 
 ### Advanced Features
 - [ ] Metadata extraction (resolution, duration, codec info)
-- [ ] Performance optimizations for large directories
 - [ ] Async operations for better responsiveness
-- [ ] Plugin/extension system for custom processors
 - [ ] Add DB to keep state of media directories. Can validate files are where last was. Can have events NewTvShowAdded to decouple handler. Then use API to fetch metadata including episode names, that way can keep all info without storing it in names of shows as now.
 
 ### Optimizing C#
@@ -91,21 +106,16 @@ Do these first since will affect and help how solve the cricital issues below
 - [ ] Command-line arguments support for automation
 - [ ] Watch folders for automatic processing
 - [ ] Scheduled operations
-- [ ] appSettings.Local.json support for local overrides, (check in and deploy appSettings.Development?)
-- [ ] Configuration menu for runtime settings changes => write to appSettings.Local.json
 
 ### Platform & Integration
 - [ ] GUI version (WPF/MAUI)
 - [ ] Web interface for remote management
 - [ ] Portable/standalone version
 
-## Known Issues 🐛
+## Known Issues
 - [ ] Console input issues when input is redirected (app hangs with piped input or automation)
 - [ ] Large directory scanning may be slow
 - [ ] No graceful handling of locked files
-
-## Won't Do
-- [ ] Support for additional media formats (images, audio)
 
 ## Done 
 - [x] Configuration loading from appsettings.json

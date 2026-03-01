@@ -146,25 +146,25 @@ public class TmdbApiTvEpisodeEnricher : IMediaFileEnricher<TvEpisode>
 
         var results = new List<TvEpisodeEnrichmentResult>(fileCount);
 
-        // as get episodes complete, enrich media files with metadata
+        // as getEpisodeTasks complete, enrich each media files with metadata
         while (getEpisodeTasks.Count > 0)
         {
-            var finishedGet = await Task.WhenAny(getEpisodeTasks);
-            var getTvEpisodeResult = await finishedGet;
+            var finishedGetEpisodeTask = await Task.WhenAny(getEpisodeTasks);
+            var getEpisodeResult = await finishedGetEpisodeTask;
             // note we don't bother removing from task-2-file mapping dictionary
-            getEpisodeTasks.Remove(finishedGet);
+            getEpisodeTasks.Remove(finishedGetEpisodeTask);
 
-            TvEpisode file = getEpisodeTaskToFiles[finishedGet];
+            TvEpisode file = getEpisodeTaskToFiles[finishedGetEpisodeTask];
             TvEpisodeEnrichmentResult result;
 
-            if (getTvEpisodeResult.IsSuccess)
+            if (getEpisodeResult.IsSuccess)
             {
-                EnrichMediaFile(file, getTvEpisodeResult.Value);
+                EnrichMediaFile(file, getEpisodeResult.Value);
                 result = new TvEpisodeEnrichmentResult(file, ResultBase.Success());
             }
             else
             {
-                result = new TvEpisodeEnrichmentResult(file, ResultBase.Failure(getTvEpisodeResult.Error));
+                result = new TvEpisodeEnrichmentResult(file, ResultBase.Failure(getEpisodeResult.Error));
             }
 
             results.Add(result);

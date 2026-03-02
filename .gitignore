@@ -11,5 +11,4 @@ obj/
 .ionide
 appsettings.Development.json
 /.vs
-MediaOrganizer.Benchmarks/BenchmarkDotNet.Artifacts/*
-BenchmarkDotNet.Artifacts/*
+**/BenchmarkDotNet.Artifacts/*

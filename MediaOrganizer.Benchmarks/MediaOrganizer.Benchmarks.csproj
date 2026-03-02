@@ -17,10 +17,13 @@
     <ProjectReference Include="..\MediaOrganizer\MediaOrganizer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="BenchmarkDotNet.Artifacts\" />
+  </ItemGroup>
+
   <!-- Copy MediaInfo.dll using PowerShell script after build -->
   <Target Name="CopyMediaInfoDll" AfterTargets="Build">
-    <Exec Command="pwsh -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\build\CopyMediaInfoDll.ps1&quot; -OutputPath &quot;$(OutputPath)&quot; -Configuration &quot;$(Configuration)&quot;" 
-          ContinueOnError="true" />
+    <Exec Command="pwsh -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\build\CopyMediaInfoDll.ps1&quot; -OutputPath &quot;$(OutputPath)&quot; -Configuration &quot;$(Configuration)&quot;" ContinueOnError="true" />
   </Target>
 
 </Project>

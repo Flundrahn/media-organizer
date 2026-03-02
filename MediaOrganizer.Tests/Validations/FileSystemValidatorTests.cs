@@ -133,4 +133,88 @@ public class FileSystemValidatorTests
         // Assert
         Assert.False(result);
     }
+
+    [Theory]
+    [InlineData("ValidFolder")]
+    [InlineData("Valid Folder")]
+    [InlineData("Valid-Folder")]
+    [InlineData("Valid_Folder")]
+    [InlineData("ValidFolder123")]
+    public void IsValidPathSegment_WithValidSegment_ReturnsTrue(string segment)
+    {
+        // Act
+        var result = _sut.IsValidPathSegment(segment);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    public void IsValidPathSegment_WithNullOrEmpty_ReturnsFalse(string? segment)
+    {
+        // Act
+        #pragma warning disable CS8604 // Possible null reference argument.
+        var result = _sut.IsValidPathSegment(segment);
+        #pragma warning restore CS8604 // Possible null reference argument.
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Theory]
+    [InlineData("Invalid<>Folder")]
+    [InlineData("Invalid|Folder")]
+    [InlineData("Invalid:Folder")]
+    [InlineData("Invalid\"Folder")]
+    [InlineData("Invalid*Folder")]
+    [InlineData("Invalid?Folder")]
+    public void IsValidPathSegment_WithInvalidCharacters_ReturnsFalse(string segment)
+    {
+        // Act
+        var result = _sut.IsValidPathSegment(segment);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void AreValidPathSegments_WithAllValidSegments_ReturnsTrue()
+    {
+        // Arrange - All segments valid, no empty entries
+        var segments = new[] { "Folder1", "Folder2", "File Name" };
+
+        // Act
+        var result = _sut.AreValidPathSegments(segments);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void AreValidPathSegments_WithEmptySegment_ReturnsFalse()
+    {
+        // Arrange - Empty segments should be removed by caller using StringSplitOptions.RemoveEmptyEntries
+        var segments = new[] { "Folder1", "", "Folder2" };
+
+        // Act
+        var result = _sut.AreValidPathSegments(segments);
+
+        // Assert
+        Assert.False(result, "Empty segments should cause validation to fail - caller should use RemoveEmptyEntries");
+    }
+
+    [Fact]
+    public void AreValidPathSegments_WithInvalidSegmentAmongValid_ReturnsFalse()
+    {
+        // Arrange
+        var segments = new[] { "Folder1", "Invalid<>Folder", "Folder3" };
+
+        // Act
+        var result = _sut.AreValidPathSegments(segments);
+
+        // Assert
+        Assert.False(result);
+    }
 }

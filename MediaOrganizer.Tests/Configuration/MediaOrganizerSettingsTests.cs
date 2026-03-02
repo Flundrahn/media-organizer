@@ -396,6 +396,14 @@ public class MediaOrganizerSettingsTests
     [InlineData(@"{TvShowName}\Season {Season}\{TvShowName}")]  // Windows-style paths with verbatim string
     [InlineData("{TvShowName}/Season {Season}/{TvShowName}")]   // Unix-style paths
     [InlineData("{TvShowName}\\\\Season {Season}\\\\{TvShowName}")] // Double-escaped backslashes
+    [InlineData("{TvShowName}/Season {Season}\\{TvShowName}")]  // Mixed forward and backslash
+    [InlineData(@"{TvShowName}\Season {Season}/{TvShowName}")]  // Mixed backslash and forward
+    [InlineData("/{TvShowName}/Season {Season}")]               // Leading forward slash
+    [InlineData("{TvShowName}/Season {Season}/")]               // Trailing forward slash
+    [InlineData(@"\{TvShowName}\Season {Season}")]              // Leading backslash
+    [InlineData(@"{TvShowName}\Season {Season}\")]              // Trailing backslash
+    [InlineData("{TvShowName}//Season {Season}")]               // Double forward slash
+    [InlineData(@"{TvShowName}\\Season {Season}")]              // Double backslash
     public void IsValid_WithDifferentPathSeparators_ReturnsTrue(string template)
     {
         // Arrange

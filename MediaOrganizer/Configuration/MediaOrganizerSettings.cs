@@ -238,7 +238,9 @@ public class MediaOrganizerSettings
             @"\{[^}]*\}",
             "X"); // Replace placeholders with a safe character
 
-        var pathParts = templateWithoutPlaceholders.Split('/', '\\');
+        var pathParts = templateWithoutPlaceholders.Split(
+            [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+            StringSplitOptions.RemoveEmptyEntries);
         if (_validator != null && !_validator.AreValidPathSegments(pathParts))
         {
             _validationErrors.Add($"{templateName} contains invalid path characters");

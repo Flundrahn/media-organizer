@@ -28,17 +28,11 @@ public class FileSystemValidator
         return path.IndexOfAny(InvalidPathChars) < 0;
     }
 
-    /// <summary>
-    /// Validates that a path segment (directory or filename) contains only valid characters
-    /// </summary>
-    /// <param name="pathSegment">The path segment to validate</param>
-    /// <returns>True if the path segment is valid</returns>
     public bool IsValidPathSegment(string pathSegment)
     {
         if (string.IsNullOrEmpty(pathSegment))
             return false;
 
-        // Check for invalid path characters
         if (pathSegment.IndexOfAny(InvalidPathChars) > -1)
             return false;
 
@@ -50,15 +44,9 @@ public class FileSystemValidator
         return true;
     }
 
-    /// <summary>
-    /// Validates multiple path segments at once
-    /// </summary>
-    /// <param name="pathSegments">The path segments to validate</param>
-    /// <returns>True if all path segments are valid</returns>
     public bool AreValidPathSegments(IEnumerable<string> pathSegments)
     {
-        return pathSegments.All(segment => 
-            string.IsNullOrEmpty(segment) || IsValidPathSegment(segment));
+        return pathSegments.All(IsValidPathSegment);
     }
 
     public bool DirectoryIsWriteable(string path)

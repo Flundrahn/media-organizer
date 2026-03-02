@@ -37,7 +37,6 @@ Do these first since will affect and help how solve the cricital issues below
 - [ ] **Feature: cleanup jpg and nfo (and txt?) files** - Extends existing cleanup feature
 
 ## 📚 Documentation & DevEx
-- [ ] **Add readme** - Essential for project usability
 - [ ] **Add smooth build and publish setup, maybe checkout GitHub actions and release** - DevEx
 - [ ] **Use microsoft package for console options that can display usage and so on** - Better CLI UX
 
@@ -118,6 +117,7 @@ Do these first since will affect and help how solve the cricital issues below
 - [x] Complete cleanup directory console UI to able manually cleanup either tv show or movie directories
 - [x] **Generate regex in compile time for performance** - Implemented RegexOptions.Compiled for better performance
 - [x] **Settings validate one property at a time in own method** - Code quality
+- [x] **Add readme** - Essential for project usability
 
 # WORKING NOTES: String Deduplicator
 

@@ -65,10 +65,10 @@ public class Movie : IMediaFile
 
     public bool IsOrganized(MediaOrganizerSettings settings)
     {
-        if (!IsValid
-            || string.IsNullOrWhiteSpace(settings.MovieDestinationDirectory)
-            || string.IsNullOrWhiteSpace(settings.MoviePathTemplate))
+        if (!IsValid)
+        {
             return false;
+        }
 
         var organizedFullPath = GenerateFullPath(settings);
         var currentFullPath = Path.GetFullPath(CurrentFilePath); // Helps normalize for path comparison

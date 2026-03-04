@@ -79,10 +79,10 @@ public class TvEpisode : IMediaFile
     // I could return in a try pattern
     public bool IsOrganized(MediaOrganizerSettings settings)
     {
-        if (!IsValid
-            || string.IsNullOrWhiteSpace(settings.TvShowDestinationDirectory)
-            || string.IsNullOrWhiteSpace(settings.TvShowPathTemplate))
+        if (!IsValid)
+        {
             return false;
+        }
 
         var organizedFullPath = GenerateFullPath(settings);
         var currentFullPath = Path.GetFullPath(CurrentFilePath); // Helps normalize for path comparison

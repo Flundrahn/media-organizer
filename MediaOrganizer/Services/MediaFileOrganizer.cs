@@ -155,7 +155,7 @@ public class MediaFileOrganizer
                                fileInfo.Name,
                                mediaFileDestinationPath);
 
-        mediaFile.CurrentFile = _fileSystem.FileInfo.New(mediaFileDestinationPath);
+        mediaFile.SetCurrentFilePath(_fileSystem.FileInfo.New(mediaFileDestinationPath));
         _result.OrganizedCount++;
         return mediaFile;
     }

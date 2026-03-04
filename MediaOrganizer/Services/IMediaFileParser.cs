@@ -3,17 +3,9 @@ using MediaOrganizer.Models;
 
 namespace MediaOrganizer.Services;
 
-/// <summary>
-/// Interface for parsing TV show episode information from filenames
-/// </summary>
 public interface IMediaFileParser
 {
     // TODO: possibly replace the CanParse with a TryParse pattern
-    /// <summary>
-    /// Determines if the given filename can be parsed as a TV show episode
-    /// </summary>
-    /// <param name="filename">The filename to check</param>
-    /// <returns>True if the filename appears to be a TV show episode</returns>
     bool CanParse(string filename);
 
     /// <summary>

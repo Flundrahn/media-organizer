@@ -184,7 +184,7 @@ public class MovieParserTests
         Assert.Equal(string.Empty, movie.Title);
         Assert.Null(movie.Year);
         Assert.Equal(string.Empty, movie.Quality);
-        Assert.Equal(fileInfo, movie.CurrentFile);
-        Assert.Equal(fileInfo, movie.OriginalFile);
+        Assert.Equal(fileInfo.FullName, movie.CurrentFilePath);
+        Assert.Equal(fileInfo.FullName, movie.OriginalFilePath);
     }
 }

@@ -261,16 +261,16 @@ public class MediaOrganizerConsoleApp
             var currentFile = organizer.PeekFile();
             
             _console.WriteLine($"Files remaining: {organizer.RemainingCount}");
-            
+
             if (currentFile != null && currentFile.IsValid)
             {
-                _console.WriteLine($"Next file: {currentFile.OriginalFile.Name}");
+                _console.WriteLine($"Next file: {Path.GetFileName(currentFile.OriginalFilePath)}");
                 // TODO: Fix performance so feel free to generate the relative path many times like this
                 _console.WriteLine($"Will organize as: {currentFile.GenerateRelativePath(_settings)}");
             }
             else
             {
-                _console.WriteLine($"Next file: {currentFile?.OriginalFile.Name}");
+                _console.WriteLine($"Next file: {Path.GetFileName(currentFile?.OriginalFilePath)}");
                 _console.WriteError("Cannot parse this file - it will be skipped or failed");
             }
             

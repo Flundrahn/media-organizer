@@ -18,7 +18,7 @@ public class MovieTests
         var movie = new Movie(fileInfo);
 
         // Assert
-        Assert.Equal(fileInfo, movie.OriginalFile);
+        Assert.Equal(fileInfo.FullName, movie.OriginalFilePath);
     }
 
     [Fact]
@@ -31,8 +31,8 @@ public class MovieTests
         var movie = new Movie(fileInfo);
 
         // Assert
-        Assert.Equal(fileInfo, movie.CurrentFile);
-        Assert.Same(movie.OriginalFile, movie.CurrentFile);
+        Assert.Equal(fileInfo.FullName, movie.CurrentFilePath);
+        Assert.Equal(movie.OriginalFilePath, movie.CurrentFilePath);
     }
 
     [Fact]

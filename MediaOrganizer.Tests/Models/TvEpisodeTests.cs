@@ -17,7 +17,7 @@ public class TvEpisodeTests
         var episode = new TvEpisode(fileInfo);
 
         // Assert
-        Assert.Equal(fileInfo, episode.OriginalFile);
+        Assert.Equal(fileInfo.FullName, episode.OriginalFilePath);
     }
 
     [Fact]
@@ -31,8 +31,8 @@ public class TvEpisodeTests
         var episode = new TvEpisode(fileInfo);
 
         // Assert
-        Assert.Equal(fileInfo, episode.CurrentFile);
-        Assert.Same(episode.OriginalFile, episode.CurrentFile);
+        Assert.Equal(fileInfo.FullName, episode.CurrentFilePath);
+        Assert.Equal(episode.OriginalFilePath, episode.CurrentFilePath);
     }
 
     [Fact]

@@ -1,6 +1,6 @@
+using MediaOrganizer.Configuration;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
-using MediaOrganizer.Configuration;
 
 namespace MediaOrganizer.Models;
 
@@ -43,23 +43,25 @@ public class Movie : IMediaFile
         }
     }
 
-    public IFileInfo OriginalFile { get; init; }
+    public string OriginalFilePath { get; init; }
 
-    public IFileInfo CurrentFile { get; set; }
+    public string CurrentFilePath { get; set; } 
 
     public MediaType Type => MediaType.Movie;
 
-    /// <summary>
-    /// Initializes a new instance of Movie with file information
-    /// </summary>
-    /// <param name="fileInfo">The file information to set as both original and current file</param>
     public Movie(IFileInfo fileInfo)
     {
-        OriginalFile = fileInfo;
-        CurrentFile = fileInfo;
+        OriginalFilePath = fileInfo.FullName;
+        CurrentFilePath = fileInfo.FullName;
+        //TODO: save also relative path
     }
 
     public bool IsValid => !string.IsNullOrWhiteSpace(Title);
+
+    public void SetCurrentFilePath(IFileInfo fileInfo)
+    {
+        CurrentFilePath = fileInfo.FullName;
+    }
 
     public bool IsOrganized(MediaOrganizerSettings settings)
     {
@@ -69,7 +71,7 @@ public class Movie : IMediaFile
             return false;
 
         var organizedFullPath = GenerateFullPath(settings);
-        var currentFullPath = Path.GetFullPath(CurrentFile.FullName);
+        var currentFullPath = Path.GetFullPath(CurrentFilePath); // Helps normalize for path comparison
 
         return string.Equals(currentFullPath, organizedFullPath, StringComparison.OrdinalIgnoreCase);
     }
@@ -112,15 +114,16 @@ public class Movie : IMediaFile
         // Clean up extra spaces
         result = Regex.Replace(result, @"\s+", " ").Trim();
 
+        // NOTE: Here should consider use extension of current file later, when introduce DB, leave for now
         // Always append the original file extension
-        var originalExtension = Path.GetExtension(OriginalFile.Name);
+
+        var originalExtension = Path.GetExtension(OriginalFilePath);
         if (!string.IsNullOrEmpty(originalExtension) && !result.EndsWith(originalExtension, StringComparison.OrdinalIgnoreCase))
         {
             result += originalExtension;
         }
 
         return result;
-
     }
 
     public override string ToString()

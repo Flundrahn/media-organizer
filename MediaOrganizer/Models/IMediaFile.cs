@@ -10,14 +10,16 @@ namespace MediaOrganizer.Models;
 public interface IMediaFile
 {
     /// <summary>
-    /// The original file info when the media file was first parsed
+    /// The original file path when the media file was first parsed
     /// </summary>
-    IFileInfo OriginalFile { get; }
+    string OriginalFilePath { get; }
 
     /// <summary>
-    /// The current file info, which may be different from original if the file has been moved
+    /// The current file path, which may be different from original if the file has been moved
     /// </summary>
-    IFileInfo CurrentFile { get; set; }
+    string CurrentFilePath { get; }
+
+    void SetCurrentFilePath(IFileInfo fileInfo);
 
     /// <summary>
     /// Whether the parsing was successful and the media file contains valid information

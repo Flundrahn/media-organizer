@@ -127,8 +127,8 @@ public class MediaFileOrganizerTests
         Assert.True(result.IsValid, "Returned episode should be valid");
 
         // Assert - verify the original and current file paths are tracked correctly
-        Assert.Equal(sourceFilePath, result.OriginalFile.FullName);
-        Assert.NotEqual(result.OriginalFile.FullName, result.CurrentFile.FullName);
+        Assert.Equal(sourceFilePath, result.OriginalFilePath);
+        Assert.NotEqual(result.OriginalFilePath, result.CurrentFilePath);
     }
 
     [Fact]

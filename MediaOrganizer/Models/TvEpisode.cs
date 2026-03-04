@@ -1,6 +1,6 @@
+using MediaOrganizer.Configuration;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
-using MediaOrganizer.Configuration;
 
 namespace MediaOrganizer.Models;
 
@@ -21,8 +21,8 @@ public class TvEpisode : IMediaFile
     public string TvShowName
     {
         get => _tvShowName;
-        internal set => _tvShowName = string.IsNullOrWhiteSpace(value) 
-            ? string.Empty 
+        internal set => _tvShowName = string.IsNullOrWhiteSpace(value)
+            ? string.Empty
             : value;
     }
 
@@ -40,8 +40,8 @@ public class TvEpisode : IMediaFile
     public string Title
     {
         get => _title;
-        internal set => _title = string.IsNullOrWhiteSpace(value) 
-            ? string.Empty 
+        internal set => _title = string.IsNullOrWhiteSpace(value)
+            ? string.Empty
             : value;
     }
 
@@ -49,32 +49,31 @@ public class TvEpisode : IMediaFile
     public string Quality
     {
         get => _quality;
-        internal set => _quality = string.IsNullOrWhiteSpace(value) 
-            ? string.Empty 
+        internal set => _quality = string.IsNullOrWhiteSpace(value)
+            ? string.Empty
             : value;
     }
 
     public int? Year { get; internal set; }
-
-    public IFileInfo OriginalFile { get; init; }
-
-    public IFileInfo CurrentFile { get; set; }
-
+    public string OriginalFilePath { get; init; }
+    public string CurrentFilePath { get; set; }
     public MediaType Type => MediaType.TvShow;
 
-    /// <summary>
-    /// Initializes a new instance of TvEpisode with file information
-    /// </summary>
-    /// <param name="fileInfo">The file information to set as both original and current file</param>
     public TvEpisode(IFileInfo fileInfo)
     {
-        OriginalFile = fileInfo;
-        CurrentFile = fileInfo;
+        OriginalFilePath = fileInfo.FullName;
+        CurrentFilePath = fileInfo.FullName;
+        //TODO: save also relative path
     }
 
     public bool IsValid => !string.IsNullOrWhiteSpace(TvShowName) && Season > 0 && Episode > 0;
 
-    // note: this is a nice method to have, it just troubles me a little bit that it does encourage generating the path multiple times
+    public void SetCurrentFilePath(IFileInfo fileInfo)
+    {
+        CurrentFilePath = fileInfo.FullName;
+    }
+
+    // NOTE: this is a nice method to have, it just troubles me a little bit that it does encourage generating the path multiple times
     // it might be possible to refactor later to be smarter somehow, cache somehow.
     // to check if already organized, I need to generate the path from the settings and compare to current file path.
     // I could return in a try pattern
@@ -86,7 +85,7 @@ public class TvEpisode : IMediaFile
             return false;
 
         var organizedFullPath = GenerateFullPath(settings);
-        var currentFullPath = Path.GetFullPath(CurrentFile.FullName); // Helps normalize for path comparison
+        var currentFullPath = Path.GetFullPath(CurrentFilePath); // Helps normalize for path comparison
 
         return string.Equals(currentFullPath, organizedFullPath, StringComparison.OrdinalIgnoreCase);
     }
@@ -132,7 +131,7 @@ public class TvEpisode : IMediaFile
         result = Regex.Replace(result, @"\s+", " ").Trim();
 
         // Always append the original file extension
-        var originalExtension = Path.GetExtension(OriginalFile.Name);
+        var originalExtension = Path.GetExtension(OriginalFilePath);
         if (!string.IsNullOrEmpty(originalExtension) && !result.EndsWith(originalExtension, StringComparison.OrdinalIgnoreCase))
         {
             result += originalExtension;

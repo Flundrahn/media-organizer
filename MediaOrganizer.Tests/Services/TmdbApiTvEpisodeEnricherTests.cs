@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
 using MediaOrganizer.Infrastructure.ApiClients;
 using MediaOrganizer.Models;
-using MediaOrganizer.Services;
+using MediaOrganizer.Services.MetadataEnrichers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using TMDbLib.Objects.General;

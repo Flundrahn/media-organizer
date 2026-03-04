@@ -6,7 +6,7 @@ using TMDbLib.Objects.General;
 using TMDbLib.Objects.Search;
 using TmdbTvEpisode = TMDbLib.Objects.TvShows.TvEpisode;
 
-namespace MediaOrganizer.Services;
+namespace MediaOrganizer.Services.MetadataEnrichers;
 
 public class TmdbApiTvEpisodeEnricher : IMediaFileEnricher<TvEpisode>
 {

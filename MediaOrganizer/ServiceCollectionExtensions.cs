@@ -32,6 +32,8 @@ public static class ServiceCollectionExtensions
             .AddTransient<FileSystemValidator>()
             .AddTransient<IDirectoryCleaner, DirectoryCleaner>()
             .AddTransient<MediaOrganizerConsoleApp>()
+            .AddTransient<TvEpisodeParser>()
+            .AddTransient<MovieParser>()
             .AddMediaFileOrganizerFactory()
             .AddTmdbApi();
 
@@ -45,7 +47,9 @@ public static class ServiceCollectionExtensions
             return new MediaFileOrganizerFactory(
                 resolveFileSystem: () => provider.GetRequiredService<IFileSystem>(),
                 resolveLogger: () => provider.GetRequiredService<ILogger<MediaFileOrganizer>>(),
-                resolveSettings: () => provider.GetRequiredService<IOptions<MediaOrganizerSettings>>());
+                resolveSettings: () => provider.GetRequiredService<IOptions<MediaOrganizerSettings>>(),
+                resolveTvEpisodeParser: () => provider.GetRequiredService<TvEpisodeParser>(),
+                resolveMovieParser: () => provider.GetRequiredService<MovieParser>());
         });
 
         return services;

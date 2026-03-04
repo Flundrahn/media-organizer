@@ -13,6 +13,7 @@ public interface IMediaFile
     /// The original file path when the media file was first parsed
     /// </summary>
     string OriginalFilePath { get; }
+    public string OriginalFileRelativePath { get; }
 
     /// <summary>
     /// The current file path, which may be different from original if the file has been moved

@@ -9,6 +9,10 @@ namespace MediaOrganizer.Models;
 /// </summary>
 public class TvEpisode : IMediaFile
 {
+    private string _quality = string.Empty;
+    private string _tvShowName = string.Empty;
+    private string _title = string.Empty;
+
     /// <summary>
     /// Valid placeholders that can be used in path templates for TV show episodes
     /// </summary>
@@ -16,8 +20,6 @@ public class TvEpisode : IMediaFile
     {
         "TvShowName", "Season", "Episode", "Title", "Year", "Quality"
     };
-
-    private string _tvShowName = string.Empty;
     public string TvShowName
     {
         get => _tvShowName;
@@ -25,18 +27,14 @@ public class TvEpisode : IMediaFile
             ? string.Empty
             : value;
     }
-
     /// <summary>
     /// The season number (1-based)
     /// </summary>
     public int Season { get; internal set; }
-
     /// <summary>
     /// The episode number within the season (1-based)
     /// </summary>
     public int Episode { get; internal set; }
-
-    private string _title = string.Empty;
     public string Title
     {
         get => _title;
@@ -44,8 +42,6 @@ public class TvEpisode : IMediaFile
             ? string.Empty
             : value;
     }
-
-    private string _quality = string.Empty;
     public string Quality
     {
         get => _quality;
@@ -53,17 +49,22 @@ public class TvEpisode : IMediaFile
             ? string.Empty
             : value;
     }
-
     public int? Year { get; internal set; }
-    public string OriginalFilePath { get; init; }
-    public string CurrentFilePath { get; set; }
+    public string OriginalFilePath { get; }
+    public string OriginalFileRelativePath { get; }
+    public string CurrentFilePath { get; private set; }
     public MediaType Type => MediaType.TvShow;
 
-    public TvEpisode(IFileInfo fileInfo)
+    public TvEpisode(IFileInfo fileInfo, string tvShowSourceDirectory)
     {
+        if (!fileInfo.FullName.StartsWith(tvShowSourceDirectory, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException($"File '{fileInfo.FullName}' is not within the configured source directory '{tvShowSourceDirectory}'.");
+        }
+
         OriginalFilePath = fileInfo.FullName;
         CurrentFilePath = fileInfo.FullName;
-        //TODO: save also relative path
+        OriginalFileRelativePath = Path.GetRelativePath(tvShowSourceDirectory, fileInfo.FullName);
     }
 
     public bool IsValid => !string.IsNullOrWhiteSpace(TvShowName) && Season > 0 && Episode > 0;
@@ -97,10 +98,10 @@ public class TvEpisode : IMediaFile
 
     public string GenerateRelativePath(MediaOrganizerSettings settings)
     {
-        string template = settings.TvShowPathTemplate;
-
         if (!IsValid)
+        {
             throw new InvalidOperationException("Cannot generate path for an invalid TV show episode.");
+        }
 
         var replacements = new Dictionary<string, string>
         {
@@ -114,7 +115,7 @@ public class TvEpisode : IMediaFile
             { "{Quality}", Quality }
         };
 
-        var result = template;
+        var result = settings.TvShowPathTemplate;
         foreach (var replacement in replacements)
         {
             result = result.Replace(replacement.Key, replacement.Value);
@@ -127,7 +128,6 @@ public class TvEpisode : IMediaFile
         // Clean up patterns where Year was empty - remove empty parentheses
         result = Regex.Replace(result, @"\s*\(\s*\)", "");
 
-        // Clean up extra spaces
         result = Regex.Replace(result, @"\s+", " ").Trim();
 
         // Always append the original file extension

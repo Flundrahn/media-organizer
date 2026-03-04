@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using MediaOrganizer.Infrastructure.ApiClients;
+using MediaOrganizer.Models;
 using MediaOrganizer.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -69,10 +70,13 @@ public class TmdbApiTvEpisodeEnricherTests
         _sut = new TmdbApiTvEpisodeEnricher(NullLogger<TmdbApiTvEpisodeEnricher>.Instance, _fakeTmdbClient);
     }
 
-    private static MediaOrganizer.Models.TvEpisode CreateTvEpisode(string showName = "ShowName", int season = 1, int episode = 1, int year = 0)
+    private static TvEpisode CreateTvEpisode(string showName = "ShowName", int season = 1, int episode = 1, int year = 0)
     {
         var fileInfoMock = new Mock<IFileInfo>();
-        return new MediaOrganizer.Models.TvEpisode(fileInfoMock.Object)
+        fileInfoMock.SetupGet(f => f.FullName)
+                    .Returns("SourceDirectory/ShowName.S01E01.mkv");
+
+        return new TvEpisode(fileInfoMock.Object, "SourceDirectory")
         {
             TvShowName = showName,
             Season = season,

@@ -15,7 +15,7 @@ public class MovieTests
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.1080p.mkv");
 
         // Act
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
 
         // Assert
         Assert.Equal(fileInfo.FullName, movie.OriginalFilePath);
@@ -28,7 +28,7 @@ public class MovieTests
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\Inception.2010.4K.mp4");
 
         // Act
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
 
         // Assert
         Assert.Equal(fileInfo.FullName, movie.CurrentFilePath);
@@ -36,11 +36,26 @@ public class MovieTests
     }
 
     [Fact]
+    public void Constructor_WithFileOutsideSourceDirectory_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var fileInfo = _mockFileSystem.FileInfo.New(@"C:\wrong\The.Matrix.1999.1080p.mkv");
+        var sourceDirectory = @"C:\source\Movies";
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => new Movie(fileInfo, sourceDirectory)); 
+
+        Assert.Contains("not within the configured source directory", exception.Message);
+        Assert.Contains(fileInfo.FullName, exception.Message);
+        Assert.Contains(sourceDirectory, exception.Message);
+    }
+
+    [Fact]
     public void IsValid_WithValidData_ReturnsTrue()
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\test.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source\");
         movie.Title = "The Matrix";
         movie.Year = 1999;
 
@@ -53,7 +68,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\test.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "";
         movie.Year = 1999;
 
@@ -66,7 +81,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\test.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = null;
 
@@ -79,7 +94,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\test.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = 1999;
         movie.Quality = "1080p";
@@ -96,7 +111,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\test.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "Inception";
         movie.Year = 2010;
         movie.Quality = "";
@@ -113,7 +128,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.1080p.BluRay.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = 1999;
         movie.Quality = "1080p";
@@ -135,7 +150,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.1080p.BluRay.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = 1999;
         movie.Quality = "1080p";
@@ -157,7 +172,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.1080p.BluRay.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = 1999;
         movie.Quality = "1080p";
@@ -179,7 +194,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.1080p.BluRay.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = 1999;
         movie.Quality = "1080p";
@@ -201,7 +216,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\Inception.2010.mp4");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "Inception";
         movie.Year = 2010;
         movie.Quality = "";
@@ -223,7 +238,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\Inception.2010.mp4");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "Inception";
         movie.Year = 2010;
         movie.Quality = "";
@@ -245,7 +260,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\invalid.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         // Leave properties at default values (invalid state)
 
         var settings = new MediaOrganizerSettings
@@ -263,7 +278,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = 1999;
 
@@ -276,7 +291,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = 1999;
 
@@ -297,7 +312,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = 1999;
 
@@ -318,7 +333,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\The.Matrix.1999.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = 1999;
 
@@ -341,7 +356,7 @@ public class MovieTests
         var correctPath = @"C:\destination\Movies\The Matrix (1999).mkv";
         var fileInfo = _mockFileSystem.FileInfo.New(correctPath);
 
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\destination");
         movie.Title = "The Matrix";
         movie.Year = 1999;
 
@@ -365,7 +380,7 @@ public class MovieTests
         var wrongPath = @"C:\source\The.Matrix.1999.mkv";
         var fileInfo = _mockFileSystem.FileInfo.New(wrongPath);
 
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
         movie.Title = "The Matrix";
         movie.Year = 1999;
 
@@ -387,7 +402,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\invalid.mkv");
-        var movie = new Movie(fileInfo); // Invalid movie (no properties set)
+        var movie = new Movie(fileInfo, @"C:\source"); // Invalid movie (no properties set)
 
         var settings = new MediaOrganizerSettings
         {
@@ -407,7 +422,7 @@ public class MovieTests
     {
         // Arrange
         var fileInfo = _mockFileSystem.FileInfo.New(@"C:\source\test.mkv");
-        var movie = new Movie(fileInfo);
+        var movie = new Movie(fileInfo, @"C:\source");
 
         // Act & Assert
         Assert.Equal(MediaType.Movie, movie.Type);

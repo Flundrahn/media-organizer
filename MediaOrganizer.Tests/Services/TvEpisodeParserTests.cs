@@ -1,11 +1,26 @@
 using System.IO.Abstractions.TestingHelpers;
+using MediaOrganizer.Configuration;
 using MediaOrganizer.Models;
 using MediaOrganizer.Services;
+using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Tests.Services;
 
 public class TvEpisodeParserTests
 {
+    private readonly TvEpisodeParser _sut;
+    private readonly MediaOrganizerSettings _settings;
+
+    public TvEpisodeParserTests()
+    {
+        _settings = new MediaOrganizerSettings()
+        {
+            TvShowSourceDirectory = @"C:\TvSource",
+        };
+        var options = Options.Create(_settings);
+        _sut = new TvEpisodeParser(options);
+    }
+
     [Theory]
     [InlineData("Alien.Earth.S01E07.1080p.WEB.h264-ETHEL[EZTVx.to].mkv", "Alien Earth", 1, 7, "")]
     [InlineData("Gen.V.S02E01.REPACK.1080p.WEB.h264-ETHEL[EZTVx.to].mkv", "Gen V", 2, 1, "")]
@@ -14,12 +29,11 @@ public class TvEpisodeParserTests
     public void Parse_WithStandardSxxExxPattern_ShouldReturnCorrectTvEpisode(string filename, string expectedShow, int expectedSeason, int expectedEpisode, string expectedTitle)
     {
         // Arrange
-        var parser = new TvEpisodeParser();
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}");
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.TvShowSourceDirectory}\{filename}");
 
         // Act
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
@@ -37,12 +51,11 @@ public class TvEpisodeParserTests
     public void Parse_WithSeasonXEpisodePattern_ShouldReturnCorrectTvEpisode(string filename, string expectedShow, int expectedSeason, int expectedEpisode, string expectedTitle)
     {
         // Arrange
-        var parser = new TvEpisodeParser();
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.TvShowSourceDirectory}\{filename}"); 
 
         // Act
-        var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); 
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
@@ -61,12 +74,11 @@ public class TvEpisodeParserTests
     public void Parse_WithNoEpisodeTitle_ShouldReturnCorrectTvEpisode(string filename, string expectedShow, int expectedSeason, int expectedEpisode)
     {
         // Arrange
-        var parser = new TvEpisodeParser();
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.TvShowSourceDirectory}\{filename}"); 
 
         // Act
-        var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); 
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
@@ -83,12 +95,11 @@ public class TvEpisodeParserTests
     public void Parse_WithYearInParenthesesPattern_ShouldReturnCorrectTvEpisode(string filename, string expectedShow, int expectedSeason, int expectedEpisode, int expectedYear)
     {
         // Arrange
-        var parser = new TvEpisodeParser();
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.TvShowSourceDirectory}\{filename}"); 
 
         // Act
-        var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); 
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid);
@@ -107,12 +118,11 @@ public class TvEpisodeParserTests
     public void Parse_WithInvalidFormat_ShouldReturnInvalidTvEpisode(string filename)
     {
         // Arrange
-        var parser = new TvEpisodeParser();
+        var mockFileSystem = new MockFileSystem();
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.TvShowSourceDirectory}\{filename}"); 
 
         // Act
-        var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\source\{filename}"); 
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.False(result.IsValid);
@@ -124,11 +134,8 @@ public class TvEpisodeParserTests
     [InlineData("Game of Thrones (2011) S01E01.avi")]
     public void CanParse_WithValidTvShowFormat_ShouldReturnTrue(string filename)
     {
-        // Arrange
-        var parser = new TvEpisodeParser();
-
         // Act
-        var canParse = parser.CanParse(filename);
+        var canParse = _sut.CanParse(filename);
 
         // Assert
         Assert.True(canParse);
@@ -140,11 +147,8 @@ public class TvEpisodeParserTests
     [InlineData("")]
     public void CanParse_WithInvalidFormat_ShouldReturnFalse(string filename)
     {
-        // Arrange
-        var parser = new TvEpisodeParser();
-
         // Act
-        var canParse = parser.CanParse(filename);
+        var canParse = _sut.CanParse(filename);
 
         // Assert
         Assert.False(canParse);
@@ -154,17 +158,15 @@ public class TvEpisodeParserTests
     public void Parse_WithSpacedSxxExxWithTitlePattern_ShouldParseCorrectly()
     {
         // Arrange
-        var parser = new TvEpisodeParser();
-        var realFilePath = @"C:\Videos\TV Programmes\Its Always Sunny in Philadelphia S17E08 The Golden Bachelor Live 1080p AMZN WEB-DL DDP5 1 H 264-FLUX[EZTVx.to].mkv";
-
-        // Act - Use mock file system for testing, but with the real filename
+        var filename = "Its Always Sunny in Philadelphia S17E08 The Golden Bachelor Live 1080p AMZN WEB-DL DDP5 1 H 264-FLUX[EZTVx.to].mkv";
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New(realFilePath);
-        var result = parser.Parse(fileInfo);
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.TvShowSourceDirectory}\{filename}");
+
+        // Act
+        var result = _sut.Parse(fileInfo);
 
         // Debug output to understand what's happening
-        var filename = fileInfo.Name;
-        var canParse = parser.CanParse(filename);
+        var canParse = _sut.CanParse(filename);
         
         // Output debug information
         var tvShow = Assert.IsType<TvEpisode>(result);
@@ -192,11 +194,10 @@ public class TvEpisodeParserTests
     public void CanParse_WithSpacedSxxExxWithTitlePattern_ShouldReturnTrue()
     {
         // Arrange
-        var parser = new TvEpisodeParser();
         var filename = "Its Always Sunny in Philadelphia S17E08 The Golden Bachelor Live 1080p AMZN WEB-DL DDP5 1 H 264-FLUX[EZTVx.to].mkv";
 
         // Act
-        var canParse = parser.CanParse(filename);
+        var canParse = _sut.CanParse(filename);
 
         // Assert - Using the SpacedSxxExxWithTitlePattern
         Assert.True(canParse, "Should be able to identify episode format with SpacedSxxExxWithTitlePattern");
@@ -206,12 +207,11 @@ public class TvEpisodeParserTests
     public void Parse_WithDashedSxxExxWithTitlePattern_ShouldParseCorrectly()
     {
         // Arrange
-        var parser = new TvEpisodeParser();
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New(@"C:\source\The Mandalorian - S02E02 - Chapter 10 The Passenger.mkv");
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.TvShowSourceDirectory}\The Mandalorian - S02E02 - Chapter 10 The Passenger.mkv");
 
         // Act
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid, "Should be able to parse dashed SxxExx format with title");
@@ -226,11 +226,10 @@ public class TvEpisodeParserTests
     public void CanParse_WithDashedSxxExxWithTitlePattern_ShouldReturnTrue()
     {
         // Arrange
-        var parser = new TvEpisodeParser();
         var filename = "The Mandalorian - S02E02 - Chapter 10 The Passenger.mkv";
 
         // Act
-        var canParse = parser.CanParse(filename);
+        var canParse = _sut.CanParse(filename);
 
         // Assert
         Assert.True(canParse, "Should be able to identify dashed SxxExx format with title");
@@ -240,17 +239,15 @@ public class TvEpisodeParserTests
     public void Parse_WithSpacedSxxExxWithQualityPattern_ShouldParseCorrectly()
     {
         // Arrange
-        var parser = new TvEpisodeParser();
-        var realFilePath = @"C:\Videos\TV Programmes\The Sandman\Season 2\The Sandman S02E07 1080p.mkv";
-
-        // Act - Use mock file system for testing, but with the real filename
+        var filename = "The Sandman S02E07 1080p.mkv";
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New(realFilePath);
-        var result = parser.Parse(fileInfo);
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.TvShowSourceDirectory}\{filename}");
+
+        // Act
+        var result = _sut.Parse(fileInfo);
 
         // Debug output to understand what's happening
-        var filename = fileInfo.Name;
-        var canParse = parser.CanParse(filename);
+        var canParse = _sut.CanParse(filename);
         
         // Output debug information
         var tvShow = Assert.IsType<TvEpisode>(result);
@@ -278,11 +275,10 @@ public class TvEpisodeParserTests
     public void CanParse_WithSpacedSxxExxWithQualityPattern_ShouldReturnTrue()
     {
         // Arrange
-        var parser = new TvEpisodeParser();
         var filename = "The Sandman S02E07 1080p.mkv";
 
         // Act
-        var canParse = parser.CanParse(filename);
+        var canParse = _sut.CanParse(filename);
 
         // Assert
         Assert.True(canParse, "Should be able to identify SpacedSxxExxWithQualityPattern format");
@@ -292,11 +288,10 @@ public class TvEpisodeParserTests
     public void CanParse_WithDashedSxxExxPattern_ShouldReturnTrue()
     {
         // Arrange
-        var parser = new TvEpisodeParser();
         var filename = "Breaking Bad - S01E01.mkv";
 
         // Act
-        var canParse = parser.CanParse(filename);
+        var canParse = _sut.CanParse(filename);
 
         // Assert
         Assert.True(canParse, "Should be able to identify DashedSxxExxPattern format");
@@ -306,12 +301,11 @@ public class TvEpisodeParserTests
     public void Parse_WithDashedSxxExxPattern_ShouldParseCorrectly()
     {
         // Arrange
-        var parser = new TvEpisodeParser();
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New(@"C:\Videos\TV Programmes\Breaking Bad\Season 1\Breaking Bad - S01E01.mkv");
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.TvShowSourceDirectory}\Breaking Bad - S01E01.mkv");
 
         // Act
-        var result = parser.Parse(fileInfo);
+        var result = _sut.Parse(fileInfo);
 
         // Assert
         Assert.True(result.IsValid, "Should be able to parse DashedSxxExxPattern");
@@ -327,11 +321,10 @@ public class TvEpisodeParserTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var testFile = mockFileSystem.FileInfo.New(@"C:\Test\The Lord of the Rings The Rings of Power - S01E01 S01E01 - A Shadow of the Past.avi");
-        var parser = new TvEpisodeParser();
+        var testFile = mockFileSystem.FileInfo.New($@"{_settings.TvShowSourceDirectory}\The Lord of the Rings The Rings of Power - S01E01 S01E01 - A Shadow of the Past.avi");
 
         // Act
-        var result = parser.Parse(testFile);
+        var result = _sut.Parse(testFile);
 
         // Assert
         Assert.True(result.IsValid, "Should be able to parse repeated SxxExx pattern");
@@ -346,11 +339,10 @@ public class TvEpisodeParserTests
     public void CanParse_WithRepeatedSxxExxPattern_ShouldReturnTrue()
     {
         // Arrange
-        var parser = new TvEpisodeParser();
         var filename = "The Lord of the Rings The Rings of Power - S01E01 S01E01 - A Shadow of the Past.avi";
 
         // Act
-        var canParse = parser.CanParse(filename);
+        var canParse = _sut.CanParse(filename);
 
         // Assert
         Assert.True(canParse, "Should be able to identify repeated SxxExx pattern format");

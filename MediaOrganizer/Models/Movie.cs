@@ -9,6 +9,9 @@ namespace MediaOrganizer.Models;
 /// </summary>
 public class Movie : IMediaFile
 {
+    private string _title = string.Empty;
+    private string _quality = string.Empty;
+
     /// <summary>
     /// Valid placeholders that can be used in path templates for movies
     /// </summary>
@@ -16,8 +19,6 @@ public class Movie : IMediaFile
     {
         "Title", "Year", "Quality"
     };
-
-    private string _title = string.Empty;
     public string Title
     {
         get => _title;
@@ -28,10 +29,7 @@ public class Movie : IMediaFile
                 : value;
         }
     }
-
     public int? Year { get; internal set; }
-
-    private string _quality = string.Empty;
     public string Quality
     {
         get => _quality;
@@ -42,18 +40,22 @@ public class Movie : IMediaFile
                 : value;
         }
     }
-
-    public string OriginalFilePath { get; init; }
-
-    public string CurrentFilePath { get; set; } 
-
+    public string OriginalFilePath { get; }
+    public string OriginalFileRelativePath { get; }
+    public string CurrentFilePath { get; private set; } 
     public MediaType Type => MediaType.Movie;
 
-    public Movie(IFileInfo fileInfo)
+    public Movie(IFileInfo fileInfo, string movieSourceDirectory)
     {
+        if (!fileInfo.FullName.StartsWith(movieSourceDirectory, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException($"File '{fileInfo.FullName}' is not within the configured source directory '{movieSourceDirectory}'.");
+        }
+
         OriginalFilePath = fileInfo.FullName;
         CurrentFilePath = fileInfo.FullName;
-        //TODO: save also relative path
+
+        OriginalFileRelativePath = Path.GetRelativePath(movieSourceDirectory, fileInfo.FullName);
     }
 
     public bool IsValid => !string.IsNullOrWhiteSpace(Title);

@@ -1,12 +1,26 @@
 using System.IO.Abstractions.TestingHelpers;
+using MediaOrganizer.Configuration;
 using MediaOrganizer.Models;
 using MediaOrganizer.Services;
+using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Tests.Services;
 
 public class MovieParserTests
 {
-    private readonly MovieParser _sut = new();
+    private MovieParser _sut;
+    private readonly MediaOrganizerSettings _settings;
+
+    public MovieParserTests()
+    {
+        _settings = new MediaOrganizerSettings
+        {
+            MovieSourceDirectory = @"C:\movies",
+            MovieDestinationDirectory = @"C:\movies",
+        };
+        var options = Options.Create(_settings);
+        _sut = new MovieParser(options);
+    }
 
     [Theory]
     [InlineData("The Matrix 1999 1080p BluRay.mkv", true)]
@@ -39,7 +53,7 @@ public class MovieParserTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.MovieSourceDirectory}\{filename}");
 
         // Act
         var result = _sut.Parse(fileInfo);
@@ -63,7 +77,7 @@ public class MovieParserTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.MovieSourceDirectory}\{filename}");
 
         // Act
         var result = _sut.Parse(fileInfo);
@@ -85,7 +99,7 @@ public class MovieParserTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.MovieSourceDirectory}\{filename}");
 
         // Act
         var result = _sut.Parse(fileInfo);
@@ -112,7 +126,7 @@ public class MovieParserTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.MovieSourceDirectory}\{filename}");
 
         // Act
         var result = _sut.Parse(fileInfo);
@@ -135,7 +149,7 @@ public class MovieParserTests
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.MovieSourceDirectory}\{filename}");
 
         // Act
         var result = _sut.Parse(fileInfo);
@@ -149,13 +163,25 @@ public class MovieParserTests
     }
 
     [Theory]
-    // [InlineData("Bram.Stokers.Dracula.1992.RM4k.1080p.BluRay.x265.hevc.10bit.AAC.7.1.commentary-HeVK.mkv", "Bram Stokers Dracula", 1992, "1080p")]
-    [InlineData("Thunderbolts.2025.Proper.1080p.WEB-DL.DDP5.1.x265-NeoNoir.mkv", "Thunderbolts", 2025, "1080p")]
-    public void Parse_ComplexDotsReleaseFormat_ShouldReturnCorrectMovie(string filename, string expectedTitle, int expectedYear, string expectedQuality)
+    [InlineData(
+        "Bram.Stokers.Dracula.1992.RM4k.1080p.BluRay.x265.hevc.10bit.AAC.7.1.commentary-HeVK.mkv",
+        "Bram Stokers Dracula",
+        1992,
+        "1080p")]
+    [InlineData(
+        "Thunderbolts.2025.Proper.1080p.WEB-DL.DDP5.1.x265-NeoNoir.mkv",
+        "Thunderbolts",
+        2025,
+        "1080p")]
+    public void Parse_ComplexDotsReleaseFormat_ShouldReturnCorrectMovie(
+        string filename,
+        string expectedTitle,
+        int expectedYear,
+        string expectedQuality)
     {
         // Arrange
         var mockFileSystem = new MockFileSystem();
-        var fileInfo = mockFileSystem.FileInfo.New($@"C:\movies\{filename}");
+        var fileInfo = mockFileSystem.FileInfo.New($@"{_settings.MovieSourceDirectory}\{filename}");
 
         // Act
         var result = _sut.Parse(fileInfo);

@@ -1,7 +1,9 @@
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
+using MediaOrganizer.Configuration;
 using MediaOrganizer.Models;
 using MediaOrganizer.Utils;
+using Microsoft.Extensions.Options;
 
 namespace MediaOrganizer.Services;
 
@@ -42,6 +44,13 @@ public partial class MovieParser : IMediaFileParser
         TitleOnlyPattern()
     ];
 
+    private readonly MediaOrganizerSettings _settings;
+
+    public MovieParser(IOptions<MediaOrganizerSettings> settings)
+    {
+        _settings = settings.Value;
+    }
+
     public bool CanParse(string filename)
     {
         if (string.IsNullOrWhiteSpace(filename))
@@ -78,7 +87,7 @@ public partial class MovieParser : IMediaFileParser
                 ? match.Groups["quality"].Value
                 : string.Empty;
 
-            return new Movie(fileInfo)
+            return new Movie(fileInfo, _settings.MovieSourceDirectory)
             {
                 Title = title,
                 Year = year,
@@ -86,7 +95,7 @@ public partial class MovieParser : IMediaFileParser
             };
         }
 
-        return new Movie(fileInfo);
+        return new Movie(fileInfo, _settings.MovieSourceDirectory);
     }
 
     private static string ExtractAndCleanTitle(string rawTitle)

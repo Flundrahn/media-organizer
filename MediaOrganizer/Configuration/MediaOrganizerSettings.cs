@@ -92,7 +92,7 @@ public class MediaOrganizerSettings
     /// <summary>
     /// When true, automatically removes empty directories after finishing OrganizeFiles operation.
     /// Only removes directories that become empty as a result of the file organization process.
-    /// Note: Directory cleanup can also be run manually through the application menu.
+    /// Directory cleanup can also be run manually through the application menu.
     /// </summary>
     public bool AutoCleanupEmptyDirectories { get; set; } = false;
 

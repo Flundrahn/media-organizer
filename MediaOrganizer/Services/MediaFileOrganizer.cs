@@ -31,7 +31,6 @@ public class MediaFileOrganizer
 
     internal MediaFileOrganizer(
         IFileSystem fileSystem,
-        // NOTE: Investigate how logger injected from subclass works
         ILogger<MediaFileOrganizer> logger,
         IMediaFileParser parser,
         IOptions<MediaOrganizerSettings> settings,

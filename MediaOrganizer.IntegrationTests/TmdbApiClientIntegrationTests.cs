@@ -27,7 +27,7 @@ public class TmdbApiClientIntegrationTests
     }
 
     [Fact]
-    public async Task SearchTvShowAsync_ForValidShowName_ReturnsResults()
+    public async Task SearchTvShowAsync_ForValidShowName_FindsTvShow()
     {
         // Act
         var result = await _apiClient.SearchTvShowAsync("Breaking Bad");
@@ -38,6 +38,21 @@ public class TmdbApiClientIntegrationTests
         Assert.NotEmpty(result.Results);
         Assert.NotNull(result.Results[0].Name);
         Assert.Contains("Breaking Bad", result.Results[0].Name, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task SearchTvShowAsync_ForValidShowNameWhereSpecialCharacterWasStripped_FindsTvShow()
+    {
+        // Act
+        var result = await _apiClient.SearchTvShowAsync("Its Always Sunny in Philadelphia");
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(result.Results);
+        Assert.NotEmpty(result.Results);
+        Assert.NotNull(result.Results[0].Name);
+        // The returned name contains the apostrophe
+        Assert.Contains("It's Always Sunny in Philadelphia", result.Results[0].Name, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

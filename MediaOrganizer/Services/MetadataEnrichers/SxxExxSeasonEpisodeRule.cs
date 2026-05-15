@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace MediaOrganizer.Services.MetadataEnrichers;
 
@@ -14,17 +15,16 @@ public partial class SxxExxSeasonEpisodeRule : IExtractionRule
 
     public string Name => nameof(SxxExxSeasonEpisodeRule);
 
-    public bool TryExtract(string filePath, out RuleMatch match)
+    public bool TryExtract(string filePath, [NotNullWhen(true)] out RuleMatch? match)
     {
         var matches = Pattern().Matches(filePath);
-        
+
         if (matches.Count == 0)
         {
-            match = new RuleMatch { RuleName = Name };
+            match = null;
             return false;
         }
 
-        // Extract unique season/episode combinations
         var uniqueMatches = matches
             .Select(m => new
             {
@@ -36,7 +36,7 @@ public partial class SxxExxSeasonEpisodeRule : IExtractionRule
 
         if (uniqueMatches.Count == 0)
         {
-            match = new RuleMatch { RuleName = Name };
+            match = null;
             return false;
         }
 

@@ -30,10 +30,11 @@ public class SxxExxSeasonEpisodeRuleTests
         var sut = new SxxExxSeasonEpisodeRule();
 
         // Act
-        var result = sut.TryExtract(filePath, out RuleMatch match);
+        var result = sut.TryExtract(filePath, out var match);
 
         // Assert
         Assert.True(result);
+        Assert.NotNull(match);
         Assert.Equal(expectedSeason, match.SeasonNumber); 
         Assert.Equal(expectedEpisode, match.EpisodeNumber); 
     }
@@ -57,12 +58,11 @@ public class SxxExxSeasonEpisodeRuleTests
         var sut = new SxxExxSeasonEpisodeRule();
 
         // Act
-        var result = sut.TryExtract(filePath, out RuleMatch match);
+        var result = sut.TryExtract(filePath, out var match);
 
         // Assert
         Assert.False(result);
-        Assert.Null(match.SeasonNumber);
-        Assert.Null(match.EpisodeNumber);
+        Assert.Null(match);
     }
 
     [Theory]
@@ -77,10 +77,11 @@ public class SxxExxSeasonEpisodeRuleTests
         var sut = new SxxExxSeasonEpisodeRule();
 
         // Act
-        var result = sut.TryExtract(filePath, out RuleMatch match);
+        var result = sut.TryExtract(filePath, out var match);
 
         // Assert
         Assert.True(result);
+        Assert.NotNull(match);
         Assert.Equal(expectedSeason, match.SeasonNumber);
         Assert.Equal(expectedEpisode, match.EpisodeNumber);
         Assert.Equal(expectedConfidence, match.Confidence);
@@ -94,14 +95,17 @@ public class SxxExxSeasonEpisodeRuleTests
 
         // Act & Assert - all should match
         Assert.True(sut.TryExtract("show.s02e13.mkv", out var match1));
+        Assert.NotNull(match1);
         Assert.Equal(2, match1.SeasonNumber);
         Assert.Equal(13, match1.EpisodeNumber);
 
         Assert.True(sut.TryExtract("show.S02E13.mkv", out var match2));
+        Assert.NotNull(match2);
         Assert.Equal(2, match2.SeasonNumber);
         Assert.Equal(13, match2.EpisodeNumber);
 
         Assert.True(sut.TryExtract("show.S02e13.mkv", out var match3));
+        Assert.NotNull(match3);
         Assert.Equal(2, match3.SeasonNumber);
         Assert.Equal(13, match3.EpisodeNumber);
     }
@@ -116,6 +120,7 @@ public class SxxExxSeasonEpisodeRuleTests
         sut.TryExtract("show.S02E13.mkv", out var match);
 
         // Assert
+        Assert.NotNull(match);
         Assert.Equal(nameof(SxxExxSeasonEpisodeRule), match.RuleName);
     }
 }

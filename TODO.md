@@ -16,11 +16,11 @@ FEATURE: Enrich with metadata from The Movie Database (TMDB) API and use that in
         - [x] Define interface for enrichment.
         - [x] Add class that uses api client to enrich TvEpisode objects with info from TMDB api
         - [x] Implement batch processing for TMDB api enricher
-        - [ ] Add class that enriches tv show objects with info from file path. Copy and use same regex from old TvEpisodeParser but we will now only show name, season number, episode number.
+        - [ ] Add class FilePathTvEpisodeEnricher. Use same regex from old TvEpisodeParser but we will now only show name, season number, episode number.
         - [ ] Add class TvEpisodeParser2, will be able to use multiple enrichers in order to add and improve info of a TvEpisode object
     - [ ] Use TvEpisodeParser2 in media organizer classes instead of old parser.
 
-### Notes : FilePathTvEpisodeEnricher
+### WORKING NOTES: FilePathTvEpisodeEnricher
 
 Use some type of regex based engine internally to handle extraction of
 - show name, well enough that it is searchable in TMDB
@@ -28,13 +28,28 @@ Use some type of regex based engine internally to handle extraction of
 - episode number
 
 This will support some patterns of filepath, but not all
-This will support some patterns of filename, but not all
+ 
+The.Glades.S03E07.720p.WEB-DL.DD5.1.H.264-KiNGS	The Glades
 
-### Notes : TmdbApiTvEpisodeEnricher
+{ShowName}/{SeasonNr}/{FileName}
+{ShowName}/{SeasonEpisode_FileName}
+{ShowName_SeasonEpisode_FileName}
+
+- Looks like I was workinng on new class ShowNameBeforeSeasonFolderRule. Unclear if this is still how I would solve it.
+- There is an interface IExtractionRule.
+- added ShowNameCleaner
+- added better impl of TryDo pattern in SxxExxSeasonEpisodeRule to handle nulls
+- added big new file of tests for FilePathTvEpisodeEnricher, with cases in txt file too
+- added more unity tests in ShowNameBeforeSeasonFolderRuleTests and for ShowNameCleaner that I don't know how use yet
+- yesterday added tests SeparatorRegexTests, don't belong to current logic.
+
+### WORKING NOTES: TmdbApiTvEpisodeEnricher
+
 - add handling, if multiple results for show search, should return some type of result where user can choose which is the correct one
 - meaning a result with show candidates
 
 ## Priority Features 
+
 Do these first since will affect and help how solve the cricital issues below
 
 - [ ] Add DB SQLite and ORM
@@ -45,11 +60,13 @@ Do these first since will affect and help how solve the cricital issues below
     - Refactor to use extractor get quality from files
 
 ## Critical Issues
+
 - [ ] **Problem: does not move auxiliary files along with main video for movie or tv show** - Core functionality gap - Possibly this would be easier if we store actual show and movie metadata in DB or corresponding.
 - [ ] **Problem: does not rename subtitle files along with corresponding video file** - Related to above, possibly wait if will add DB anyway.
 - [ ] **Problem: does not use the full path when organizing media** if do not have say title, season or episode in file name will not find it - Core functionality issue
 
 ## Core Improvements
+
 - [ ] **File organization/moving: Strategy pattern for different organization methods** - Architecture improvement
 - [ ] **Feature: cleanup jpg and nfo (and txt?) files** - Extends existing cleanup feature
 - [ ] Kodi NFO file generation and reading. Seems to exist one format for movie and another for tv episode
@@ -60,9 +77,11 @@ Do these first since will affect and help how solve the cricital issues below
     - [ ] Feature to enable generating nfo files
 
 ## Documentation & DevEx
+
 - [ ] **Add smooth build and publish setup, maybe checkout GitHub actions and release**
 
 ## Refactoring & Architecture
+
 - [ ] **Possibly refactor MediaOrganizerService into Program.cs** - Separate UI from logic
 - [ ] **Add quality to TvEpisode and parser** - Feature enhancement
 - [ ] **DRY double validation TvShow and movie model** - Code quality. UPDATE don't completely remember what was about. May have already fixed, remove later if fixed or is obsolete TODO.
@@ -70,9 +89,11 @@ Do these first since will affect and help how solve the cricital issues below
 ## Nice to Have
 
 ### UI
+
 - [ ] **Use microsoft package for console options that can display usage and so on** - Better CLI UX
 
 ### Core Features
+
 - [ ] Batch operations with progress tracking
 - [ ] Undo operations for file moves
 - [ ] Duplicate file detection and handling
@@ -82,17 +103,20 @@ Do these first since will affect and help how solve the cricital issues below
 - [ ] Feature to submit failed files, along with exception or other info. Could use to put a micro service in cloud, nice practice. Could use to submit new patterns to strengthen the algorithm in FilePathTvEpisodeEnricher.
 
 ### Enhanced User Experience
+
 - [ ] File preview/details view with metadata
 - [ ] Filtering options (by size, date, extension)
 - [ ] Recent operations history
 - [ ] Default to destination folders same as source - unless specified
 
 ### Advanced Features
+
 - [ ] Metadata extraction (resolution, duration, codec info)
 - [ ] Async operations for better responsiveness
 - [ ] Add DB to keep state of media directories. Can validate files are where last was. Can have events NewTvShowAdded to decouple handler. Then use API to fetch metadata including episode names, that way can keep all info without storing it in names of shows as now.
 
 ### Optimizing C#
+
 - [ ] Figure out when useful to do ConfigureAwait(false) or not
 - [ ] Possibly remove usage of TMDbLib and create own client
 - [ ] Add caching of Tv Show searches for TMDB API
@@ -102,22 +126,26 @@ Do these first since will affect and help how solve the cricital issues below
     let's get functionality working first, then think about changes for batching
 
 ### Configuration & Automation
+
 - [ ] Export/import settings profiles
 - [ ] Command-line arguments support for automation
 - [ ] Watch folders for automatic processing
 - [ ] Scheduled operations
 
 ### Platform & Integration
+
 - [ ] GUI version (WPF/MAUI)
 - [ ] Web interface for remote management
 - [ ] Portable/standalone version
 
 ## Known Issues
+
 - [ ] Console input issues when input is redirected (app hangs with piped input or automation)
 - [ ] Large directory scanning may be slow
 - [ ] No graceful handling of locked files
 
 ## Done 
+
 - [x] Configuration loading from appsettings.json
 - [x] File system validation with proper error reporting
 - [x] Interactive main menu with file count display

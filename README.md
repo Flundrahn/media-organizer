@@ -34,7 +34,9 @@ dotnet build
 
 Run the application:
 ```bash
-dotnet run --project MediaOrganizer
+# TODO: update when fixed appsettings according to default .NET pattern
+cd MediaOrganized # run from app src folder to use included appsettings
+dotnet run
 ```
 
 Navigate through the interactive menu to:

@@ -91,6 +91,7 @@ Do these first since will affect and help how solve the cricital issues below
 ### UI
 
 - [ ] **Use microsoft package for console options that can display usage and so on** - Better CLI UX
+- [ ] If cleanup empty folders and there are none report with INFO
 
 ### Core Features
 
@@ -131,6 +132,7 @@ Do these first since will affect and help how solve the cricital issues below
 - [ ] Command-line arguments support for automation
 - [ ] Watch folders for automatic processing
 - [ ] Scheduled operations
+- [ ] Simplify appsettings/options so if destination is empty it defaults to source
 
 ### Platform & Integration
 
